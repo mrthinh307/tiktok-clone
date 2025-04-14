@@ -2,7 +2,7 @@ import Header from './Header';
 
 function HeaderOnly({ children }) {
     return (
-        <div className="container">
+        <div>
             <Header />
             <div className="content">{children}</div>
         </div>
