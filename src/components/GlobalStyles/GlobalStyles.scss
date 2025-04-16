@@ -2,7 +2,8 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap');
 
 :root {
-    --primary: #fe2c55;
+    --primary-color: #fe2c55;
+    --text-color: rgb(22, 24, 35);
 }
 
 * {
@@ -23,4 +24,15 @@ body {
     // font-optical-sizing: auto;
     // font-style: normal;
     // font-variation-settings: 'wdth' 100;
+}
+
+button, input, [tabindex] {
+    outline: none;
+    border: none;
+    color: var(--text-color)
+}
+
+a[href] {
+    text-decoration: none;
+    color: var(--text-color)
 }
