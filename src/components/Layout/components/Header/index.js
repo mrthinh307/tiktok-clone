@@ -7,7 +7,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import styles from './Header.module.scss';
-import images from '~/assets/images/index';
+import { InboxIcon, MessageIcon, PlusIcon, DarkLogoIcon } from '~/assets/images/icons';
 
 const cx = classNames.bind(styles);
 
@@ -16,7 +16,7 @@ function Header() {
         <header className={cx('wrapper')}>
             <div className={cx('inner-content')}>
                 <div className={cx('logo')}>
-                    <img src={images.darkLogo} alt="logo" />
+                    <DarkLogoIcon className={cx('logo-icon')} />
                 </div>
                 <div className={cx('search')}>
                     <input placeholder="Seach" spellCheck={false} />
@@ -31,7 +31,24 @@ function Header() {
                         <FontAwesomeIcon icon={faMagnifyingGlass} />
                     </button>
                 </div>
-                <div className={cx('action')}></div>
+                <div className={cx('action')}>
+                    <a href="#" className={cx('action-upload')}>
+                        <PlusIcon className={cx('plus')} />
+                        <span>Upload</span>
+                    </a>
+                    <a href="#" className={cx('action-message')}>
+                        <MessageIcon className={cx('message')} />
+                    </a>
+                    <a href="#" className={cx('action-inbox')}>
+                        <InboxIcon className={cx('inbox')} />
+                    </a>
+                    <div className={cx('action-user')}>
+                        <img
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJDRALoJakgEuuuGmBvBi-eSbPMe5B9fSdtA&s"
+                            alt="user"
+                        />
+                    </div>
+                </div>
             </div>
         </header>
     );
