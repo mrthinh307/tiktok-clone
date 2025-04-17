@@ -2,3 +2,13 @@ export { ReactComponent as MessageIcon } from './message.svg'
 export { ReactComponent as InboxIcon } from './inbox.svg';
 export { ReactComponent as PlusIcon } from './plus.svg';
 export { ReactComponent as DarkLogoIcon } from './dark-logo.svg';
+export { ReactComponent as BlueTickIcon } from './tick.svg';
+export { ReactComponent as EllipsisIcon } from './ellipsis.svg';
+export { ReactComponent as ProfileIcon } from './profile.svg';
+export { ReactComponent as CoinIcon } from './coin.svg';
+export { ReactComponent as CreatorIcon } from './creator.svg';
+export { ReactComponent as SettingIcon } from './setting.svg';
+export { ReactComponent as LanguageIcon } from './language.svg';
+export { ReactComponent as FeedbackIcon } from './feedback.svg';
+export { ReactComponent as DarkModeIcon } from './dark-mode.svg';
+export { ReactComponent as LogoutIcon } from './logout.svg';
