@@ -1,6 +1,5 @@
 .wrapper {
     --search-border-radius: 92px;
-    --search-hover-bg: rgba(22, 24, 35, 0.06);
     --search-height: 46px;
     --search-top-spacer: 9px;
     --search-button-width: 52px;
@@ -26,8 +25,12 @@
     display: flex;
 }
 
-.search {
+.search,
+.search-result {
     width: 500px;
+}
+
+.search {
     height: var(--search-height);
     padding: 12px 16px;
     padding-right: 0;
@@ -47,7 +50,7 @@
         line-height: 21px;
         padding: 0;
         background: transparent;
-        caret-color: var(--primary-color);;
+        caret-color: var(--primary-color);
 
         &::placeholder {
             font-weight: 500;
@@ -113,6 +116,15 @@
     }
 }
 
+.search-title {
+    height: 30px;
+    padding: 5px 12px;
+    font-size: 1.4rem;
+    line-height: 18px;
+    font-weight: 600;
+    color: rgba(22, 24, 35, 0.5);
+}
+
 .clear,
 .loading {
     position: absolute;
@@ -172,6 +184,7 @@
         align-items: center;
         justify-content: center;
         color: var(--text-color);
+        position: relative;
     }
 
     &-user {
@@ -180,12 +193,26 @@
         justify-content: center;
         align-items: center;
         cursor: pointer;
+        position: relative;
 
         img {
             border-radius: 50px;
             width: 100%;
         }
     }
+
+    // &-user::after, &-inbox::after {
+    //     content: '';
+    //     display: block;
+    //     width: 16px;
+    //     height: 16px;
+    //     position: absolute;
+    //     left: 50%;
+    //     top: 100%;
+    //     background: white;
+    //     transform: translateX(-50%) rotate(45deg);
+    //     box-shadow: -2px -2px 6px rgba(0,0,0,0.04);
+    // } 
 }
 
 .message {
@@ -197,3 +224,44 @@
     width: 22px;
     height: auto;
 }
+
+:global {
+    .tippy-box {
+        background-color: rgba(84, 84, 84, 0.92) !important;
+        color: rgb(255, 255, 255) !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        font-size: 1.6rem !important;
+        line-height: 21px;
+        padding: 1.5px 1px !important;
+
+        .tippy-arrow {
+            color: rgba(84, 84, 84, 0.92) !important;
+        }
+
+        &[data-placement^='bottom'] > .tippy-arrow:before {
+            top: -8px !important;
+        }
+    }
+}
+
+:global {
+    *::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background-color: rgba(22, 24, 35, 0.06);
+        border-radius: 8px;
+    }
+
+    *::-webkit-scrollbar-button {
+        display: none;
+    }
+}
+
+
