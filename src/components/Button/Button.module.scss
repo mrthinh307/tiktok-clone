@@ -1,30 +1,43 @@
 .wrapper {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 100px;
-    padding: 9px 16px;
-    border-radius: 4px;
+    font-family: 'TikTokText-Medium', sans-serif;
+    width: 100%;
+    padding: 10px 8px 10px 16px;
+    gap: 10px;
     font-size: 1.6rem;
-    font-weight: 700;
+    line-height: 21px;
+    display: flex;
+    align-items: center;
     cursor: pointer;
-    background-color: var(--white);
-    border: 1px solid transparent;
+    background-color: transparent;
     user-select: none;
 
-    + .wrapper {
-        margin-left: 8px;
+    span {
+        display: flex;
+        align-items: center;
+    }
+
+    .icon {
+        width: 20px !important;
+        height: 20px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    
+        svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
     }
 
     &.disabled {
         pointer-events: none;
         opacity: 0.5;
     }
-}
 
-.icon + .title,
-.title + .icon {
-    margin-left: 8px;
+    &:hover {
+        background: var(--search-hover-bg);
+    }
 }
 
 // Button types
@@ -43,6 +56,7 @@
     color: var(--white);
     background-color: var(--primary);
     border-color: var(--primary);
+    border-radius: 4px;
 
     &:hover {
         border-color: var(--primary);
@@ -70,8 +84,6 @@
         text-decoration: underline;
     }
 }
-
-// Disabled
 
 // Button sizes
 .small {
