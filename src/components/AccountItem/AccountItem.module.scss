@@ -1,0 +1,67 @@
+.wrapper {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 9px 16px;
+    cursor: pointer;
+    background: rgb(255, 255, 255);
+    gap: 12px;
+    position: relative;
+
+    &:hover {
+        background: var(--search-hover-bg);
+    }
+}
+
+.avatar {
+    width: 38.58px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.nickname {
+    font-size: 1.6rem;
+    font-weight: 600;
+    // ...
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    strong {
+        line-height: 21px;
+
+        & + .blue-tick {
+            margin-left: 4px;
+        }
+    }
+}
+
+.blue-tick {
+    width: 14px;
+    height: 14px;
+}
+
+.name {
+    font-size: 1.4rem;
+    line-height: 18px;
+    color: rgba(22, 24, 35, 0.5);
+    font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ellipsis {
+    position: absolute;
+    right: 24px;
+}

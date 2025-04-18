@@ -1,0 +1,40 @@
+.wrapper {
+    width: 100%;
+    max-height: min(-156px + 100vh, 734px);
+    min-height: 100px;
+    border-radius: 8px;
+    background: rgb(255, 255, 255);
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 2px 12px;
+    padding-top: 8px;
+    margin-bottom: 8px;
+    overflow: hidden auto;
+}
+
+.custom-tooltip {
+    max-height: 200px; // Chiều cao tối đa của tooltip
+    overflow: hidden; // Ẩn phần tràn bên ngoài
+}
+
+.scrollable-content {
+    max-height: 200px !important;
+    overflow-y: auto !important;
+    padding-right: 8px !important;
+
+    // Style thanh cuộn (hiệu ứng đẹp mắt)
+    scrollbar-width: thin !important; // Firefox
+    scrollbar-color: #999 #f0f0f0 !important; // Firefox
+
+    &::-webkit-scrollbar {
+        width: 6px !important;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f0f0f0 !important;
+        border-radius: 4px !important;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: #999 !important;
+        border-radius: 4px !important;
+    }
+}
