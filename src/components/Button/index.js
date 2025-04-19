@@ -12,8 +12,9 @@ function Button({
     text = false,
     rounded = false,
     disabled = false,
-    small = false,
-    large = false,
+    buttonSize = 'medium',
+    iconSize = 'small',
+    hoverType = 'background',
     children,
     className,
     leftIcon,
@@ -44,24 +45,35 @@ function Button({
         Comp = 'a';
     }
 
-    const classes = cx('wrapper', {
-        [className]: className,
-        primary,
-        outline,
-        text,
-        disabled,
-        rounded,
-        small,
-        large,
-    });
+    const classes = cx(
+        'wrapper',
+        `button-${buttonSize}`,
+        `hover-${hoverType}`,
+        {
+            [className]: className,
+            primary,
+            outline,
+            text,
+            disabled,
+            rounded,
+        },
+    );
 
     return (
         <Comp className={classes} {...props}>
-            {leftIcon && <span className={cx('icon')}>{leftIcon}</span>}
+            {leftIcon && (
+                <span className={cx('icon', `icon-${iconSize}`)}>
+                    {leftIcon}
+                </span>
+            )}
             <span className={cx('title')}>{children}</span>
-            {rightIcon && <span className={cx('icon')}>{rightIcon}</span>}
+            {rightIcon && (
+                <span className={cx('icon', `icon-${iconSize}`)}>
+                    {rightIcon}
+                </span>
+            )}
         </Comp>
     );
 }
 
-export default Button;  
+export default Button;
