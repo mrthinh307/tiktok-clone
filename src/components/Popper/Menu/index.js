@@ -6,7 +6,8 @@ import MenuItem from './MenuItem';
 
 const cx = classNames.bind(styles);
 
-function Menu({ children, items = [], className }) {
+function Menu({ children, items = [], className, ...props }) {
+    let hiddenDelayTime = props.hiddenDelayTime || 0;
     const itemsSize = items.length;
     const renderItems = () => {
         return items.map((item, index) => {
@@ -25,6 +26,7 @@ function Menu({ children, items = [], className }) {
     return (
         <HeadlessTippy
             interactive={true}
+            delay={[0, hiddenDelayTime]}
             animation={false}
             appendTo={() => document.body}
             placement="bottom-end"

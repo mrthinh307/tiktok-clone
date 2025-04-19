@@ -158,6 +158,7 @@ function Header() {
 
                     <Menu
                         items={USER_OPTIONS}
+                        hiddenDelayTime={700}
                     >
                         <div className={cx('action-user')}>
                             <img
