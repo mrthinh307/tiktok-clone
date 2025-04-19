@@ -6,23 +6,33 @@ import MenuItem from './MenuItem';
 
 const cx = classNames.bind(styles);
 
-function Menu({ children, items = [] }) {
+function Menu({ children, items = [], className }) {
+    const itemsSize = items.length;
     const renderItems = () => {
-        return items.map((item, index) => <MenuItem key={index} data={item} />);
+        return items.map((item, index) => {
+            return index !== itemsSize - 1 ? (
+                <MenuItem key={index} data={item} />
+            ) : (
+                <MenuItem
+                    key={index}
+                    data={item}
+                    className={cx('menu-item-separator')}
+                />
+            );
+        });
     };
 
     return (
         <HeadlessTippy
-                delay={
-                [0, 700]
-            } 
             interactive={true}
             animation={false}
             appendTo={() => document.body}
             placement="bottom-end"
             render={(attrs) => (
                 <div className={cx('menu-items')} tabIndex="-1" {...attrs}>
-                    <PopperWrapper className={cx('popper-wrapper')}>{renderItems()}</PopperWrapper>
+                    <PopperWrapper className={cx('popper-wrapper', className)}>
+                        {renderItems()}
+                    </PopperWrapper>
                 </div>
             )}
         >

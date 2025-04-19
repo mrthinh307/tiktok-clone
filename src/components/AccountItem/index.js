@@ -1,21 +1,30 @@
 import classNames from 'classnames/bind';
 import styles from './AccountItem.module.scss';
-import { BlueTickIcon, EllipsisIcon } from '~/assets/images/icons';
+import {
+    BlueTickIcon,
+    EllipsisIcon,
+    MarkIrrelevantIcon,
+    ReportIcon,
+} from '~/assets/images/icons';
 import Menu from '../Popper/Menu';
-import { ProfileIcon, CoinIcon } from '~/assets/images/icons';
+import {} from '~/assets/images/icons';
+import { createContext } from 'react';
+import { icon } from '@fortawesome/fontawesome-svg-core';
 
 const cx = classNames.bind(styles);
 
-const USER_OPTIONS = [
+const SEARCH_ACCOUNT_OPTIONS = [
     {
-        icon: <ProfileIcon />,
-        title: 'View profile',
+        icon: <ReportIcon />,
+        title: 'Report',
     },
     {
-        icon: <CoinIcon />,
-        title: 'Get coins',
+        icon: <MarkIrrelevantIcon />,
+        title: 'Mark as irrelevant',
     },
-]
+];
+
+export const ConfigureButtonContext = createContext();
 
 function AccountItem() {
     const examleImg =
@@ -31,7 +40,14 @@ function AccountItem() {
                 </p>
                 <p className={cx('name')}>Do Phung</p>
             </div>
-            <EllipsisIcon className={cx('ellipsis')} />
+            <ConfigureButtonContext.Provider value={{ buttonSize: 'small', iconSize: 'medium', hoverType: 'font'}}>
+                <Menu
+                    items={SEARCH_ACCOUNT_OPTIONS}
+                    className={cx('account-item-menu')}
+                >
+                    <EllipsisIcon className={cx('ellipsis')} />
+                </Menu>
+            </ConfigureButtonContext.Provider>
         </div>
     );
 }

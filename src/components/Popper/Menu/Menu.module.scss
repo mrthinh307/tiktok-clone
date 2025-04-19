@@ -1,8 +1,24 @@
 .menu-items {
     width: 223px;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .popper-wrapper {
     padding-bottom: 8px;
 }
 
+.menu-item-separator {
+    position: relative;
+}
+
+.menu-item-separator::before {
+    content: '';
+    width: 90%;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 1px;
+    background-color: rgba(22, 24, 35, 0.12);
+}

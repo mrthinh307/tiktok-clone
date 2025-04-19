@@ -12,3 +12,5 @@ export { ReactComponent as LanguageIcon } from './language.svg';
 export { ReactComponent as FeedbackIcon } from './feedback.svg';
 export { ReactComponent as DarkModeIcon } from './dark-mode.svg';
 export { ReactComponent as LogoutIcon } from './logout.svg';
+export { ReactComponent as ReportIcon } from './report.svg';
+export { ReactComponent as MarkIrrelevantIcon } from './mark-irrelevant.svg';

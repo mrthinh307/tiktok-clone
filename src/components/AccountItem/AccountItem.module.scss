@@ -64,4 +64,19 @@
 .ellipsis {
     position: absolute;
     right: 24px;
+    z-index: 5;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+        transform: scale(1.2);
+    }
 }
+
+.account-item-menu {
+    min-width: 150px;
+    width: 87%;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important; 
+    margin-bottom: 0px !important;
+}
+
