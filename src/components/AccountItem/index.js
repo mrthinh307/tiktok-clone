@@ -3,32 +3,16 @@ import styles from './AccountItem.module.scss';
 import {
     BlueTickIcon,
     EllipsisIcon,
-    MarkIrrelevantIcon,
-    ReportIcon,
 } from '~/assets/images/icons';
 import Menu from '../Popper/Menu';
 import {} from '~/assets/images/icons';
 import { createContext } from 'react';
+import {
+    SEARCH_ACCOUNT_BUTTON_PROPS,
+    SEARCH_ACCOUNT_OPTIONS,
+} from '~/constants/headerConstants';
 
 const cx = classNames.bind(styles);
-
-const SEARCH_ACCOUNT_OPTIONS = [
-    {
-        icon: <ReportIcon />,
-        title: 'Report',
-    },
-    {
-        icon: <MarkIrrelevantIcon />,
-        title: 'Mark as irrelevant',
-        seperate: true,
-    },
-];
-
-const SEARCH_ACCOUNT_BUTTON_PROPS = {
-    buttonSize: 'small',
-    iconSize: 'medium',
-    hoverType: 'font',
-};
 
 export const ConfigureButtonContext = createContext();
 
