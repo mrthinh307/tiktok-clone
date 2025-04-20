@@ -9,7 +9,6 @@ import {
 import Menu from '../Popper/Menu';
 import {} from '~/assets/images/icons';
 import { createContext } from 'react';
-import { icon } from '@fortawesome/fontawesome-svg-core';
 
 const cx = classNames.bind(styles);
 
@@ -21,8 +20,15 @@ const SEARCH_ACCOUNT_OPTIONS = [
     {
         icon: <MarkIrrelevantIcon />,
         title: 'Mark as irrelevant',
+        seperate: true,
     },
 ];
+
+const SEARCH_ACCOUNT_BUTTON_PROPS = {
+    buttonSize: 'small',
+    iconSize: 'medium',
+    hoverType: 'font',
+};
 
 export const ConfigureButtonContext = createContext();
 
@@ -40,14 +46,13 @@ function AccountItem() {
                 </p>
                 <p className={cx('name')}>Do Phung</p>
             </div>
-            <ConfigureButtonContext.Provider value={{ buttonSize: 'small', iconSize: 'medium', hoverType: 'font'}}>
-                <Menu
-                    items={SEARCH_ACCOUNT_OPTIONS}
-                    className={cx('account-item-menu')}
-                >
-                    <EllipsisIcon className={cx('ellipsis')} />
-                </Menu>
-            </ConfigureButtonContext.Provider>
+            <Menu
+                items={SEARCH_ACCOUNT_OPTIONS}
+                className={cx('account-item-menu')}
+                {...SEARCH_ACCOUNT_BUTTON_PROPS}
+            >
+                <EllipsisIcon className={cx('ellipsis')} />
+            </Menu>
         </div>
     );
 }
