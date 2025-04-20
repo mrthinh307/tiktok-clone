@@ -1,0 +1,1 @@
+export const DEBOUNCE_DELAY = 600; // 500ms

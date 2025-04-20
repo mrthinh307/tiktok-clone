@@ -5,11 +5,13 @@ import styles from './Search.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import AccountItem from '~/components/AccountItem';
 import { Wrapper as PopperWrapper } from '~/components/Popper';
+import { useDebounce } from '~/hooks';
 import {
     faCircleXmark,
     faMagnifyingGlass,
     faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
+import { DEBOUNCE_DELAY } from '~/constants/common';
 
 const cx = classNames.bind(styles);
 
@@ -18,6 +20,8 @@ function Search() {
     const [searchResult, setSearchResult] = useState([]);
     const [showResult, setShowResult] = useState(true);
     const [showLoading, setShowLoading] = useState(false);
+
+    const debounced = useDebounce(searchValue, DEBOUNCE_DELAY);
 
     useEffect(() => {
         if (!searchValue.trim()) {
@@ -29,7 +33,7 @@ function Search() {
 
         fetch(
             `https://tiktok.fullstack.edu.vn/api/users/search?q=${encodeURIComponent(
-                searchValue,
+                debounced,
             )}&type=less`,
         )
             .then((response) => response.json())
@@ -42,7 +46,8 @@ function Search() {
                 setSearchResult([]); // Clear results on error
                 console.error('Error fetching search results:', error);
             });
-    }, [searchValue]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [debounced]);
 
     const inputRef = useRef();
 
@@ -56,7 +61,7 @@ function Search() {
     return (
         <HeadlessTippy
             interactive={true}
-            visible={(searchResult.length > 0 && showResult)} 
+            visible={searchResult.length > 0 && showResult}
             appendTo={() => document.body}
             render={(attrs) => (
                 <div className={cx('search-result')} tabIndex="-1" {...attrs}>
