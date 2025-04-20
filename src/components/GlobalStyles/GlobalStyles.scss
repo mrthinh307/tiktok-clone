@@ -1,5 +1,4 @@
 @import 'normalize.css';
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap');
 
 @font-face {
     font-family: 'TikTokText-Regular';
@@ -22,6 +21,27 @@
     src: url(../../../src/assets/fonts/TikTokText-Bold.otf);
 }
 
+@font-face {
+    font-family: 'TikTokDisplay-Regular';
+    font-style: normal;
+    font-weight: 400;
+    src: url(../../../src/assets/fonts/TikTokDisplay-Regular.otf);
+}
+
+@font-face {
+    font-family: 'TikTokDisplay-Medium';
+    font-style: normal;
+    font-weight: 500;
+    src: url(../../../src/assets/fonts/TikTokDisplay-Medium.otf);
+}
+
+@font-face {
+    font-family: 'TikTokDisplay-Bold';
+    font-style: normal;
+    font-weight: 700;
+    src: url(../../../src/assets/fonts/TikTokDisplay-Bold.otf);
+}
+
 :root {
     --primary-color: #fe2c55;
     --text-color: rgb(22, 24, 35);
@@ -39,8 +59,7 @@ html {
 }
 
 body {
-    // font-family: 'IBM Plex Sans', sans-serif;
-    font-family: 'TikTokText-Regular', sans-serif;
+    font-family: 'TikTokText-Regular', 'TikTokDisplay-Regular', sans-serif;
     font-size: 1.6rem;
     line-height: 1.5;
     text-rendering: optimizeSpeed;
