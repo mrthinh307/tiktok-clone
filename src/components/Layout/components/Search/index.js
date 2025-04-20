@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import HeadlessTippy from '@tippyjs/react/headless';
 import classNames from 'classnames/bind';
 import styles from './Search.module.scss';
+
+import * as searchServies from '~/services/apiServices/searchService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import AccountItem from '~/components/AccountItem';
 import { Wrapper as PopperWrapper } from '~/components/Popper';
@@ -29,23 +31,16 @@ function Search() {
             return;
         }
 
-        setShowLoading(true);
+        const fetchApi = async () => {
+            setShowLoading(true);
 
-        fetch(
-            `https://tiktok.fullstack.edu.vn/api/users/search?q=${encodeURIComponent(
-                debounced,
-            )}&type=less`,
-        )
-            .then((response) => response.json())
-            .then((data) => {
-                setSearchResult(data.data); // Assuming the API returns an array of users in 'data.data'
-                setShowLoading(false);
-            })
-            .catch((error) => {
-                setShowLoading(false);
-                setSearchResult([]); // Clear results on error
-                console.error('Error fetching search results:', error);
-            });
+            const searchResult = await searchServies.search(debounced, 'more');
+            setSearchResult(searchResult);
+            
+            setShowLoading(false);
+        };
+
+        fetchApi();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debounced]);
 
@@ -61,7 +56,7 @@ function Search() {
     return (
         <HeadlessTippy
             interactive={true}
-            visible={searchResult.length > 0 && showResult}
+            visible={!!searchResult.length  && showResult}
             appendTo={() => document.body}
             render={(attrs) => (
                 <div className={cx('search-result')} tabIndex="-1" {...attrs}>
