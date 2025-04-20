@@ -17,35 +17,62 @@ function Search() {
     const [searchValue, setSearchValue] = useState('');
     const [searchResult, setSearchResult] = useState([]);
     const [showResult, setShowResult] = useState(true);
+    const [showLoading, setShowLoading] = useState(false);
 
     useEffect(() => {
-        setTimeout(() => {
-            setSearchResult([1, 2, 3]);
-        }, 0);
-    }, []);
+        if (!searchValue.trim()) {
+            setSearchResult([]);
+            return;
+        }
+
+        setShowLoading(true);
+
+        fetch(
+            `https://tiktok.fullstack.edu.vn/api/users/search?q=${encodeURIComponent(
+                searchValue,
+            )}&type=less`,
+        )
+            .then((response) => response.json())
+            .then((data) => {
+                setSearchResult(data.data); // Assuming the API returns an array of users in 'data.data'
+                setShowLoading(false);
+            })
+            .catch((error) => {
+                setShowLoading(false);
+                setSearchResult([]); // Clear results on error
+                console.error('Error fetching search results:', error);
+            });
+    }, [searchValue]);
 
     const inputRef = useRef();
 
     const handleClearInput = () => {
         setSearchValue('');
         setSearchResult([]);
-        setShowResult(false); 
+        setShowResult(false);
         inputRef.current.focus();
     };
 
     return (
         <HeadlessTippy
             interactive={true}
-            visible={searchResult.length > 0 && showResult}
+            visible={(searchResult.length > 0 && showResult)} 
             appendTo={() => document.body}
             render={(attrs) => (
                 <div className={cx('search-result')} tabIndex="-1" {...attrs}>
                     <PopperWrapper>
                         <h4 className={cx('search-title')}>Accounts</h4>
                         <div className={cx('accounts-list')}>
-                            <AccountItem />
-                            <AccountItem />
-                            <AccountItem />
+                            {searchResult.map((result) => (
+                                <AccountItem
+                                    key={result.id}
+                                    data={result}
+                                    onClick={() => {
+                                        setShowResult(false);
+                                        setSearchValue('');
+                                    }}
+                                />
+                            ))}
                         </div>
                     </PopperWrapper>
                 </div>
@@ -61,12 +88,17 @@ function Search() {
                     spellCheck={false}
                     onFocus={() => setShowResult(true)}
                 />
-                {!!searchValue.length > 0 && (
+                {!!searchValue.length > 0 && !showLoading && (
                     <button className={cx('clear')} onClick={handleClearInput}>
                         <FontAwesomeIcon icon={faCircleXmark} />
                     </button>
                 )}
-                <FontAwesomeIcon className={cx('loading')} icon={faSpinner} />
+                {showLoading && (
+                    <FontAwesomeIcon
+                        className={cx('loading')}
+                        icon={faSpinner}
+                    />
+                )}
 
                 <button className={cx('search-btn')}>
                     <FontAwesomeIcon icon={faMagnifyingGlass} />

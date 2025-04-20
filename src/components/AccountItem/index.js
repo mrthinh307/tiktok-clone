@@ -1,5 +1,6 @@
 import classNames from 'classnames/bind';
 import styles from './AccountItem.module.scss';
+import { Link } from 'react-router-dom';
 import {
     BlueTickIcon,
     EllipsisIcon,
@@ -16,19 +17,18 @@ const cx = classNames.bind(styles);
 
 export const ConfigureButtonContext = createContext();
 
-function AccountItem() {
-    const examleImg =
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJDRALoJakgEuuuGmBvBi-eSbPMe5B9fSdtA&s';
+function AccountItem({ data }) {
+
 
     return (
-        <div className={cx('wrapper')}>
-            <img className={cx('avatar')} src={examleImg} alt="Avatar" />
+        <Link to={`/@${data.nickname}`} className={cx('wrapper')}>
+            <img className={cx('avatar')} src={data.avatar} alt={data.full_name} />
             <div className={cx('info')}>
                 <p className={cx('nickname')}>
-                    <strong>mixigaming</strong>
-                    <BlueTickIcon className={cx('blue-tick')} />
+                    <strong>{data.nickname}</strong>
+                    {data.tick && <BlueTickIcon className={cx('blue-tick')} />}
                 </p>
-                <p className={cx('name')}>Do Phung</p>
+                <p className={cx('name')}>{data.full_name}</p>
             </div>
             <Menu
                 items={SEARCH_ACCOUNT_OPTIONS}
@@ -37,7 +37,7 @@ function AccountItem() {
             >
                 <EllipsisIcon className={cx('ellipsis')} />
             </Menu>
-        </div>
+        </Link>
     );
 }
 

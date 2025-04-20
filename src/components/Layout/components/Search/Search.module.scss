@@ -111,5 +111,16 @@
 }
 
 .loading {
-    display: none;
+    animation: spinner 1.4s linear infinite;
 }
+
+@keyframes spinner {
+    from {
+        transform: translateY(-50%)rotate(0deg);
+    }
+    to {
+        transform: translateY(-50%) rotate(360deg);
+    }
+}
+
+
