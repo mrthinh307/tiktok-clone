@@ -1,34 +1,42 @@
+import { useState, useRef, useEffect } from 'react';
 import HeadlessTippy from '@tippyjs/react/headless';
 import classNames from 'classnames/bind';
 import styles from './Search.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
 import AccountItem from '~/components/AccountItem';
 import { Wrapper as PopperWrapper } from '~/components/Popper';
 import {
     faCircleXmark,
     faMagnifyingGlass,
-    faSpinner, 
+    faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
 
 const cx = classNames.bind(styles);
 
 function Search() {
+    const [searchValue, setSearchValue] = useState('');
     const [searchResult, setSearchResult] = useState([]);
-    const [showResult, setShowResult] = useState(false);
+    const [showResult, setShowResult] = useState(true);
 
-    const handleHideResult = () => {
-        setShowResult(false);
-    };
+    useEffect(() => {
+        setTimeout(() => {
+            setSearchResult([1, 2, 3]);
+        }, 0);
+    }, []);
 
-    const handleInputFocus = () => {
-        setShowResult(true);
+    const inputRef = useRef();
+
+    const handleClearInput = () => {
+        setSearchValue('');
+        setSearchResult([]);
+        setShowResult(false); 
+        inputRef.current.focus();
     };
 
     return (
         <HeadlessTippy
             interactive={true}
-            visible={searchResult.length > 0 || showResult}
+            visible={searchResult.length > 0 && showResult}
             appendTo={() => document.body}
             render={(attrs) => (
                 <div className={cx('search-result')} tabIndex="-1" {...attrs}>
@@ -42,19 +50,22 @@ function Search() {
                     </PopperWrapper>
                 </div>
             )}
-            onClickOutside={handleHideResult}
+            onClickOutside={() => setShowResult(false)}
         >
             <div className={cx('search')}>
                 <input
-                    value={searchResult}
-                    onChange={(e) => setSearchResult(e.target.value)}
+                    ref={inputRef}
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
                     placeholder="Seach"
                     spellCheck={false}
-                    onFocus={handleInputFocus}
+                    onFocus={() => setShowResult(true)}
                 />
-                <button className={cx('clear')}>
-                    <FontAwesomeIcon icon={faCircleXmark} />
-                </button>
+                {!!searchValue.length > 0 && (
+                    <button className={cx('clear')} onClick={handleClearInput}>
+                        <FontAwesomeIcon icon={faCircleXmark} />
+                    </button>
+                )}
                 <FontAwesomeIcon className={cx('loading')} icon={faSpinner} />
 
                 <button className={cx('search-btn')}>
