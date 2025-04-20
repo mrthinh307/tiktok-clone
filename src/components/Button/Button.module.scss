@@ -1,18 +1,23 @@
 .wrapper {
     font-family: 'TikTokText-Medium', sans-serif;
+    font-weight: 400;
     width: 100%;
     gap: 10px;
-    font-size: 1.6rem;
-    line-height: 21px;
     display: flex;
     align-items: center;
     cursor: pointer;
     background-color: transparent;
     user-select: none;
 
-    span {
-        display: flex;
-        align-items: center;
+    .title {
+        font-size: 1.6rem;
+        line-height: 21px;
+
+        &.title-small {
+            font-size: 1.4rem;
+            line-height: 18px;
+            margin-left: 8px;
+        }
     }
 
     .icon {
@@ -46,6 +51,29 @@
         pointer-events: none;
         opacity: 0.5;
     }
+}
+
+// Button sizes
+.button-small {
+    padding: 12px 12px;
+}
+
+.button-medium {
+    padding: 10px 8px 10px 16px;
+}
+
+.button-large {
+    padding: 14px 16px;
+    min-width: 140px;
+}
+
+// Button hover types
+.hover-background:hover {
+    background: var(--search-hover-bg);
+}
+
+.hover-font:hover {
+    color: var(--primary-color);
 }
 
 // Button types
@@ -93,25 +121,15 @@
     }
 }
 
-// Button sizes
-.button-small {
-    padding: 12px 12px;
+// Font types
+.font-regular {
+    font-family: 'TikTokText-Regular', sans-serif;
 }
 
-.button-medium {
-    padding: 10px 8px 10px 16px;
+.font-medium {
+    font-family: 'TikTokText-Medium', sans-serif;
 }
 
-.button-large {
-    padding: 14px 16px;
-    min-width: 140px;
-}
-
-// Button hover types
-.hover-background:hover {
-    background: var(--search-hover-bg);
-}
-
-.hover-font:hover {
-    color: var(--primary-color);
+.font-bold {
+    font-family: 'TikTokText-Bold', sans-serif;
 }

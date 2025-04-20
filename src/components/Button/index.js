@@ -12,9 +12,11 @@ function Button({
     text = false,
     rounded = false,
     disabled = false,
-    buttonSize = 'medium',
-    iconSize = 'small',
-    hoverType = 'background',
+    buttonSize,
+    iconSize,
+    titleSize,
+    hoverType,
+    fontType,
     children,
     className,
     leftIcon,
@@ -49,6 +51,7 @@ function Button({
         'wrapper',
         `button-${buttonSize}`,
         `hover-${hoverType}`,
+        `font-${fontType}`,
         {
             [className]: className,
             primary,
@@ -66,7 +69,7 @@ function Button({
                     {leftIcon}
                 </span>
             )}
-            <span className={cx('title')}>{children}</span>
+            <span className={cx('title', `title-${titleSize}`)}>{children}</span>
             {rightIcon && (
                 <span className={cx('icon', `icon-${iconSize}`)}>
                     {rightIcon}
