@@ -47,6 +47,12 @@
     --text-color: rgb(22, 24, 35);
     --search-hover-bg: rgba(22, 24, 35, 0.06);
     --ui-page-flat-bg-1: rgba(255, 255, 255, 1);
+
+    --font-family-regular: 'TikTokText-Regular', 'TikTokDisplay-Regular',
+        sans-serif;
+    --font-family-medium: 'TikTokText-Medium', 'TikTokDisplay-Medium',
+        sans-serif;
+    --font-family-bold: 'TikTokText-Bold', 'TikTokDisplay-Bold', sans-serif;
 }
 
 * {
@@ -60,7 +66,7 @@ html {
 }
 
 body {
-    font-family: 'TikTokText-Regular', 'TikTokDisplay-Regular', sans-serif;
+    font-family: var(--font-family-regular);
     font-size: 1.6rem;
     line-height: 1.5;
     text-rendering: optimizeSpeed;
@@ -69,13 +75,65 @@ body {
     // font-variation-settings: 'wdth' 100;
 }
 
-button, input, [tabindex] {
+html ::-webkit-scrollbar {
+    border-radius: 0px;
+    width: 8px;
+}
+
+html *::-webkit-scrollbar {
+    border-radius: 0;
+    width: 8px;
+}
+
+
+html ::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(22, 24, 35, 0.06);
+}
+
+html *::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(22, 24, 35, 0.06);
+}
+
+
+html ::-webkit-scrollbar-track {
+    border-radius: 0px;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+html *::-webkit-scrollbar-track {
+    border-radius: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.tippy-box {
+    background-color: rgba(84, 84, 84, 0.92) !important;
+    color: rgb(255, 255, 255) !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 1.6rem !important;
+    line-height: 21px;
+    padding: 1.5px 1px !important;
+
+    .tippy-arrow {
+        color: rgba(84, 84, 84, 0.92) !important;
+    }
+
+    &[data-placement^='bottom'] > .tippy-arrow:before {
+        top: -8px !important;
+    }
+}
+
+button,
+input,
+[tabindex] {
     outline: none;
     border: none;
-    color: var(--text-color)
+    color: var(--text-color);
 }
 
 a[href] {
     text-decoration: none;
-    color: var(--text-color)
+    color: var(--text-color);
 }

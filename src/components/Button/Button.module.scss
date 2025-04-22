@@ -1,5 +1,5 @@
 .wrapper {
-    font-family: 'TikTokText-Medium', sans-serif;
+    font-family: var(--font-family-medium);
     font-weight: 400;
     width: 100%;
     gap: 10px;
@@ -128,13 +128,13 @@
 
 // Font types
 .font-regular {
-    font-family: 'TikTokText-Regular', sans-serif;
+    font-family: var(--font-family-regular);
 }
 
 .font-medium {
-    font-family: 'TikTokText-Medium', sans-serif;
+    font-family: var(--font-family-medium);
 }
 
 .font-bold {
-    font-family: 'TikTokText-Bold', sans-serif;
+    font-family: var(--font-family-bold);
 }
