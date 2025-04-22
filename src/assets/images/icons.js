@@ -1,4 +1,4 @@
-export { ReactComponent as MessageIcon } from './message.svg'
+export { ReactComponent as MessageIcon } from './message.svg';
 export { ReactComponent as InboxIcon } from './inbox.svg';
 export { ReactComponent as PlusIcon } from './plus.svg';
 export { ReactComponent as DarkLogoIcon } from './dark-logo.svg';
@@ -15,3 +15,21 @@ export { ReactComponent as LogoutIcon } from './logout.svg';
 export { ReactComponent as ReportIcon } from './report.svg';
 export { ReactComponent as MarkIrrelevantIcon } from './mark-irrelevant.svg';
 export { ReactComponent as BackIcon } from './back.svg';
+export { ReactComponent as ArrowBackIcon } from './arrow-back.svg';
+export { ReactComponent as NotificationIcon } from './notification.svg';
+export { ReactComponent as PrivacyIcon } from './privacy.svg';
+export { ReactComponent as BusinessIcon } from './business.svg';
+export { ReactComponent as AdsIcon } from './ads.svg';
+export { ReactComponent as ScreenTimeIcon } from './time.svg';
+export { ReactComponent as ContentPreferencesIcon } from './content.svg';
+export { ReactComponent as ManageAdsIcon } from './manage-ads.svg';
+export { ReactComponent as MuteAdsIcon } from './mute-ads.svg';
+export { ReactComponent as RightArrowIcon } from './right-arrow.svg';
+export { ReactComponent as DownArrowIcon } from './down-arrow.svg';
+export { ReactComponent as SettingShareIcon } from './setting-share.svg';
+export { ReactComponent as InfoIcon } from './info.svg';
+export { ReactComponent as UsingOffIcon } from './using-off.svg';
+export { ReactComponent as DisconnectAdsIcon } from './disconnect-ads.svg';
+export { ReactComponent as ClearIcon } from './clear.svg';
+
+
