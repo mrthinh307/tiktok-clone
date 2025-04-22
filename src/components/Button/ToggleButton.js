@@ -12,8 +12,8 @@ function ToggleButton() {
     };
 
     return (
-        <div class={cx('toggle-button', {'active': isActive})} onClick={handleClick}>
-            <span class={cx('span-switch-icon', {'active': isActive})}></span>
+        <div className={cx('toggle-button', {'active': isActive})} onClick={handleClick}>
+            <span className={cx('span-switch-icon', {'active': isActive})}></span>
         </div>
     );
 }

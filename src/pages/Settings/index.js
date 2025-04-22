@@ -45,7 +45,6 @@ function Setting() {
                         activeSidebar={activeSidebar}
                         onItemClick={handleSidebarClick}
                     />
-
                     <div className={cx('setting-content', 'hide-scrollbar')}>
                         {renderContents(SETTING_CONTENT_ITEMS)}
                     </div>

@@ -14,6 +14,7 @@ function Menu({
     items = [],
     className,
     onChange = defaultFn,
+    hideOnClick = false,
     ...props
 }) {
     const [history, setHistory] = useState([{ data: items }]);
@@ -45,6 +46,7 @@ function Menu({
     return (
         <HeadlessTippy
             interactive={true}
+            hideOnClick={hideOnClick}
             offset={[12, 12]}
             delay={[0, props.hiddenDelayTime || 0]}
             animation={false}

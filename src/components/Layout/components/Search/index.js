@@ -25,6 +25,13 @@ function Search() {
 
     const debounced = useDebounce(searchValue, DEBOUNCE_DELAY);
 
+    const handleChangeInput = (e) => {
+        const searchValue = e.target.value;
+        if (!searchValue.startsWith(' ')) {
+            setSearchValue(searchValue);
+        }
+    };
+
     useEffect(() => {
         if (!searchValue.trim()) {
             setSearchResult([]);
@@ -36,7 +43,7 @@ function Search() {
 
             const searchResult = await searchServies.search(debounced, 'more');
             setSearchResult(searchResult);
-            
+
             setShowLoading(false);
         };
 
@@ -56,7 +63,7 @@ function Search() {
     return (
         <HeadlessTippy
             interactive={true}
-            visible={!!searchResult.length  && showResult}
+            visible={!!searchResult.length && showResult}
             appendTo={() => document.body}
             render={(attrs) => (
                 <div className={cx('search-result')} tabIndex="-1" {...attrs}>
@@ -83,7 +90,7 @@ function Search() {
                 <input
                     ref={inputRef}
                     value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
+                    onChange={handleChangeInput}
                     placeholder="Seach"
                     spellCheck={false}
                     onFocus={() => setShowResult(true)}
