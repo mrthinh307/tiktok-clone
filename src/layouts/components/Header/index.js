@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import 'tippy.js/animations/scale.css';
 import 'tippy.js/dist/tippy.css';
 
-import routesConfig from '~/config/routes';
+import config from '~/config';
 import {
     InboxIcon,
     MessageIcon,
@@ -33,7 +33,7 @@ function Header() {
         <header className={cx('wrapper')}>
             <div className={cx('inner-content')}>
                 <div className={cx('logo')}>
-                    <Link to={routesConfig.home} style={{ cursor: 'pointer' }}>
+                    <Link to={config.routes.home} style={{ cursor: 'pointer' }}>
                         <DarkLogoIcon />
                     </Link>
                 </div>
@@ -42,7 +42,7 @@ function Header() {
                 <Search />
 
                 <div className={cx('action')}>
-                    <a href={routesConfig.upload} className={cx('action-upload')}>
+                    <a href={config.routes.upload} className={cx('action-upload')}>
                         <PlusIcon className={cx('plus')} />
                         <span>Upload</span>
                     </a>
