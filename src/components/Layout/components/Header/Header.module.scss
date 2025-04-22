@@ -8,6 +8,7 @@
     height: 60px;
     box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 1px;
     display: flex;
+    z-index: 1;
 }
 
 .inner-content {
@@ -108,43 +109,5 @@
     height: auto;
 }
 
-:global {
-    .tippy-box {
-        background-color: rgba(84, 84, 84, 0.92) !important;
-        color: rgb(255, 255, 255) !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-        font-size: 1.6rem !important;
-        line-height: 21px;
-        padding: 1.5px 1px !important;
-
-        .tippy-arrow {
-            color: rgba(84, 84, 84, 0.92) !important;
-        }
-
-        &[data-placement^='bottom'] > .tippy-arrow:before {
-            top: -8px !important;
-        }
-    }
-}
-
-:global {
-    *::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    *::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    *::-webkit-scrollbar-thumb {
-        background-color: rgba(22, 24, 35, 0.06);
-        border-radius: 8px;
-    }
-
-    *::-webkit-scrollbar-button {
-        display: none;
-    }
-}
 
 

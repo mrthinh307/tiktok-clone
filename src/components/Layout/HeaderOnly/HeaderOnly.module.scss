@@ -1,7 +1,43 @@
 .wrapper {
-    width: 100%;
-    height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center;
+}
+
+:global {
+    .tippy-box {
+        background-color: rgba(84, 84, 84, 0.92) !important;
+        color: rgb(255, 255, 255) !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        font-size: 1.6rem !important;
+        line-height: 21px;
+        padding: 1.5px 1px !important;
+
+        .tippy-arrow {
+            color: rgba(84, 84, 84, 0.92) !important;
+        }
+
+        &[data-placement^='bottom'] > .tippy-arrow:before {
+            top: -8px !important;
+        }
+    }
+}
+
+:global {
+    *::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background-color: rgba(22, 24, 35, 0.06);
+        border-radius: 8px;
+    }
+
+    *::-webkit-scrollbar-button {
+        display: none;
+    }
 }
