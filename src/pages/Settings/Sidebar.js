@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
 import styles from './Setting.module.scss';
 import MenuItem from '~/components/Popper/Menu/MenuItem';
@@ -26,5 +27,10 @@ function Sidebar({ activeSidebar, onItemClick }) {
         </nav>
     );
 }
+
+Sidebar.propTypes = {
+    activeSidebar: PropTypes.number.isRequired,
+    onItemClick: PropTypes.func.isRequired,
+};
 
 export default Sidebar;

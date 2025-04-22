@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
 import styles from './Setting.module.scss';
 import Tippy from '@tippyjs/react';
@@ -107,5 +108,41 @@ function ContentItem({ data }) {
         </div>
     );
 }
+
+ContentItem.propTypes = {
+    data: PropTypes.shape({
+        title: PropTypes.string.isRequired,
+        tooltip: PropTypes.shape({
+            desc: PropTypes.string,
+            icon: PropTypes.node,
+        }),
+        items: PropTypes.arrayOf(
+            PropTypes.shape({
+                title: PropTypes.string,
+                desc: PropTypes.string,
+                action: PropTypes.shape({
+                    type: PropTypes.string,
+                    text: PropTypes.string,
+                    onClick: PropTypes.func,
+                    content: PropTypes.node,
+                }),
+                children: PropTypes.arrayOf(
+                    PropTypes.shape({
+                        icon: PropTypes.node,
+                        title: PropTypes.string,
+                        desc: PropTypes.string,
+                        strongTitle: PropTypes.bool,
+                        action: PropTypes.shape({
+                            type: PropTypes.string,
+                            text: PropTypes.string,
+                            onClick: PropTypes.func,
+                            content: PropTypes.node,
+                        }),
+                    }),
+                ),
+            }),
+        ),
+    }).isRequired,
+};
 
 export default ContentItem;

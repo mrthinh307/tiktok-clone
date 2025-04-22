@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
 import styles from './Menu.module.scss';
 import Button from '~/components/Button';
@@ -31,6 +32,21 @@ function MenuItem({
             {data.title}
         </Button>
     );
+}
+
+MenuItem.propTypes = {
+    data: PropTypes.shape({
+        icon: PropTypes.node,
+        title: PropTypes.string.isRequired,
+        seperate: PropTypes.bool,
+    }).isRequired,
+    buttonSize: PropTypes.string,
+    iconSize: PropTypes.string,
+    titleSize: PropTypes.string,
+    hoverType: PropTypes.string,
+    fontType: PropTypes.string,
+    onClick: PropTypes.func,
+    active: PropTypes.bool,
 }
 
 export default MenuItem;

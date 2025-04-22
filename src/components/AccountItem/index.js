@@ -1,10 +1,10 @@
 import classNames from 'classnames/bind';
 import styles from './AccountItem.module.scss';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { BlueTickIcon, EllipsisIcon } from '~/assets/images/icons';
 import Menu from '../Popper/Menu';
 import {} from '~/assets/images/icons';
-import { createContext } from 'react';
 import {
     SEARCH_ACCOUNT_BUTTON_PROPS,
     SEARCH_ACCOUNT_OPTIONS,
@@ -12,8 +12,6 @@ import {
 import { DEFAULT_AVATAR } from '~/constants/common';
 
 const cx = classNames.bind(styles);
-
-export const ConfigureButtonContext = createContext();
 
 function AccountItem({ data }) {
     return (
@@ -44,5 +42,9 @@ function AccountItem({ data }) {
         </Link>
     );
 }
+
+AccountItem.propTypes = {
+    data: PropTypes.object.isRequired,
+};
 
 export default AccountItem;
