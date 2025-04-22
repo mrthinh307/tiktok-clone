@@ -70,3 +70,9 @@
     font-size: 1.6rem;
     line-height: 21px;
 }
+
+.menu-item {
+    &.active {
+        color: var(--primary-color);
+    }
+}

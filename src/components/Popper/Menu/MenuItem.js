@@ -4,15 +4,27 @@ import Button from '~/components/Button';
 
 const cx = classNames.bind(styles);
 
-function MenuItem({ data, buttonSize, iconSize, titleSize, hoverType, fontType, onClick }) {
+function MenuItem({
+    data,
+    buttonSize,
+    iconSize,
+    titleSize,
+    hoverType,
+    fontType,
+    onClick,
+    active,
+}) {
     return (
         <Button
+            className={cx('menu-item',{
+                seperate: data.seperate,
+                active: active,
+            })}
             buttonSize={buttonSize}
             iconSize={iconSize}
             titleSize={titleSize}
             hoverType={hoverType}
             fontType={fontType}
-            className={cx({seperate: data.seperate})}
             onClick={onClick}
             leftIcon={data.icon}
         >
