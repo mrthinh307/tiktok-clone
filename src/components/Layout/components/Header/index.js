@@ -1,27 +1,27 @@
 import classNames from 'classnames/bind';
 import Tippy from '@tippyjs/react';
+import { Link } from 'react-router-dom';
 import 'tippy.js/animations/scale.css';
 import 'tippy.js/dist/tippy.css';
 
+import routesConfig from '~/config/routes';
 import {
     InboxIcon,
     MessageIcon,
     PlusIcon,
     DarkLogoIcon,
 } from '~/assets/images/icons';
-import { USER_OPTIONS, USER_MENU_BUTTON_PROPS } from '~/constants/headerConstants';import styles from './Header.module.scss';
+import {
+    USER_OPTIONS,
+    USER_MENU_BUTTON_PROPS,
+} from '~/constants/headerConstants';
+import styles from './Header.module.scss';
 import Menu from '~/components/Popper/Menu';
 import Search from '../Search';
 
 const cx = classNames.bind(styles);
 
 function Header() {
-    // useEffect(() => {
-    //     setTimeout(() => {
-    //         setSearchResult([1, 2, 3]);
-    //     }, 0);
-    // }, []);
-
     const handleMenuChange = (menuItem) => {
         switch (menuItem.field) {
             default:
@@ -33,14 +33,16 @@ function Header() {
         <header className={cx('wrapper')}>
             <div className={cx('inner-content')}>
                 <div className={cx('logo')}>
-                    <DarkLogoIcon />
+                    <Link to={routesConfig.home} style={{ cursor: 'pointer' }}>
+                        <DarkLogoIcon />
+                    </Link>
                 </div>
 
                 {/* Search */}
-                <Search />  
+                <Search />
 
                 <div className={cx('action')}>
-                    <a href="/" className={cx('action-upload')}>
+                    <a href={routesConfig.upload} className={cx('action-upload')}>
                         <PlusIcon className={cx('plus')} />
                         <span>Upload</span>
                     </a>
