@@ -19,7 +19,7 @@ import {
     SettingShareIcon,
     UsingOffIcon,
 } from '~/assets/images/icons';
-import ToggleButton from '~/components/Button/ToggleButton';
+import { ToggleButton } from '~/components/Button';
 
 
 export const SETTING_SIDEBAR_ITEMS = [
