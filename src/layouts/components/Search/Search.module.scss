@@ -125,3 +125,17 @@
 }
 
 
+@media (max-width: 1200px) {
+    .search,
+    .search-result {
+        width: calc(100vw / 2.8);
+    }
+}
+
+
+@media (max-width: 992px) {
+    .search,
+    .search-result {
+        display: none;
+    }
+}
