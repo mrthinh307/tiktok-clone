@@ -33,6 +33,7 @@ function Menu({
                     hoverType={item.hoverType || props.hoverType}
                     fontType={item.fontType || props.fontType}
                     onClick={() => {
+                        // Next menu
                         if (isParent) {
                             setHistory((prev) => [...prev, item.children]);
                         } else {
@@ -44,6 +45,35 @@ function Menu({
         });
     };
 
+    const handleBack = () => {
+        setHistory((prev) => prev.slice(0, prev.length - 1))
+    };
+
+    const renderResult = (attrs) => (
+        <div className={cx('menu-items')} tabIndex="-1" {...attrs}>
+            <PopperWrapper
+                className={cx(
+                    'popper-wrapper',
+                    { 'has-header': history.length > 1 },
+                    className,
+                )}
+            >
+                {history.length > 1 && (
+                    <Header
+                        title={history[history.length - 1].title}
+                        onBack={handleBack}
+                    />
+                )}
+                {renderItems(props)}
+            </PopperWrapper>
+        </div>
+    );
+
+    //  Reset to first menu when hidden
+    const handleReset = () => {
+        setHistory((prev) => prev.slice(0, 1));
+    };
+
     return (
         <HeadlessTippy
             interactive={true}
@@ -53,30 +83,8 @@ function Menu({
             animation={false}
             appendTo={() => document.body}
             placement="bottom-end"
-            render={(attrs) => (
-                <div className={cx('menu-items')} tabIndex="-1" {...attrs}>
-                    <PopperWrapper
-                        className={cx(
-                            'popper-wrapper',
-                            { 'has-header': history.length > 1 },
-                            className,
-                        )}
-                    >
-                        {history.length > 1 && (
-                            <Header
-                                title={history[history.length - 1].title}
-                                onBack={() => {
-                                    setHistory((prev) =>
-                                        prev.slice(0, prev.length - 1),
-                                    );
-                                }}
-                            />
-                        )}
-                        {renderItems(props)}
-                    </PopperWrapper>
-                </div>
-            )}
-            onHidden={() => setHistory((prev) => prev.slice(0, 1))}
+            render={renderResult}
+            onHidden={handleReset}
         >
             {children}
         </HeadlessTippy>
