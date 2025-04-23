@@ -13,16 +13,16 @@ function Button({
     text = false,
     rounded = false,
     disabled = false,
-    buttonSize,
+    buttonPadding,
     iconSize,
     titleSize,
     hoverType,
     fontType,
     children,
-    className,
     leftIcon,
     rightIcon,
     onClick,
+    className,
     ...passProps
 }) {
     let Comp = 'button';
@@ -50,7 +50,7 @@ function Button({
 
     const classes = cx(
         'wrapper',
-        `button-${buttonSize}`,
+        `padding-${buttonPadding}`,
         `hover-${hoverType}`,
         `font-${fontType}`,
         {
@@ -64,7 +64,7 @@ function Button({
     );
 
     return (
-        <Comp className={classes} {...props}>
+        <Comp {...props} className={classes}>
             {leftIcon && (
                 <span className={cx('icon', `icon-${iconSize}`)}>
                     {leftIcon}
@@ -90,7 +90,7 @@ Button.prototypes = {
     text: PropTypes.bool,
     rounded: PropTypes.bool,
     disabled: PropTypes.bool,
-    buttonSize: PropTypes.string,
+    buttonPadding: PropTypes.string,
     iconSize: PropTypes.string,
     titleSize: PropTypes.string,
     hoverType: PropTypes.string,

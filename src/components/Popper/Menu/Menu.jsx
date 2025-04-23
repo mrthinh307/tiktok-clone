@@ -27,7 +27,7 @@ function Menu({
                 <MenuItem
                     key={index}
                     data={item}
-                    buttonSize={item.buttonSize || props.buttonSize}
+                    buttonPadding={item.buttonPadding || props.buttonPadding}
                     iconSize={item.iconSize || props.iconSize}
                     titleSize={item.titleSize || props.titleSize}
                     hoverType={item.hoverType || props.hoverType}

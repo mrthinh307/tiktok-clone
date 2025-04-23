@@ -7,7 +7,7 @@ const cx = classNames.bind(styles);
 
 function MenuItem({
     data,
-    buttonSize,
+    buttonPadding,
     iconSize,
     titleSize,
     hoverType,
@@ -21,7 +21,7 @@ function MenuItem({
                 seperate: data.seperate,
                 active: active,
             })}
-            buttonSize={buttonSize}
+            buttonPadding={buttonPadding}
             iconSize={iconSize}
             titleSize={titleSize}
             hoverType={hoverType}
@@ -40,7 +40,7 @@ MenuItem.propTypes = {
         title: PropTypes.string.isRequired,
         seperate: PropTypes.bool,
     }).isRequired,
-    buttonSize: PropTypes.string,
+    buttonPadding: PropTypes.string,
     iconSize: PropTypes.string,
     titleSize: PropTypes.string,
     hoverType: PropTypes.string,

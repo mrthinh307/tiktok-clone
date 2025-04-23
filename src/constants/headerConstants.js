@@ -12,7 +12,7 @@ import {
 } from '~/assets/images/icons';
 
 export const USER_MENU_BUTTON_PROPS = {
-    buttonSize: 'medium',
+    buttonPadding: 'medium',
     iconSize: 'small',
     hoverType: 'background',
     hiddenDelayTime: 700,
@@ -367,7 +367,7 @@ export const SEARCH_ACCOUNT_OPTIONS = [
 ];
 
 export const SEARCH_ACCOUNT_BUTTON_PROPS = {
-    buttonSize: 'small',
+    buttonPadding: 'small',
     iconSize: 'medium',
     hoverType: 'font',
 };
