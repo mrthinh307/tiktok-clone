@@ -20,10 +20,10 @@ const cx = classNames.bind(styles);
 function Search() {
     const [searchValue, setSearchValue] = useState('');
     const [searchResult, setSearchResult] = useState([]);
-    const [showResult, setShowResult] = useState(true);
+    const [showResult, setShowResult] = useState(false);
     const [showLoading, setShowLoading] = useState(false);
 
-    const debounced = useDebounce(searchValue, DEBOUNCE_DELAY);
+    const debouncedValue = useDebounce(searchValue, DEBOUNCE_DELAY);
 
     const handleChangeInput = (e) => {
         const searchValue = e.target.value;
@@ -33,7 +33,7 @@ function Search() {
     };
 
     useEffect(() => {
-        if (!searchValue.trim()) {
+        if (!searchValue.trim()) {  
             setSearchResult([]);
             return;
         }
@@ -41,7 +41,7 @@ function Search() {
         const fetchApi = async () => {
             setShowLoading(true);
 
-            const searchResult = await searchServies.search(debounced, 'more');
+            const searchResult = await searchServies.search(debouncedValue, 'more');
             setSearchResult(searchResult);
 
             setShowLoading(false);
@@ -49,7 +49,7 @@ function Search() {
 
         fetchApi();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [debounced]);
+    }, [debouncedValue]);
 
     const inputRef = useRef();
 
@@ -77,7 +77,7 @@ function Search() {
                                     onClick={() => {
                                         setShowResult(false);
                                         setSearchValue('');
-                                    }}
+                                    }}  
                                 />
                             ))}
                         </div>
