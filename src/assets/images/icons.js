@@ -31,5 +31,7 @@ export { ReactComponent as InfoIcon } from './info.svg';
 export { ReactComponent as UsingOffIcon } from './using-off.svg';
 export { ReactComponent as DisconnectAdsIcon } from './disconnect-ads.svg';
 export { ReactComponent as ClearIcon } from './clear.svg';
+export { ReactComponent as SearchIcon } from './search.svg';
+export { ReactComponent as OnlyDarkLogoIcon } from './only-dark-logo.svg';
 
 
