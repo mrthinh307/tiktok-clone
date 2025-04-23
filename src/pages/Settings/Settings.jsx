@@ -1,7 +1,7 @@
 import classNames from 'classnames/bind';
 import styles from './Setting.module.scss';
 import ContentItem from './ContentItem';
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import { ArrowBackIcon } from '~/assets/images/icons';
 import { SETTING_CONTENT_ITEMS } from './constants';
 import Sidebar from './Sidebar';
@@ -13,7 +13,7 @@ function Settings() {
 
     const contentRefs = useRef([]);
 
-    const handleSidebarClick = (index) => {
+    const handleSidebarClick = useCallback((index) => {
         setActiveSidebar(index);
 
         if (contentRefs.current[index]) {
@@ -22,19 +22,22 @@ function Settings() {
                 block: 'start',
             });
         }
-    };
+    }, []);
 
-    const renderContents = (items) => {
-        return items.map((item, index) => (
+    const renderedContents = useMemo(() => {
+        return SETTING_CONTENT_ITEMS.map((item, index) => (
             <div
                 key={index}
-                ref={(el) => (contentRefs.current[index] = el)}
+                ref={(el) => {
+                    contentRefs.current[index] = el;
+                }}
                 className={cx('content-section')}
             >
                 <ContentItem data={item} />
             </div>
         ));
-    };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [SETTING_CONTENT_ITEMS]);
 
     return (
         <div className={cx('setting-wrapper')}>
@@ -46,7 +49,7 @@ function Settings() {
                         onItemClick={handleSidebarClick}
                     />
                     <div className={cx('setting-content', 'hide-scrollbar')}>
-                        {renderContents(SETTING_CONTENT_ITEMS)}
+                        {renderedContents}
                     </div>
                 </div>
             </div>
