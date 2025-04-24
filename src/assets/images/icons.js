@@ -33,5 +33,12 @@ export { ReactComponent as DisconnectAdsIcon } from './disconnect-ads.svg';
 export { ReactComponent as ClearIcon } from './clear.svg';
 export { ReactComponent as SearchIcon } from './search.svg';
 export { ReactComponent as OnlyDarkLogoIcon } from './only-dark-logo.svg';
+export { ReactComponent as HomeIcon } from './home.svg';
+export { ReactComponent as ExploreIcon } from './explore.svg';
+export { ReactComponent as FollowingIcon } from './following.svg';
+export { ReactComponent as LiveIcon } from './live.svg';
+export { ReactComponent as UploadIcon } from './upload.svg';
+export { ReactComponent as FriendsIcon } from './friends.svg';
+
 
 
