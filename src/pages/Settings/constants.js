@@ -54,7 +54,7 @@ export const SETTING_SIDEBAR_ITEMS = [
 ];
 
 export const SETTING_SIDEBAR_ITEM_PROPS = {
-    buttonSize: 'large',
+    buttonPadding: 'large',
     iconSize: 'medium',
     titleSize: 'large',
 };
