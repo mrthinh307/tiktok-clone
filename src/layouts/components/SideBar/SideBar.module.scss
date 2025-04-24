@@ -52,10 +52,7 @@
     padding: 10px 0 !important;
     padding-left: 10px !important;
     color: var(--ui-text-placeholder) !important;
-}
-
-.collapsed .search-btn {
-    gap: 0 !important;
+    gap: 2px !important
 }
 
 .drawer-container {
@@ -65,7 +62,7 @@
     left: 72px;
     z-index: 99;
     background: rgba(255, 255, 255, 1);
-    transition: width 0.4s ease, transform 0.4s ease, opacity 0.4s ease;
+    transition: width 0.4s ease, transform 0.2s ease, opacity 0.4s ease;
     transform: translateX(-50px);
     opacity: 0; 
     border-right: 1px solid rgba(0, 0, 0, 0.12);

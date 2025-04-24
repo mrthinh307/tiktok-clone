@@ -61,6 +61,7 @@ function Button({
             text,
             disabled,
             rounded,
+            collapsed,
         },
     );
 
@@ -71,11 +72,9 @@ function Button({
                     {leftIcon}
                 </span>
             )}
-            {!collapsed && (
-                    <span className={cx('title', `title-${titleSize}`)}>
-                        {children}
-                    </span>
-                )}
+            <span className={cx('title', `title-${titleSize}`)}>
+                {children}
+            </span>
             {rightIcon && (
                 <span className={cx('icon', `icon-${iconSize}`)}>
                     {rightIcon}

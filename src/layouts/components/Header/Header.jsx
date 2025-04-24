@@ -47,12 +47,12 @@ function Header() {
                         <span>Upload</span>
                     </a>
                     <Tippy content="Message" arrow={true} duration={0}>
-                        <a href="/" className={cx('action-message')}>
+                        <a href={config.routes.home} className={cx('action-message')}>
                             <MessageIcon className={cx('message')} />
                         </a>
                     </Tippy>
                     <Tippy content="Inbox" arrow={true} duration={0}>
-                        <a href="/" className={cx('action-inbox')}>
+                        <a href={config.routes.home} className={cx('action-inbox')}>
                             <InboxIcon className={cx('inbox')} />
                         </a>
                     </Tippy>

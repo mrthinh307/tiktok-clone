@@ -1,6 +1,5 @@
 import classNames from 'classnames/bind';
 import styles from './SideBar.module.scss';
-import PropTypes from 'prop-types';
 import { useState, useEffect, useRef, memo } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '~/components/Button';
@@ -9,6 +8,8 @@ import {
     OnlyDarkLogoIcon,
     SearchIcon,
 } from '~/assets/images/icons';
+import config from '~/config';
+import Menu from './Menu';
 
 const cx = classNames.bind(styles);
 
@@ -46,7 +47,7 @@ function SideBar() {
         return (
             <div ref={drawerRef} className={cx('drawer-container')}>
                 Hello World
-            </div>
+            </div>  
         );
     };
 
@@ -55,7 +56,7 @@ function SideBar() {
             <div className={cx('container')}>
                 <header className={cx('header-wrapper')}>
                     <div className={cx('header-logo')}>
-                        <Link to="/">
+                        <Link to={config.routes.home} className={cx('logo-link')}>
                             {!isCollapsed ? (
                                 <DarkLogoIcon className={cx('logo')} />
                             ) : (
@@ -79,6 +80,7 @@ function SideBar() {
                         </Button>
                     </div>
                 </header>
+                <Menu collapsed={isCollapsed} />
             </div>
             {showDrawer && <DrawerContainer />}
         </aside>

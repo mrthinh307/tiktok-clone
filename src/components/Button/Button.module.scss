@@ -12,7 +12,9 @@
     .title {
         font-size: 1.6rem;
         line-height: 21px;
-        margin-right: 10px;
+        white-space: nowrap; 
+        opacity: 1;
+        overflow: hidden;
 
         &.title-small {
             font-size: 1.4rem;
@@ -27,11 +29,24 @@
         }
     }
 
+    &.collapsed {
+        .title {
+            max-width: 0;
+            opacity: 0;
+            margin-left: 0;
+            margin-right: 0;
+            padding-left: 0;
+            padding-right: 0;
+            pointer-events: none;
+        }
+    }
+
     .icon {
         display: flex;
         align-items: center;
         justify-content: center;
         color: var(--text-color) !important;
+        flex-shrink: 0; 
 
         &.icon-small {
             width: 20px;
@@ -139,3 +154,4 @@
 .font-bold {
     font-family: var(--font-family-bold);
 }
+
