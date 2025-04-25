@@ -1,5 +1,9 @@
-export { ReactComponent as MessageIcon } from './message.svg';
-export { ReactComponent as InboxIcon } from './inbox.svg';
+export { ReactComponent as MessageSemiBoldIcon } from './message-semibold.svg';
+export { ReactComponent as MessageReuglarIcon } from './message-regular.svg';
+export { ReactComponent as MessageSolidIcon } from './message-solid.svg';
+export { ReactComponent as InboxSemiBoldIcon } from './inbox-semibold.svg';
+export { ReactComponent as InboxRegularIcon } from './inbox-regular.svg';
+export { ReactComponent as InboxSolidIcon } from './inbox-solid.svg';
 export { ReactComponent as PlusIcon } from './plus.svg';
 export { ReactComponent as DarkLogoIcon } from './dark-logo.svg';
 export { ReactComponent as BlueTickIcon } from './tick.svg';
@@ -34,11 +38,15 @@ export { ReactComponent as ClearIcon } from './clear.svg';
 export { ReactComponent as SearchIcon } from './search.svg';
 export { ReactComponent as OnlyDarkLogoIcon } from './only-dark-logo.svg';
 export { ReactComponent as HomeIcon } from './home.svg';
+export { ReactComponent as HomeSolidIcon } from './home-solid.svg';
 export { ReactComponent as ExploreIcon } from './explore.svg';
+export { ReactComponent as ExploreSolidIcon } from './explore-solid.svg';
 export { ReactComponent as FollowingIcon } from './following.svg';
+export { ReactComponent as FollowingSolidIcon } from './following-solid.svg';
 export { ReactComponent as LiveIcon } from './live.svg';
 export { ReactComponent as UploadIcon } from './upload.svg';
 export { ReactComponent as FriendsIcon } from './friends.svg';
+export { ReactComponent as FriendsSolidIcon } from './friends-solid.svg';
 
 
 
