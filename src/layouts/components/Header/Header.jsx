@@ -6,8 +6,8 @@ import 'tippy.js/dist/tippy.css';
 
 import config from '~/config';
 import {
-    InboxIcon,
-    MessageIcon,
+    InboxSemiBoldIcon,
+    MessageSemiBoldIcon,
     PlusIcon,
     DarkLogoIcon,
 } from '~/assets/images/icons';
@@ -48,12 +48,12 @@ function Header() {
                     </a>
                     <Tippy content="Message" arrow={true} duration={0}>
                         <a href={config.routes.home} className={cx('action-message')}>
-                            <MessageIcon className={cx('message')} />
+                            <MessageSemiBoldIcon className={cx('message')} />
                         </a>
                     </Tippy>
                     <Tippy content="Inbox" arrow={true} duration={0}>
                         <a href={config.routes.home} className={cx('action-inbox')}>
-                            <InboxIcon className={cx('inbox')} />
+                            <InboxSemiBoldIcon className={cx('inbox')} />
                         </a>
                     </Tippy>
 
