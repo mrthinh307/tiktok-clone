@@ -1,16 +1,24 @@
 import PropTypes from 'prop-types';
 import MenuItem from './MenuItem';
+import { useState, useCallback } from 'react';
 import config from '~/config';
 import {
     EllipsisIcon,
     ExploreIcon,
+    ExploreSolidIcon,
     FollowingIcon,
+    FollowingSolidIcon,
     FriendsIcon,
+    FriendsSolidIcon,
     HomeIcon,
-    InboxIcon,
+    HomeSolidIcon,
+    InboxRegularIcon,
+    InboxSolidIcon,
     LiveIcon,
-    MessageIcon,
+    MessageReuglarIcon,
+    MessageSolidIcon,
     UploadIcon,
+    SearchIcon,
 } from '~/assets/images/icons';
 import classNames from 'classnames/bind';
 import styles from './Menu.module.scss';
@@ -19,50 +27,62 @@ const cx = classNames.bind(styles);
 
 const SIDEBAR_MENU_ITEMS = [
     {
+        title: 'Search',
+        icon: <SearchIcon />,
+        activeIcon: <SearchIcon />,
+        iconSize: 'small',
+        isSearchItem: true,
+    },
+    {
         title: 'For You',
         to: config.routes.home,
         icon: <HomeIcon />,
+        activeIcon: <HomeSolidIcon />,
         iconSize: 'large',
     },
     {
         title: 'Explore',
-        to: config.routes.home,
+        to: config.routes.explore,
         icon: <ExploreIcon />,
+        activeIcon: <ExploreSolidIcon />,
         iconSize: 'large',
     },
     {
         title: 'Following',
-        to: config.routes.home,
+        to: config.routes.following,
         icon: <FollowingIcon />,
+        activeIcon: <FollowingSolidIcon />,
         iconSize: 'medium',
     },
     {
         title: 'Friends',
-        to: config.routes.home,
+        to: config.routes.friends,
         icon: <FriendsIcon />,
+        activeIcon: <FriendsSolidIcon />,
         iconSize: 'large',
     },
     {
         title: 'Upload',
-        to: config.routes.home,
+        to: config.routes.upload,
         icon: <UploadIcon />,
         iconSize: 'medium',
     },
     {
         title: 'Activity',
-        to: config.routes.home,
-        icon: <InboxIcon />,
-        iconSize: 'medium',
+        icon: <InboxRegularIcon />,
+        activeIcon: <InboxSolidIcon />,
+        iconSize: 'large',
     },
     {
         title: 'Messages',
-        to: config.routes.home,
-        icon: <MessageIcon />,
+        to: config.routes.messages,
+        icon: <MessageReuglarIcon />,
+        activeIcon: <MessageSolidIcon />,
         iconSize: 'medium',
     },
     {
         title: 'LIVE',
-        to: config.routes.home,
+        to: config.routes.live,
         icon: (
             <div className={cx('live-icon-wrapper')}>
                 <LiveIcon />
@@ -78,8 +98,14 @@ const SIDEBAR_MENU_ITEMS = [
     },
     {
         title: 'Profile',
-        to: config.routes.home,
+        to: config.routes.profile,
         icon: (
+            <img
+                alt="user"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJDRALoJakgEuuuGmBvBi-eSbPMe5B9fSdtA&amp;s"
+            />
+        ),
+        activeIcon: (
             <img
                 alt="user"
                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJDRALoJakgEuuuGmBvBi-eSbPMe5B9fSdtA&amp;s"
@@ -88,31 +114,68 @@ const SIDEBAR_MENU_ITEMS = [
     },
     {
         title: 'More',
-        to: config.routes.home,
         icon: <EllipsisIcon />,
+        activeIcon: <EllipsisIcon />,
         iconSize: 'medium',
     },
 ];
 
-function Menu({ collapsed }) {
+function Menu({ collapsed, onToggleCollapse }) {
+    const [activeItemIndex, setActiveItemIndex] = useState(null);
+    const hasNonNavLinkActive = activeItemIndex !== null && collapsed;
+
+    const getClickHandler = useCallback((item, index) => {
+        if (item.to) {
+            return () => {
+                setActiveItemIndex(index);
+                if (collapsed) {
+                    onToggleCollapse();
+                }
+            };
+        } else {
+            return () => {
+                if (activeItemIndex === index) {
+                    setActiveItemIndex(null);
+                    if (collapsed) {
+                        onToggleCollapse();
+                    }
+                } else {
+                    setActiveItemIndex(index);
+                    if (!collapsed) {
+                        onToggleCollapse();
+                    }
+                }
+            };
+        }
+    }, [activeItemIndex, collapsed, onToggleCollapse]);
+
     return (
         <div className={cx('menu-wrapper')}>
-            {SIDEBAR_MENU_ITEMS.map((item, index) => (
-                <MenuItem
-                    key={index}
-                    title={item.title}
-                    to={item.to}
-                    icon={item.icon}
-                    iconSize={item.iconSize || 'large'}
-                    collapsed={collapsed}
-                />
-            ))}
+            {SIDEBAR_MENU_ITEMS.map((item, index) => {
+                const clickHandler = getClickHandler(item, index);
+
+                return (
+                    <MenuItem
+                        key={index}
+                        title={item.title}
+                        to={item.to}
+                        icon={item.icon}
+                        activeIcon={item.activeIcon}
+                        iconSize={item.iconSize || 'large'}
+                        collapsed={collapsed}
+                        onClick={clickHandler}
+                        isActive={activeItemIndex === index}
+                        disableNavLinkActive={hasNonNavLinkActive}
+                    />
+                );
+            })}
         </div>
     );
 }
 
 Menu.propTypes = {
-    children: PropTypes.node.isRequired,
+    collapsed: PropTypes.bool,
+    onToggleCollapse: PropTypes.func,
 };
 
 export default Menu;

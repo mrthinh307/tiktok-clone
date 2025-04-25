@@ -22,37 +22,16 @@
     padding: 0 16px;
 }
 
-.header-wrapper {
+.header-logo {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: space-between;
     padding-top: 20px;
-    padding-bottom: 8px;
-    gap: 16px;
-}
-
-.header-logo {
-    width: 100%;
-    display: flex;
+    padding-bottom: 16px;
     padding-left: 8px;
-    line-height: 0;
-}
-
-.search-container {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-}
-
-.search-btn {
-    font-family: var(--font-family-regular) !important;
-    padding: 10px 0 !important;
-    padding-left: 10px !important;
-    color: var(--ui-text-placeholder) !important;
-    gap: 2px !important
+    padding: 20px 0 16px 8px;
 }
 
 .drawer-container {
