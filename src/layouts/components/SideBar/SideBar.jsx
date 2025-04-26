@@ -6,6 +6,7 @@ import { DarkLogoIcon, OnlyDarkLogoIcon } from '~/assets/images/icons';
 import config from '~/config';
 import Menu from './Menu';
 import { useDrawer } from '~/hooks';
+import DrawerContainer from './DrawContainer';
 
 const cx = classNames.bind(styles);
 
@@ -22,14 +23,6 @@ function SideBar() {
         setIsCollapsed(prevState => !prevState);
     }, []);
 
-    const DrawerContainer = function DrawerContainer() {
-        return (
-            <div ref={drawerRef} className={cx('drawer-container')}>
-                Hello World
-            </div>
-        );
-    };
-
     return (
         <aside className={cx('wrapper', { collapsed: isCollapsed })}>
             <div className={cx('container')}>
@@ -44,7 +37,7 @@ function SideBar() {
                     collapsed={isCollapsed}
                     onToggleCollapse={handleToggleCollapse}
                 />
-                {showDrawer && <DrawerContainer />}
+                {showDrawer && <DrawerContainer ref={drawerRef} />}
             </div>
         </aside>
     );

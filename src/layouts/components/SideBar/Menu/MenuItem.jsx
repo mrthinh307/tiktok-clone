@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 import { Link, useLocation } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import styles from './Menu.module.scss';
-import { memo } from 'react';
 
 const cx = classNames.bind(styles);
 
@@ -65,4 +64,4 @@ MenuItem.propTypes = {
     disableNavLinkActive: PropTypes.bool,
 };
 
-export default memo(MenuItem);
+export default MenuItem;

@@ -39,19 +39,23 @@
     height: 100vh;
     position: fixed;
     left: 72px;
-    z-index: 99;
+    z-index: 1;
     background: rgba(255, 255, 255, 1);
-    transition: width 0.4s ease, transform 0.2s ease, opacity 0.4s ease;
     transform: translateX(-50px);
     opacity: 0; 
     border-right: 1px solid rgba(0, 0, 0, 0.12);
     border-left: 1px solid rgba(0, 0, 0, 0.12);
     overflow: hidden;
+    pointer-events: none;
+
+    &.show {
+        width: 320px;
+        transform: translateX(0);
+        opacity: 1;
+        z-index: 10;
+        transition: width 0.4s ease, transform 0.2s ease, opacity 0.4s ease, z-index 0s; 
+        pointer-events: auto;
+    }
 }
 
-.drawer-container.show {
-    width: 320px;
-    transform: translateX(0);
-    opacity: 1;
-}
 
