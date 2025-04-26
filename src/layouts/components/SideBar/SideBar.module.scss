@@ -16,7 +16,7 @@
     display: flex;
     align-items: center;
     overflow: clip hidden; // Prevent scrollbars bounce, scroll chaining
-    overscroll-behavior: contain; 
+    overscroll-behavior: contain;
     flex-direction: column;
     background-color: var(--ui-page-flat-1);
     padding: 0 16px;
@@ -42,7 +42,7 @@
     z-index: 1;
     background: rgba(255, 255, 255, 1);
     transform: translateX(-50px);
-    opacity: 0; 
+    opacity: 0;
     border-right: 1px solid rgba(0, 0, 0, 0.12);
     border-left: 1px solid rgba(0, 0, 0, 0.12);
     overflow: hidden;
@@ -53,8 +53,80 @@
         transform: translateX(0);
         opacity: 1;
         z-index: 10;
-        transition: width 0.4s ease, transform 0.2s ease, opacity 0.4s ease, z-index 0s; 
+        transition: width 0.4s ease, transform 0.2s ease, opacity 0.4s ease,
+            z-index 0s;
         pointer-events: auto;
+    }
+
+    .search-container {
+        padding: 8px 0 8px 8px;
+        width: 100%;
+        position: relative;
+    }
+    
+    .title-container {
+        margin-left: 16px;
+        padding: 24px 0 16px;
+        height: 70.4px;
+    }
+    
+    .title {
+        font-family: var(--font-family-bold);
+        font-size: 2rem;
+        line-height: 25px;
+        font-weight: 700;
+    }
+
+    .close-icon {
+        width: 28px;
+        height: 28px;
+        padding: 6px;
+        position: absolute;
+        right: 16px;
+        top: 24px;
+        border-radius: 50px;
+        background: rgba(22, 24, 35, 0.06);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .search-form {
+        width: 302px !important;
+        border-radius: 92px !important;
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+    
+        & .search-input {
+            font-size: 1.4rem !important;
+        }
+    
+        & .clear-icon {
+            right: 17px !important;
+        }
+    }
+    
+    .search-results-wrapper {
+        margin-top: 12px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+    
+    .search-results-title {
+        color: rgba(22, 24, 35, 0.5);
+        font-size: 14px;
+        line-height: 18px;
+        font-weight: 600;
+        padding: 5px 8px;
+    }
+    
+    .search-result-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
     }
 }
 

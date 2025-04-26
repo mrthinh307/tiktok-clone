@@ -78,7 +78,7 @@ function Menu({
         <HeadlessTippy
             interactive={true}
             hideOnClick={hideOnClick}
-            offset={[12, 12]}
+            offset={[12, 4]}
             delay={[0, props.hiddenDelayTime || 0]}
             animation={false}
             appendTo={() => document.body}

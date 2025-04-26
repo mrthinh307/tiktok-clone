@@ -23,6 +23,10 @@ function SideBar() {
         setIsCollapsed(prevState => !prevState);
     }, []);
 
+    const handleCloseDrawer = useCallback(() => {
+        setIsCollapsed(false);
+    }, []);
+
     return (
         <aside className={cx('wrapper', { collapsed: isCollapsed })}>
             <div className={cx('container')}>
@@ -37,7 +41,7 @@ function SideBar() {
                     collapsed={isCollapsed}
                     onToggleCollapse={handleToggleCollapse}
                 />
-                {showDrawer && <DrawerContainer ref={drawerRef} />}
+                {showDrawer && <DrawerContainer ref={drawerRef} onClose={handleCloseDrawer} />}
             </div>
         </aside>
     );

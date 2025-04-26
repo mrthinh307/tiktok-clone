@@ -39,7 +39,7 @@ function Header() {
                 </div>
 
                 {/* Search */}
-                <Search />
+                <Search dropdownMenu={true} />
 
                 <div className={cx('action')}>
                     <a href={config.routes.upload} className={cx('action-upload')}>
