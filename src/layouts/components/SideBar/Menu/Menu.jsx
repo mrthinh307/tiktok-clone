@@ -32,10 +32,13 @@ function Menu({ collapsed, onToggleCollapse, onSetTitle }) {
                         }
                     } else {
                         setActiveItemIndex(index);
-                        if (!collapsed && onSetTitle) {
+                        if (!collapsed) {
                             onToggleCollapse();
-                            onSetTitle(item.title);
                         }
+                    }
+
+                    if (onSetTitle) {
+                        onSetTitle(item.title);
                     }
                 };
             }
