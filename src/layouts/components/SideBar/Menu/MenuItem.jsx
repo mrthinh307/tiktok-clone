@@ -17,7 +17,6 @@ function MenuItem({
     disableNavLinkActive = false,
 }) {
     const location = useLocation();
-
     const isPathActive = to && location.pathname === to;
 
     const activeState = to ? isPathActive && !disableNavLinkActive : isActive;

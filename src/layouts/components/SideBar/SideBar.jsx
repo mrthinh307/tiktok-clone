@@ -1,6 +1,6 @@
 import classNames from 'classnames/bind';
 import styles from './SideBar.module.scss';
-import { useState, memo, useCallback, useMemo } from 'react';
+import { useState, memo, useCallback, useMemo, useRef } from 'react';
 
 import { Link } from 'react-router-dom';
 import config from '~/config';
@@ -13,7 +13,8 @@ const cx = classNames.bind(styles);
 
 function SideBar() {
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [currentMenuTitle, setCurrentMenuTitle] = useState('');
+    const [currentMenuTitle, setCurrentMenuTitle] = useState({});
+    const menuRef = useRef(null);
 
     const drawerOptions = useMemo(() => ({
         className: cx('show'),
@@ -29,21 +30,29 @@ function SideBar() {
 
     const handleCloseDrawer = useCallback(() => {
         setIsCollapsed(false);
+        // deactivate index of menu item
+        if (menuRef.current && typeof menuRef.current.deactivateItems === 'function') {
+            menuRef.current.deactivateItems();
+        }
     }, []);
 
-    const handleMenuTitleChange = useCallback((title) => {
-        setCurrentMenuTitle(title);
+    const handleMenuTitleChange = useCallback((title, index) => {
+        setCurrentMenuTitle({
+            title,
+            index
+        });
     }, []);
 
     const menuProps = useMemo(() => ({
         collapsed: isCollapsed,
         onToggleCollapse: handleToggleCollapse,
-        onSetTitle: handleMenuTitleChange
+        onSetTitle: handleMenuTitleChange,
+        ref: menuRef,
     }), [isCollapsed, handleToggleCollapse, handleMenuTitleChange]);
 
     const drawerProps = useMemo(() => ({
         onClose: handleCloseDrawer,
-        title: currentMenuTitle
+        titleData: currentMenuTitle
     }), [handleCloseDrawer, currentMenuTitle]);
 
     return (

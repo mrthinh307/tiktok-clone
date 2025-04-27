@@ -1,4 +1,4 @@
-import { forwardRef, useState, useMemo, useEffect, useCallback } from 'react';
+import { forwardRef, useState, useMemo, useCallback } from 'react';
 import classNames from 'classnames/bind';
 import styles from './SideBar.module.scss';
 import PropTypes from 'prop-types';
@@ -11,7 +11,10 @@ import { BackIcon, CloseIcon } from '~/assets/images/icons';
 const cx = classNames.bind(styles);
 
 const DrawerContainer = forwardRef(function DrawerContainer(
-    { onClose, title = '' },
+    { onClose, titleData = {
+        title: '',
+        indexTitle: null
+    } },
     ref,
 ) {
     const [searchResults, setSearchResults] = useState([]);
@@ -19,11 +22,11 @@ const DrawerContainer = forwardRef(function DrawerContainer(
 
     const current = useMemo(() => history[history.length - 1], [history]);
 
-    useEffect(() => {
-        if (title && history.length === 1 && !history[0].title) {
-            setHistory([{ title, data: MORE_CONTENTS }]);
-        }
-    }, [title, history]);
+    // useEffect(() => {
+    //     if (titleData && titleData.title && history.length === 1) {
+    //         setHistory([{ title: titleData.title, data: MORE_CONTENTS }]);
+    //     }
+    // }, [titleData, history]);
 
     const handleSearchResults = useCallback((results) => {
         setSearchResults(results);
@@ -49,7 +52,7 @@ const DrawerContainer = forwardRef(function DrawerContainer(
         if (history.length > 1) {
             return current.title;
         } else {
-            return title;
+            return titleData.title;
         }
     };
 
@@ -106,7 +109,7 @@ const DrawerContainer = forwardRef(function DrawerContainer(
     };
 
     const renderContent = () => {
-        switch (title) {
+        switch (titleData.title) {
             case 'Search':
                 return renderSearchContent();
             case 'More':
@@ -144,7 +147,10 @@ DrawerContainer.propTypes = {
     children: PropTypes.node,
     className: PropTypes.string,
     onClose: PropTypes.func,
-    title: PropTypes.string,
+    titleData: PropTypes.shape({
+        title: PropTypes.string,
+        index: PropTypes.number,
+    }),
 };
 
 export default DrawerContainer;

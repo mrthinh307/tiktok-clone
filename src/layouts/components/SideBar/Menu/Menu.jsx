@@ -1,18 +1,23 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import PropTypes from 'prop-types';
 import MenuItem from './MenuItem';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useImperativeHandle, forwardRef } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Menu.module.scss';
 import { SIDEBAR_MENU_ITEMS } from '~/constants/sidebarConstants';
 
 const cx = classNames.bind(styles);
 
-
-
-function Menu({ collapsed, onToggleCollapse, onSetTitle }) {
+const Menu = forwardRef(function Menu({ collapsed, onToggleCollapse, onSetTitle }, ref) {
     const [activeItemIndex, setActiveItemIndex] = useState(null);
+    
     const hasNonNavLinkActive = activeItemIndex !== null && collapsed;
+
+    useImperativeHandle(ref, () => ({
+        deactivateItems: () => {
+            setActiveItemIndex(null);
+        }
+    }));
 
     const getClickHandler = useCallback(
         (item, index) => {
@@ -38,13 +43,13 @@ function Menu({ collapsed, onToggleCollapse, onSetTitle }) {
                     }
 
                     if (onSetTitle) {
-                        onSetTitle(item.title);
+                        onSetTitle(item.title, index);
                     }
                 };
             }
             // eslint-disable-next-line react-hooks/exhaustive-deps
         },
-        [activeItemIndex, collapsed, onToggleCollapse],
+        [activeItemIndex, collapsed],
     );
 
     return (
@@ -60,6 +65,7 @@ function Menu({ collapsed, onToggleCollapse, onSetTitle }) {
                         icon={item.icon}
                         activeIcon={item.activeIcon}
                         iconSize={item.iconSize || 'large'}
+
                         collapsed={collapsed}
                         onClick={clickHandler}
                         isActive={activeItemIndex === index}
@@ -69,11 +75,12 @@ function Menu({ collapsed, onToggleCollapse, onSetTitle }) {
             })}
         </div>
     );
-}
+});
 
 Menu.propTypes = {
     collapsed: PropTypes.bool,
     onToggleCollapse: PropTypes.func,
+    onSetTitle: PropTypes.func,
 };
 
 export default Menu;
