@@ -11,30 +11,6 @@
 }
 
 .custom-tooltip {
-    max-height: 200px; // Chiều cao tối đa của tooltip
-    overflow: hidden; // Ẩn phần tràn bên ngoài
-}
-
-.scrollable-content {
-    max-height: 200px !important;
-    overflow-y: auto !important;
-    padding-right: 8px !important;
-
-    // Style thanh cuộn (hiệu ứng đẹp mắt)
-    scrollbar-width: thin !important; // Firefox
-    scrollbar-color: #999 #f0f0f0 !important; // Firefox
-
-    &::-webkit-scrollbar {
-        width: 6px !important;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: #f0f0f0 !important;
-        border-radius: 4px !important;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background-color: #999 !important;
-        border-radius: 4px !important;
-    }
+    max-height: 200px; 
+    overflow: hidden; 
 }
