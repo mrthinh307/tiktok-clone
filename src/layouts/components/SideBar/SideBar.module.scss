@@ -57,77 +57,151 @@
             z-index 0s;
         pointer-events: auto;
     }
+}
 
-    .search-container {
-        padding: 8px 0 8px 8px;
-        width: 100%;
-        position: relative;
-    }
-    
-    .title-container {
-        margin-left: 16px;
-        padding: 24px 0 16px;
-        height: 70.4px;
-    }
-    
-    .title {
-        font-family: var(--font-family-bold);
-        font-size: 2rem;
-        line-height: 25px;
-        font-weight: 700;
-    }
+// Search bar styles
 
-    .close-icon {
-        width: 28px;
-        height: 28px;
-        padding: 6px;
-        position: absolute;
-        right: 16px;
-        top: 24px;
-        border-radius: 50px;
-        background: rgba(22, 24, 35, 0.06);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .search-form {
-        width: 302px !important;
-        border-radius: 92px !important;
-        padding-top: 10px !important;
-        padding-bottom: 10px !important;
-    
-        & .search-input {
-            font-size: 1.4rem !important;
-        }
-    
-        & .clear-icon {
-            right: 17px !important;
-        }
-    }
-    
-    .search-results-wrapper {
-        margin-top: 12px;
-        width: 100%;
-        max-height: 90vh;
-        overflow-y: auto;
-        padding-right: 8px;
-    }
-    
-    .search-results-title {
-        color: rgba(22, 24, 35, 0.5);
-        font-size: 14px;
-        line-height: 18px;
-        font-weight: 600;
-        padding: 5px 8px;
-    }
-    
-    .search-result-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
+.search-container {
+    padding: 8px 0 8px 8px;
+    width: 100%;
+    position: relative;
+}
+
+.header-search-bar {
+    margin-left: 16px;
+    padding: 24px 0 16px;
+    height: 70.4px;
+}
+
+.title-container {
+    display: flex;
+    gap: 8px;
+}
+
+.title {
+    font-family: var(--font-family-bold);
+    color: var(--text-color);
+    font-size: 2rem;
+    line-height: 25px;
+    font-weight: 700;
 }
 
 
+.close-icon {
+    width: 28px;
+    height: 28px;
+    padding: 6px;
+    position: absolute;
+    right: 16px;
+    top: 24px;
+    border-radius: 50px;
+    background: rgba(22, 24, 35, 0.06);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+        background: rgba(22, 24, 35, 0.1);
+    }
+}
+
+.back-icon {
+    width: 24px;
+    height: 24px;
+    padding: 6px 4px 6px 8px;
+    border-radius: 50px;
+    background: rgba(22, 24, 35, 0.06);
+    cursor: pointer;
+    
+    &:hover {
+        background: rgba(22, 24, 35, 0.1);
+    }
+}
+
+.search-form {
+    width: 302px !important;
+    border-radius: 92px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+
+    & .search-input {
+        font-size: 1.4rem !important;
+    }
+
+    & .clear-icon {
+        right: 17px !important;
+    }
+}
+
+.search-results-wrapper {
+    margin-top: 12px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.search-results-title {
+    color: var(--text-color);
+    font-size: 14px;
+    line-height: 18px;
+    font-weight: 600;
+    padding: 5px 8px;
+}
+
+.search-result-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+// More content
+
+.more-contents {
+    width: 100%;
+    margin-top: 2px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow-y: scroll;
+    gap: 4px;
+    list-style-type: none;
+    scrollbar-width: none;
+}
+
+.more-content-item {
+    width: 100%;
+    padding-right: 8px;
+    padding-left: 8px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    cursor: pointer;
+    border-radius: 92px;
+
+    &:hover {
+        background: var(--search-hover-bg);
+    }
+
+    .title {
+        font-family: var(--font-family-medium);
+        font-weight: 400;
+        font-size: 1.5rem;
+        line-height: 19px;
+    }
+
+    .icon {
+        margin-left: 5px;
+        
+        svg {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            fill: rgba(22, 24, 35, 0.3) !important; 
+        }
+    }
+}

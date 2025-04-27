@@ -23,7 +23,7 @@ const LANGUAGE_BUTTON_PROPS = {
     fontType: 'regular',
 };
 
-const LANGUAGE_LISTS = [
+export const LANGUAGE_LISTS = [
     {
         field: 'language',
         code: 'ar',

@@ -1,24 +1,33 @@
-import { forwardRef, useState } from 'react';
+import { forwardRef, useState, useMemo, useEffect, useCallback } from 'react';
 import classNames from 'classnames/bind';
 import styles from './SideBar.module.scss';
 import PropTypes from 'prop-types';
+
+import { MORE_CONTENTS } from '~/constants/sidebarConstants';
 import Search from '../Search';
 import AccountItem from '~/components/AccountItem';
-import { CloseIcon } from '~/assets/images/icons';
+import { BackIcon, CloseIcon } from '~/assets/images/icons';
 
 const cx = classNames.bind(styles);
 
 const DrawerContainer = forwardRef(function DrawerContainer(
-    { children, onClose },
+    { onClose, title = '' },
     ref,
 ) {
     const [searchResults, setSearchResults] = useState([]);
+    const [history, setHistory] = useState([{ data: MORE_CONTENTS }]);
 
-    const handleSearchResults = (results) => {
+    const current = useMemo(() => history[history.length - 1], [history]);
+
+    useEffect(() => {
+        if (title && history.length === 1 && !history[0].title) {
+            setHistory([{ title, data: MORE_CONTENTS }]);
+        }
+    }, [title, history]);
+
+    const handleSearchResults = useCallback((results) => {
         setSearchResults(results);
-    };
-
-    const handleAccountClick = (data) => {};
+    }, []);
 
     const handleClose = () => {
         if (onClose) {
@@ -26,12 +35,26 @@ const DrawerContainer = forwardRef(function DrawerContainer(
         }
     };
 
-    return (
-        <div ref={ref} className={cx('drawer-container')}>
-            <div className={cx('title-container')}>
-                <h2 className={cx('title')}>Search</h2>
-            </div>
-            <CloseIcon className={cx('close-icon')} onClick={handleClose} />
+    const handleItemClick = (item, isParent) => {
+        if (isParent) {
+            setHistory((prev) => [...prev, item.children]);
+        }
+    };
+
+    const handleBack = () => {
+        setHistory((prev) => prev.slice(0, prev.length - 1));
+    };
+
+    const getTitle = () => {
+        if (history.length > 1) {
+            return current.title;
+        } else {
+            return title;
+        }
+    };
+
+    const renderSearchContent = useCallback(() => {
+        return (
             <div className={cx('search-container')}>
                 <Search
                     className={cx('search-form')}
@@ -46,20 +69,73 @@ const DrawerContainer = forwardRef(function DrawerContainer(
                         <h4 className={cx('search-results-title')}>Accounts</h4>
                         <ul className={cx('search-result-list')}>
                             {searchResults.map((result) => (
-                                <li key={result.id}>
-                                    <AccountItem
-                                        data={result}
-                                        onClick={() =>
-                                            handleAccountClick(result)
-                                        }
-                                    />
+                                <li
+                                    key={result.id}
+                                    className={cx('search-result-item')}
+                                >
+                                    <AccountItem data={result} />
                                 </li>
                             ))}
                         </ul>
                     </div>
                 )}
             </div>
-            {children}
+        );
+    }, [searchResults, handleSearchResults]);
+
+    const renderMoreContent = () => {
+        return (
+            <div className={cx('more-contents')}>
+                {current.data.map((item, index) => {
+                    const isParent = !!item.children;
+                    return (
+                        <div
+                            key={index}
+                            className={cx('more-content-item')}
+                            onClick={() => handleItemClick(item, isParent)}
+                        >
+                            <span className={cx('title')}>{item.title}</span>
+                            {item.icon && (
+                                <span className={cx('icon')}>{item.icon}</span>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    };
+
+    const renderContent = () => {
+        switch (title) {
+            case 'Search':
+                return renderSearchContent();
+            case 'More':
+                return renderMoreContent();
+            default:
+                return null;
+        }
+    };
+
+    return (
+        <div ref={ref} className={cx('drawer-container')}>
+            <div className={cx('header-search-bar')}>
+                <div className={cx('title-container')}>
+                    {history.length > 1 && (
+                        <BackIcon
+                            className={cx('back-icon')}
+                            onClick={handleBack}
+                        />
+                    )}
+                    <h2 className={cx('title')}>{getTitle()}</h2>
+                </div>
+                {history.length === 1 && (
+                    <CloseIcon
+                        className={cx('close-icon')}
+                        onClick={handleClose}
+                    />
+                )}
+            </div>
+            {renderContent()}
         </div>
     );
 });
@@ -67,6 +143,8 @@ const DrawerContainer = forwardRef(function DrawerContainer(
 DrawerContainer.propTypes = {
     children: PropTypes.node,
     className: PropTypes.string,
+    onClose: PropTypes.func,
+    title: PropTypes.string,
 };
 
 export default DrawerContainer;

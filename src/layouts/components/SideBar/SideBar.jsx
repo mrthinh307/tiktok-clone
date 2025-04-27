@@ -1,23 +1,27 @@
 import classNames from 'classnames/bind';
 import styles from './SideBar.module.scss';
-import { useState, memo, useCallback } from 'react';
+import { useState, memo, useCallback, useMemo } from 'react';
+
 import { Link } from 'react-router-dom';
-import { DarkLogoIcon, OnlyDarkLogoIcon } from '~/assets/images/icons';
 import config from '~/config';
 import Menu from './Menu';
 import { useDrawer } from '~/hooks';
 import DrawerContainer from './DrawContainer';
+import { DarkLogoIcon, OnlyDarkLogoIcon } from '~/assets/images/icons';
 
 const cx = classNames.bind(styles);
 
 function SideBar() {
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [currentMenuTitle, setCurrentMenuTitle] = useState('');
 
-    const { showDrawer, drawerRef } = useDrawer(isCollapsed, {
+    const drawerOptions = useMemo(() => ({
         className: cx('show'),
         animationDuration: 400,
         animationDelay: 50
-    });
+    }), []);
+
+    const { showDrawer, drawerRef } = useDrawer(isCollapsed, drawerOptions);
 
     const handleToggleCollapse = useCallback(() => {
         setIsCollapsed(prevState => !prevState);
@@ -26,6 +30,21 @@ function SideBar() {
     const handleCloseDrawer = useCallback(() => {
         setIsCollapsed(false);
     }, []);
+
+    const handleMenuTitleChange = useCallback((title) => {
+        setCurrentMenuTitle(title);
+    }, []);
+
+    const menuProps = useMemo(() => ({
+        collapsed: isCollapsed,
+        onToggleCollapse: handleToggleCollapse,
+        onSetTitle: handleMenuTitleChange
+    }), [isCollapsed, handleToggleCollapse, handleMenuTitleChange]);
+
+    const drawerProps = useMemo(() => ({
+        onClose: handleCloseDrawer,
+        title: currentMenuTitle
+    }), [handleCloseDrawer, currentMenuTitle]);
 
     return (
         <aside className={cx('wrapper', { collapsed: isCollapsed })}>
@@ -38,10 +57,9 @@ function SideBar() {
                     )}
                 </Link>
                 <Menu
-                    collapsed={isCollapsed}
-                    onToggleCollapse={handleToggleCollapse}
+                    {...menuProps}
                 />
-                {showDrawer && <DrawerContainer ref={drawerRef} onClose={handleCloseDrawer} />}
+                {showDrawer && <DrawerContainer ref={drawerRef} {...drawerProps} />}
             </div>
         </aside>
     );

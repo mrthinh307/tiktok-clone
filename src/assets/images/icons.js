@@ -47,6 +47,6 @@ export { ReactComponent as LiveIcon } from './live.svg';
 export { ReactComponent as UploadIcon } from './upload.svg';
 export { ReactComponent as FriendsIcon } from './friends.svg';
 export { ReactComponent as FriendsSolidIcon } from './friends-solid.svg';
-
+export { ReactComponent as CloseIcon } from './close.svg';
 
 
