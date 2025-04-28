@@ -48,5 +48,9 @@ export { ReactComponent as UploadIcon } from './upload.svg';
 export { ReactComponent as FriendsIcon } from './friends.svg';
 export { ReactComponent as FriendsSolidIcon } from './friends-solid.svg';
 export { ReactComponent as CloseIcon } from './close.svg';
-
-
+export { ReactComponent as MuteVolumeIcon } from './mute-volume.svg';
+export { ReactComponent as UnmuteVolumeIcon } from './unmute-volume.svg';
+export { ReactComponent as TymIcon } from './tym.svg';
+export { ReactComponent as CommentIcon } from './comment.svg';
+export { ReactComponent as BookmarkIcon } from './bookmark.svg';
+export { ReactComponent as TickFollowIcon } from './tick-follow.svg';
