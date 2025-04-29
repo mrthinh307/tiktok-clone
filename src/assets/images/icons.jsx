@@ -54,3 +54,6 @@ export { ReactComponent as TymIcon } from './tym.svg';
 export { ReactComponent as CommentIcon } from './comment.svg';
 export { ReactComponent as BookmarkIcon } from './bookmark.svg';
 export { ReactComponent as TickFollowIcon } from './tick-follow.svg';
+export { ReactComponent as CaptionIcon } from './caption.svg';
+export { ReactComponent as AutoScrollIcon } from './auto-scroll.svg';
+export { ReactComponent as MiniPlayerIcon } from './mini-player.svg';
