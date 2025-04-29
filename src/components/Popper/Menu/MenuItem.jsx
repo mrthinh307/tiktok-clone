@@ -14,6 +14,9 @@ function MenuItem({
     fontType,
     onClick,
     active,
+    primary = false,
+    rounded = false,
+    outline = false,
 }) {
     return (
         <Button
@@ -21,13 +24,17 @@ function MenuItem({
                 seperate: data.seperate,
                 active: active,
             })}
+            primary={primary}
+            rounded={rounded}
+            outline={outline}
             buttonPadding={buttonPadding}
             iconSize={iconSize}
             titleSize={titleSize}
             hoverType={hoverType}
             fontType={fontType}
-            onClick={onClick}
             leftIcon={data.icon}
+            rightIcon={data.icon2}
+            onClick={onClick}
         >
             {data.title}
         </Button>

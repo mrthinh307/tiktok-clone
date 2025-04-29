@@ -36,8 +36,17 @@ function AccountItem({ data }) {
                 items={SEARCH_ACCOUNT_OPTIONS}
                 className={cx('account-item-menu')}
                 {...SEARCH_ACCOUNT_BUTTON_PROPS}
+                onClick={(e) => {
+                    e.stopPropagation();
+                }}
             >
-                <EllipsisIcon className={cx('ellipsis')} />
+                <EllipsisIcon
+                    className={cx('ellipsis')}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }}
+                />
             </Menu>
         </Link>
     );

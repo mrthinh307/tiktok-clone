@@ -14,8 +14,8 @@ function Menu({
     children,
     items = [],
     className,
+    onClick,
     onChange = defaultFn,
-    hideOnClick = false,
     ...props
 }) {
     const [history, setHistory] = useState([{ data: items }]);
@@ -32,7 +32,12 @@ function Menu({
                     titleSize={item.titleSize || props.titleSize}
                     hoverType={item.hoverType || props.hoverType}
                     fontType={item.fontType || props.fontType}
-                    onClick={() => {
+                    primary={item.primary || props.primary}
+                    rounded={item.rounded || props.rounded}
+                    outline={item.outline || props.outline}
+                    onClick={(e) => {
+                        e.preventDefault(); 
+                        e.stopPropagation();
                         // Next menu
                         if (isParent) {
                             setHistory((prev) => [...prev, item.children]);
@@ -46,17 +51,26 @@ function Menu({
     };
 
     const handleBack = () => {
-        setHistory((prev) => prev.slice(0, prev.length - 1))
+        setHistory((prev) => prev.slice(0, prev.length - 1));
     };
 
     const renderResult = (attrs) => (
-        <div className={cx('menu-items')} tabIndex="-1" {...attrs}>
+        <div
+            className={cx('menu-wrapper')}
+            tabIndex="-1"
+            {...attrs}
+            onClick={(e) => {
+                e.stopPropagation();
+                onClick && onClick(e);
+            }}
+        >
             <PopperWrapper
                 className={cx(
                     'popper-wrapper',
                     { 'has-header': history.length > 1 },
                     className,
                 )}
+                onClick={(e) => e.stopPropagation()}
             >
                 {history.length > 1 && (
                     <Header
@@ -77,11 +91,12 @@ function Menu({
     return (
         <HeadlessTippy
             interactive={true}
-            hideOnClick={hideOnClick}
-            offset={[12, 4]}
+            trigger={props.trigger || undefined}
+            hideOnClick={props.hideOnClick || false}
+            offset={props.offset || [12, 8]}
             delay={[0, props.hiddenDelayTime || 0]}
-            animation={false}
-            appendTo={() => document.body}
+            // animation={true}
+            appendTo={document.body}
             placement="bottom-end"
             render={renderResult}
             onHidden={handleReset}
@@ -97,6 +112,7 @@ Menu.propTypes = {
     className: PropTypes.string,
     onChange: PropTypes.func,
     hideOnClick: PropTypes.bool,
+    onClick: PropTypes.func,
     hiddenDelayTime: PropTypes.number,
 };
 
