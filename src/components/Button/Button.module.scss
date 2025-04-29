@@ -8,13 +8,18 @@
     font-weight: 400;
     gap: 10px;
     cursor: pointer;
+    position: relative;
 
     .title {
+        flex: 1;
         font-size: 1.6rem;
         line-height: 21px;
         white-space: nowrap; 
         opacity: 1;
         overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
         &.title-small {
             font-size: 1.4rem;
@@ -76,6 +81,7 @@
     }
 }
 
+
 // Padding sizes of button
 .padding-none {
     padding: 0;
@@ -109,20 +115,7 @@
 }
 
 .primary {
-    color: var(--white);
-    background-color: var(--primary);
-    border-color: var(--primary);
-    border-radius: 4px;
-
-    &:hover {
-        border-color: var(--primary);
-        background: linear-gradient(
-                0deg,
-                rgba(0, 0, 0, 0.06),
-                rgba(0, 0, 0, 0.06)
-            ),
-            #fe2c55;
-    }
+    border-radius: 8px;
 }
 
 .outline {

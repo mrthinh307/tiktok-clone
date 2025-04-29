@@ -74,12 +74,12 @@ function Button({
             )}
             <span className={cx('title', `title-${titleSize}`)}>
                 {children}
-            </span>
             {rightIcon && (
-                <span className={cx('icon', `icon-${iconSize}`)}>
+                <span className={cx('icon', 'right-icon')}>
                     {rightIcon}
                 </span>
             )}
+            </span>
         </Comp>
     );
 }
