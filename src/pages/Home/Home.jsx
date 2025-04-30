@@ -3,6 +3,8 @@ import classNames from 'classnames/bind';
 import styles from './Home.module.scss';
 import VideoPlayer from './components/VideoPlayer';
 import { fetchVideos } from '~/services/apiServices/videoService';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 
 const cx = classNames.bind(styles);
 
@@ -10,7 +12,14 @@ function Home() {
     const [videos, setVideos] = useState([]);
     const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const [transitionDirection, setTransitionDirection] = useState(null);
+    const [showNavigationIndicator, setShowNavigationIndicator] =
+        useState(false);
     const containerRef = useRef(null);
+    const touchStartRef = useRef(0);
+    const scrollTimeoutRef = useRef(null);
+    const navigationTimeoutRef = useRef(null);
 
     useEffect(() => {
         const loadVideos = async () => {
@@ -31,94 +40,235 @@ function Home() {
         loadVideos();
     }, []);
 
-    // Handle scroll events to change videos
+    // Handle keyboard navigation with visual feedback
     useEffect(() => {
-        const handleScroll = (event) => {
-            if (loading || !containerRef.current) return;
+        const handleKeyDown = (event) => {
+            if (loading || isTransitioning) return;
 
-            // Xác định hướng scroll
-            const delta = event.deltaY;
+            // Prevent default behavior for arrow keys
+            if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+                event.preventDefault();
+            }
 
-            if (delta > 0 && currentVideoIndex < videos.length - 1) {
-                // Scroll down - next video
-                setCurrentVideoIndex((prev) => prev + 1);
-            } else if (delta < 0 && currentVideoIndex > 0) {
-                // Scroll up - previous video
-                setCurrentVideoIndex((prev) => prev - 1);
+            switch (event.key) {
+                case 'ArrowUp':
+                    if (currentVideoIndex > 0) {
+                        showNavigationCue('prev');
+                        handleVideoTransition(currentVideoIndex - 1, 'prev');
+                    }
+                    break;
+                case 'ArrowDown':
+                    if (currentVideoIndex < videos.length - 1) {
+                        showNavigationCue('next');
+                        handleVideoTransition(currentVideoIndex + 1, 'next');
+                    }
+                    break;
+                default:
+                    break;
             }
         };
 
-        // Thêm event listener
-        window.addEventListener('wheel', handleScroll);
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentVideoIndex, loading, videos.length, isTransitioning]);
+
+    // Handle wheel events with improved behavior
+    useEffect(() => {
+        const handleScroll = (event) => {
+            if (loading || isTransitioning) return;
+
+            // Clear any pending scroll timeouts
+            if (scrollTimeoutRef.current) {
+                clearTimeout(scrollTimeoutRef.current);
+            }
+
+            // Debounce scroll events to prevent rapid firing
+            scrollTimeoutRef.current = setTimeout(() => {
+                const delta = event.deltaY;
+                if (delta > 20 && currentVideoIndex < videos.length - 1) {
+                    // Scroll down - next video
+                    showNavigationCue('next');
+                    handleVideoTransition(currentVideoIndex + 1, 'next');
+                } else if (delta < -20 && currentVideoIndex > 0) {
+                    // Scroll up - previous video
+                    showNavigationCue('prev');
+                    handleVideoTransition(currentVideoIndex - 1, 'prev');
+                }
+            }, 50);
+        };
+
+        window.addEventListener('wheel', handleScroll, { passive: false });
 
         return () => {
-            // Cleanup
             window.removeEventListener('wheel', handleScroll);
+            if (scrollTimeoutRef.current) {
+                clearTimeout(scrollTimeoutRef.current);
+            }
+            if (navigationTimeoutRef.current) {
+                clearTimeout(navigationTimeoutRef.current);
+            }
         };
-    }, [currentVideoIndex, loading, videos.length]);
-    // useEffect(() => {
-    //     let touchStartY = 0;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentVideoIndex, loading, videos.length, isTransitioning]);
 
-    //     const handleTouchStart = (e) => {
-    //         touchStartY = e.touches[0].clientY;
-    //     };
+    // Show navigation indicator briefly
+    const showNavigationCue = (direction) => {
+        // Clear any existing timeout
+        if (navigationTimeoutRef.current) {
+            clearTimeout(navigationTimeoutRef.current);
+        }
 
-    //     const handleTouchEnd = (e) => {
-    //         if (loading) return;
+        setTransitionDirection(direction);
+        setShowNavigationIndicator(true);
 
-    //         const touchEndY = e.changedTouches[0].clientY;
-    //         const deltaY = touchStartY - touchEndY;
+        // Hide after animation
+        navigationTimeoutRef.current = setTimeout(() => {
+            setShowNavigationIndicator(false);
+        }, 500);
+    };
 
-    //         // Threshold để xác định swipe
-    //         if (Math.abs(deltaY) > 50) {
-    //             if (deltaY > 0 && currentVideoIndex < videos.length - 1) {
-    //                 // Swipe up - next video
-    //                 setCurrentVideoIndex((prev) => prev + 1);
-    //             } else if (deltaY < 0 && currentVideoIndex > 0) {
-    //                 // Swipe down - previous video
-    //                 setCurrentVideoIndex((prev) => prev - 1);
-    //             }
-    //         }
-    //     };
+    // Handle smooth scroll transition with direction parameter
+    const handleVideoTransition = (newIndex, direction = null) => {
+        if (isTransitioning) return;
 
-    //     window.addEventListener('touchstart', handleTouchStart);
-    //     window.addEventListener('touchend', handleTouchEnd);
+        setIsTransitioning(true);
 
-    //     return () => {
-    //         window.removeEventListener('touchstart', handleTouchStart);
-    //         window.removeEventListener('touchend', handleTouchEnd);
-    //     };
-    // }, [currentVideoIndex, loading, videos.length]);
+        // Determine direction if not provided
+        if (!direction) {
+            direction = newIndex > currentVideoIndex ? 'next' : 'prev';
+        }
 
-    // Handle change video with button
-    const handleNextVideo = () => {
-        if (currentVideoIndex < videos.length - 1) {
-            setCurrentVideoIndex(currentVideoIndex + 1);
+        setTransitionDirection(direction);
+
+        // Apply transition class to container
+        if (containerRef.current) {
+            containerRef.current.classList.add(cx('transitioning'));
+            containerRef.current.classList.add(
+                cx(`transitioning-${direction}`),
+            );
+
+            // Set timeout to allow CSS transition to complete
+            setTimeout(() => {
+                setCurrentVideoIndex(newIndex);
+
+                // After index is updated, remove transition classes
+                setTimeout(() => {
+                    if (containerRef.current) {
+                        containerRef.current.classList.remove(
+                            cx('transitioning'),
+                        );
+                        containerRef.current.classList.remove(
+                            cx(`transitioning-${direction}`),
+                        );
+                    }
+                    setIsTransitioning(false);
+                    setTransitionDirection(null);
+                }, 50);
+            }, 300);
+        } else {
+            setCurrentVideoIndex(newIndex);
+            setIsTransitioning(false);
         }
     };
 
-    const handlePrevVideo = () => {
-        if (currentVideoIndex > 0) {
-            setCurrentVideoIndex(currentVideoIndex - 1);
-        }
-    };
+    // Handle touch events for mobile with improved behavior
+    useEffect(() => {
+        const handleTouchStart = (e) => {
+            touchStartRef.current = e.touches[0].clientY;
+        };
+
+        const handleTouchEnd = (e) => {
+            if (loading || isTransitioning) return;
+
+            const touchEndY = e.changedTouches[0].clientY;
+            const deltaY = touchStartRef.current - touchEndY;
+
+            // Threshold to determine swipe (50px)
+            if (Math.abs(deltaY) > 50) {
+                if (deltaY > 0 && currentVideoIndex < videos.length - 1) {
+                    // Swipe up - next video
+                    showNavigationCue('next');
+                    handleVideoTransition(currentVideoIndex + 1, 'next');
+                } else if (deltaY < 0 && currentVideoIndex > 0) {
+                    // Swipe down - previous video
+                    showNavigationCue('prev');
+                    handleVideoTransition(currentVideoIndex - 1, 'prev');
+                }
+            }
+        };
+
+        window.addEventListener('touchstart', handleTouchStart, {
+            passive: true,
+        });
+        window.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+        return () => {
+            window.removeEventListener('touchstart', handleTouchStart);
+            window.removeEventListener('touchend', handleTouchEnd);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentVideoIndex, loading, videos.length, isTransitioning]);
+
+    // Handle button navigation
+    // const handleNextVideo = () => {
+    //     if (currentVideoIndex < videos.length - 1) {
+    //         showNavigationCue('next');
+    //         handleVideoTransition(currentVideoIndex + 1, 'next');
+    //     }
+    // };
+
+    // const handlePrevVideo = () => {
+    //     if (currentVideoIndex > 0) {
+    //         showNavigationCue('prev');
+    //         handleVideoTransition(currentVideoIndex - 1, 'prev');
+    //     }
+    // };
 
     return (
         <div className={cx('wrapper')} ref={containerRef}>
             {loading ? (
                 <div className={cx('loading')}></div>
             ) : (
-                videos.length > 0 && (
-                    <div className={cx('video-wrapper')}>
-                        <VideoPlayer
-                            video={videos[currentVideoIndex]}
-                            onNext={handleNextVideo}
-                            onPrev={handlePrevVideo}
-                            hasNext={currentVideoIndex < videos.length - 1}
-                            hasPrev={currentVideoIndex > 0}
-                        />
-                    </div>
-                )
+                <>
+                    {videos.length > 0 && (
+                        <div className={cx('video-wrapper')}>
+                            <VideoPlayer
+                                video={videos[currentVideoIndex]}
+                                // onNext={handleNextVideo}
+                                // onPrev={handlePrevVideo}
+                                hasNext={currentVideoIndex < videos.length - 1}
+                                hasPrev={currentVideoIndex > 0}
+                            />
+                        </div>
+                    )}
+
+                    {/* Navigation direction indicators */}
+                    {showNavigationIndicator &&
+                        transitionDirection === 'prev' && (
+                            <div
+                                className={cx(
+                                    'navigation-indicator',
+                                    'prev',
+                                    'visible',
+                                )}
+                            >
+                                <FontAwesomeIcon icon={faChevronUp} />
+                            </div>
+                        )}
+                    {showNavigationIndicator &&
+                        transitionDirection === 'next' && (
+                            <div
+                                className={cx(
+                                    'navigation-indicator',
+                                    'next',
+                                    'visible',
+                                )}
+                            >
+                                <FontAwesomeIcon icon={faChevronDown} />
+                            </div>
+                        )}
+                </>
             )}
         </div>
     );
@@ -135,12 +285,12 @@ const MOCK_VIDEOS = [
             verified: true,
         },
         description:
-            'KHÔNG BIẾT SAU CHUYỆN NÀY CÔ GÁI ẤY SẼ CẢM THẤY NHƯ NÀO ĐÂY KHI ĐÃ ĐƯỢC HƯỚNG DẪN Cỡ ĐÓ RỒI MÀ VẪN THẾ NÀY',
+            "watching designers discover what's possible with new tools... #design #testing #ui #productivity",
         music: 'original sound',
         video: {
             cover: 'https://p16-sign-va.tiktokcdn.com/obj/tos-useast5-p-0068-tx/470e7757182144b189c308dc60705e9f_1714356490?x-expires=1714608000&x-signature=cyC%2BDerhviDKJpE30KZbSbuO42g%3D',
             playAddr:
-                'https://v16-webapp-prime.tiktok.com/video/tos/useast5/tos-useast5-pve-0068-tx/oQCIAnh6k2IoMEL8BBuAuCvEhgAzACEDzKafEW/?a=1988&ch=0&cr=3&dr=0&lr=tiktok_m&cd=0%7C0%7C1%7C3&cv=1&br=1408&bt=704&cs=0&ds=3&ft=_p.C~yIVtbsZPvLWfh_vjjcby7LYvGeSN2vJwJngjN0P&mime_type=video_mp4&qs=0&rc=aDxlZzNlZjc3ZzhlZzM5OUBpM2c4OTQ6ZmdpZTMzZzczNEBfLjUuMzE0XmExNS5jMzVfYSMtZmEzcjQwLWFgLS1kMS9zcw%3D%3D&btag=e00080000&expire=1714607187&l=202404271646220102452291050C14678E&ply_type=2&policy=2&signature=379016328bd3cf9882c89c867efb5c10&tk=0',
+                'https://v16-webapp-prime.tiktok.com/video/tos/useast5/tos-useast5-pve-0068-tx/oQCIAnh6k2IoMEL8BBuAuCvEhgAzACEDzKafEW/?a=1988&ch=0&cr=3&dr=0&lr=tiktok_m&cd=0%7C0%7C1%7C3&cv=1&br=1408&bt=704&cs=0&ds=3&ft=_p.C~yIVtbsZPvLWfh_vjjcby7LYvGeSN2vJwJngjN0P&mime_type=video_mp4&qs=0&rc=aDxlZzNlZjc3ZzhlZzM5OUBpM2c4OTQ6ZmdpZTMzZzczNEBfLjUuMzE0XmExNS5jMzVfYSMtZmEzcjQwLWFgLS1k',
             width: 576,
             height: 1024,
             duration: 15.12,
@@ -201,8 +351,8 @@ const MOCK_VIDEOS = [
         stats: {
             likes: 98200,
             comments: 1243,
-            saves: 8740,
-            shares: 3210,
+            saves: 8900,
+            shares: 5100,
         },
         caption: 'CODING LIFE',
     },

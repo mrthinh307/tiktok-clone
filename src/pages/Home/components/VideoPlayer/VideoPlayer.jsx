@@ -9,6 +9,8 @@ import {
     faCommentDots,
     faPause,
     faPlay,
+    faChevronUp,
+    faChevronDown,
 } from '@fortawesome/free-solid-svg-icons';
 import {
     BlueTickIcon,
@@ -34,8 +36,6 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev }) {
         return savedPreference ? savedPreference === 'muted' : true;
     });
 
-    console.log('re-render video', video.id);
-
     const [videoLoaded, setVideoLoaded] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [liked, setLiked] = useState(false);
@@ -48,9 +48,9 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev }) {
     const [followed, setFollowed] = useState(false);
     const [expandedDescription, setExpandedDescription] = useState(false);
     const [showPlayPauseOverlay, setShowPlayPauseOverlay] = useState(false);
-
+    
     const videoRef = useRef(null);
-
+    
     useEffect(() => {
         localStorage.setItem(
             'tiktok-sound-preference',
@@ -188,10 +188,10 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev }) {
     // Handle event turn on/off sound
     const toggleMute = (e) => {
         e.stopPropagation();
+        
         const newMutedState = !isMuted;
-
         setIsMuted(newMutedState);
-
+        
         if (videoRef.current) {
             videoRef.current.muted = newMutedState;
         }
@@ -199,7 +199,7 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev }) {
 
     const toggleDescription = (e) => {
         e.stopPropagation();
-        setExpandedDescription((prev) => !prev);
+        setExpandedDescription(prev => !prev);
     };
 
     const handleLike = (e) => {
@@ -209,9 +209,9 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev }) {
         setLikedFlash(true);
         setTimeout(() => {
             setLikedFlash(false);
-        }, 150);
+        }, 200);
     };
-
+    
     const handleSave = (e) => {
         e.stopPropagation();
         setSaved((prev) => !prev);
@@ -219,40 +219,27 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev }) {
         setSavedFlash(true);
         setTimeout(() => {
             setSavedFlash(false);
-        }, 150);
+        }, 200);
     };
-
+    
     const handleComment = (e) => {
         e.stopPropagation();
         setCommentFlash(true);
-        setTimeout(() => {
-            setCommentFlash(false);
-        }, 150);
+        setTimeout(() => setCommentFlash(false), 200);
     };
-
+    
     const handleShare = (e) => {
         e.stopPropagation();
         setSharedFlash(true);
-        setTimeout(() => {
-            setSharedFlash(false);
-        }, 150);
+        setTimeout(() => setSharedFlash(false), 200);
     };
-
+    
     const handleFollow = (e) => {
         e.stopPropagation();
-        setFollowed((prev) => !prev);
+        setFollowed(!followed);
     };
-
-    const handleNextVideo = (e) => {
-        e.stopPropagation();
-        onNext();
-    };
-
-    const handlePrevVideo = (e) => {
-        e.stopPropagation();
-        onPrev();
-    };
-
+    
+    // Format numbers for display (e.g. 1.2K, 2.5M)
     const formatCount = (count) => {
         if (count >= 1000000) {
             return (count / 1000000).toFixed(1) + 'M';
@@ -290,6 +277,31 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev }) {
                         )}
                     </div>
                 </div>
+                
+                {/* Navigation overlay indicators */}
+                {/* {hasPrev && (
+                    <div className={cx('nav-overlay', 'top')}>
+                        <button 
+                            className={cx('nav-overlay-button')}
+                            onClick={handlePrevVideo}
+                            aria-label="Previous video"
+                        >
+                            <FontAwesomeIcon icon={faChevronUp} />
+                        </button>
+                    </div>
+                )}
+                
+                {hasNext && (
+                    <div className={cx('nav-overlay', 'bottom')}>
+                        <button 
+                            className={cx('nav-overlay-button')}
+                            onClick={handleNextVideo}
+                            aria-label="Next video"
+                        >
+                            <FontAwesomeIcon icon={faChevronDown} />
+                        </button>
+                    </div>
+                )} */}
 
                 {/* Progress video */}
                 <div className={cx('progress-container')}>
@@ -331,47 +343,17 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev }) {
                     </Menu>
                 </div>
 
-                {/* Navigation Buttons */}
-                {/* {hasPrev && (
-                    <button
-                        className={cx('nav-button', 'prev')}
-                        onClick={handlePrevVideo}
-                    >
-                        <FontAwesomeIcon icon={faChevronUp} />
-                    </button>
-                )}
-
-                {hasNext && (
-                    <button
-                        className={cx('nav-button', 'next')}
-                        onClick={handleNextVideo}
-                    >
-                        <FontAwesomeIcon icon={faChevronDown} />
-                    </button>
-                )} */}
-
                 <div className={cx('video-info')}>
-                    <Link to={`/@${video.user.id}`} className={cx('user-info')}>
-                        {/* <div className={cx('avatar-container')}>
-                        <img
-                            src={video.user.avatar}
-                            alt={video.user.nickname}
-                            className={cx('avatar')}
-                        />
-                    </div> */}
-                        {/* <div className={cx('user-details')}>    
-
-                        <div className={cx('name')}>{video.user.nickname}</div>
-                    </div> */}
-                        <strong className={cx('username')}>
+                    <div className={cx('user-info')}>
+                        <Link to={`/@${video.user.id}`} className={cx('username')}>
                             @{video.user.nickname}
-                        </strong>
+                        </Link>
                         {video.user.verified && (
                             <span className={cx('verified-icon')}>
                                 <BlueTickIcon />
                             </span>
                         )}
-                    </Link>
+                    </div>
 
                     <div
                         className={cx('description', {

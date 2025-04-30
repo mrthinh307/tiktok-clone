@@ -7,6 +7,7 @@
     align-items: flex-end;
     background: transparent;
     gap: 16px;
+    position: relative;
 }
 
 .video-player-wrapper {
@@ -20,6 +21,12 @@
     border-radius: 16px;
     background: transparent;
     position: relative;
+    transition: transform 0.2s ease-out;
+    
+    // Add subtle hover effect
+    &:hover {
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    }
 }
 
 .video {
@@ -29,6 +36,7 @@
     display: block;
 }
 
+// Improved play/pause overlay with smoother animations
 .play-pause-overlay {
     position: absolute;
     top: 0;
@@ -41,6 +49,7 @@
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
     background: transparent;
+    z-index: 10;
 
     &.visible {
         opacity: 1;
@@ -57,8 +66,8 @@
     justify-content: center;
     border: none;
     cursor: pointer;
-    transform: scale(0.9);
-    transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    transform: scale(0.8);
+    transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
 
     svg {
         width: 28px;
@@ -71,7 +80,60 @@
     transform: scale(1.3);
 }
 
-// Thanh tiến độ video
+// Navigation overlays (for arrow indicators)
+// .nav-overlay {
+//     position: absolute;
+//     left: 0;
+//     width: 100%;
+//     height: 80px;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//     z-index: 15;
+//     opacity: 0;
+//     transition: opacity 0.3s;
+//     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), transparent);
+    
+//     &.top {
+//         top: 0;
+//         background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), transparent);
+//     }
+    
+//     &.bottom {
+//         bottom: 0;
+//         background: linear-gradient(to top, rgba(0, 0, 0, 0.2), transparent);
+//     }
+    
+//     &:hover {
+//         opacity: 1;
+//     }
+// }
+
+// .nav-overlay-button {
+//     background: rgba(255, 255, 255, 0.2);
+//     border: none;
+//     border-radius: 50%;
+//     width: 40px;
+//     height: 40px;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//     color: white;
+//     cursor: pointer;
+//     transition: all 0.2s;
+//     backdrop-filter: blur(4px);
+    
+//     &:hover {
+//         background: rgba(255, 255, 255, 0.3);
+//         transform: scale(1.1);
+//     }
+    
+//     svg {
+//         font-size: 18px;
+//     }
+// }
+
+// Keeping existing code...
 .progress-container {
     position: absolute;
     bottom: 0;
@@ -144,36 +206,6 @@
     width: 234px !important;
 }
 
-// Nút điều hướng
-.nav-button {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: rgba(22, 24, 35, 0.34);
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    cursor: pointer;
-    z-index: 11;
-
-    &.prev {
-        right: 20px;
-        top: 20px;
-    }
-
-    &.next {
-        right: 20px;
-        bottom: 70px;
-    }
-
-    &:hover {
-        background-color: rgba(22, 24, 35, 0.54);
-    }
-}
-
 // Thông tin video và người dùng
 .video-info {
     width: 100%;
@@ -208,7 +240,8 @@
 
 .username {
     font-size: 1.4rem;
-    font-weight: 600;
+    font-weight: 800;
+    color: #fff;
     line-height: 18.5px;
     position: relative;
 }
