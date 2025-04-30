@@ -1,0 +1,136 @@
+.action-buttons {
+    // position: absolute;
+    // right: 20px;
+    // bottom: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 3px;
+    gap: 14px;
+}
+
+.avatar-container,
+.sound-container {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin-bottom: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background: transparent;
+    cursor: pointer;
+}
+
+.avatar-container {
+    margin-bottom: 14px;
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.sound {
+    width: 92%;
+    height: 92%;
+    object-fit: cover;
+    border-radius: 50%;
+    animation: spin 5s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.follow-btn {
+    position: absolute;
+    top: 37px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--primary-color);
+    border: 1px solid transparent;
+    cursor: pointer;
+
+    &.followed {
+        background-color: #fff;
+        border-color: rgba(22, 24, 35, 0.2);
+    }
+
+    .plus-icon {
+        width: 10px;
+        height: 10px;
+        color: #fff;
+    }
+
+    .follow-icon {
+        color: var(--primary-color);
+    }
+
+    &:hover {
+        background: rgba(234, 40, 78, 1);
+    }
+
+    &.followed:hover {
+        background-color: rgba(245, 245, 245, 1);
+    }
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    gap: 4px;
+    color: black;
+
+    &.active {
+        color: var(--primary-color);
+    }
+
+    &.active .bookmark {
+        color: rgb(243, 205, 0);
+    }
+}
+
+.icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--search-hover-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: background 200ms ease;
+
+    &.liked-flash,
+    &.saved-flash,
+    &.comment-flash,
+    &.shared-flash {
+        background: rgba(22, 24, 35, 0.12)
+    }
+}
+
+.count {
+    font-family: var(--font-family-bold);
+    font-size: 1.2rem;
+    font-weight: 100;
+    line-height: 16px;
+    color: rgba(22, 24, 35, 0.75);
+    text-align: center;
+}
