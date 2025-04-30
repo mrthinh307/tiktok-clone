@@ -17,10 +17,10 @@ function Home() {
     const [showNavigationIndicator, setShowNavigationIndicator] =
         useState(false);
     const containerRef = useRef(null);
-    const touchStartRef = useRef(0);
     const scrollTimeoutRef = useRef(null);
     const navigationTimeoutRef = useRef(null);
 
+    // Load videos from API
     useEffect(() => {
         const loadVideos = async () => {
             try {
@@ -90,7 +90,7 @@ function Home() {
                     // Scroll down - next video
                     showNavigationCue('next');
                     handleVideoTransition(currentVideoIndex + 1, 'next');
-                } else if (delta < -20 && currentVideoIndex > 0) {
+                } else if (delta < 20 && currentVideoIndex > 0) {
                     // Scroll up - previous video
                     showNavigationCue('prev');
                     handleVideoTransition(currentVideoIndex - 1, 'prev');
@@ -165,65 +165,27 @@ function Home() {
                     setIsTransitioning(false);
                     setTransitionDirection(null);
                 }, 50);
-            }, 300);
+            }, 200);
         } else {
             setCurrentVideoIndex(newIndex);
             setIsTransitioning(false);
         }
     };
 
-    // Handle touch events for mobile with improved behavior
-    useEffect(() => {
-        const handleTouchStart = (e) => {
-            touchStartRef.current = e.touches[0].clientY;
-        };
-
-        const handleTouchEnd = (e) => {
-            if (loading || isTransitioning) return;
-
-            const touchEndY = e.changedTouches[0].clientY;
-            const deltaY = touchStartRef.current - touchEndY;
-
-            // Threshold to determine swipe (50px)
-            if (Math.abs(deltaY) > 50) {
-                if (deltaY > 0 && currentVideoIndex < videos.length - 1) {
-                    // Swipe up - next video
-                    showNavigationCue('next');
-                    handleVideoTransition(currentVideoIndex + 1, 'next');
-                } else if (deltaY < 0 && currentVideoIndex > 0) {
-                    // Swipe down - previous video
-                    showNavigationCue('prev');
-                    handleVideoTransition(currentVideoIndex - 1, 'prev');
-                }
-            }
-        };
-
-        window.addEventListener('touchstart', handleTouchStart, {
-            passive: true,
-        });
-        window.addEventListener('touchend', handleTouchEnd, { passive: true });
-
-        return () => {
-            window.removeEventListener('touchstart', handleTouchStart);
-            window.removeEventListener('touchend', handleTouchEnd);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentVideoIndex, loading, videos.length, isTransitioning]);
-
     // Handle button navigation
-    // const handleNextVideo = () => {
-    //     if (currentVideoIndex < videos.length - 1) {
-    //         showNavigationCue('next');
-    //         handleVideoTransition(currentVideoIndex + 1, 'next');
-    //     }
-    // };
+    const handleNextVideo = () => {
+        if (currentVideoIndex < videos.length - 1) {
+            showNavigationCue('next');
+            handleVideoTransition(currentVideoIndex + 1, 'next');
+        }
+    };
 
-    // const handlePrevVideo = () => {
-    //     if (currentVideoIndex > 0) {
-    //         showNavigationCue('prev');
-    //         handleVideoTransition(currentVideoIndex - 1, 'prev');
-    //     }
-    // };
+    const handlePrevVideo = () => {
+        if (currentVideoIndex > 0) {
+            showNavigationCue('prev');
+            handleVideoTransition(currentVideoIndex - 1, 'prev');
+        }
+    };
 
     return (
         <div className={cx('wrapper')} ref={containerRef}>
@@ -235,8 +197,8 @@ function Home() {
                         <div className={cx('video-wrapper')}>
                             <VideoPlayer
                                 video={videos[currentVideoIndex]}
-                                // onNext={handleNextVideo}
-                                // onPrev={handlePrevVideo}
+                                onNext={handleNextVideo}
+                                onPrev={handlePrevVideo}
                                 hasNext={currentVideoIndex < videos.length - 1}
                                 hasPrev={currentVideoIndex > 0}
                             />

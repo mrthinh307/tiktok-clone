@@ -27,15 +27,11 @@ import {
     ELLIPSIS_OPTIONS,
     ELLIPSIS_POPPER_PROPS,
 } from '~/constants/videoConstant';
+import { useAutoScroll } from '~/contexts/AutoScrollContext';
 
 const cx = classNames.bind(styles);
 
 function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev }) {
-    const [isMuted, setIsMuted] = useState(() => {
-        const savedPreference = localStorage.getItem('tiktok-sound-preference');
-        return savedPreference ? savedPreference === 'muted' : true;
-    });
-
     const [videoLoaded, setVideoLoaded] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [liked, setLiked] = useState(false);
@@ -50,6 +46,41 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev }) {
     const [showPlayPauseOverlay, setShowPlayPauseOverlay] = useState(false);
     
     const videoRef = useRef(null);
+    const autoScrollTimeoutRef = useRef(null);
+    const { isAutoScrollEnabled } = useAutoScroll();
+
+    // Handle auto scroll
+    useEffect(() => {
+        const handleVideoEnded = () => {
+            if (isAutoScrollEnabled && hasNext && onNext) {
+                autoScrollTimeoutRef.current = setTimeout(() => {
+                    onNext();
+                }, 500);
+            } else if (videoRef.current) {
+                videoRef.current.currentTime = 0;
+                videoRef.current.play().catch(err => console.error('Replay failed:', err));
+            }
+        };
+
+        if (videoRef.current) {
+            videoRef.current.addEventListener('ended', handleVideoEnded);
+        }
+
+        return () => {
+            if (videoRef.current) {
+                // eslint-disable-next-line react-hooks/exhaustive-deps
+                videoRef.current.removeEventListener('ended', handleVideoEnded);
+            }
+            if (autoScrollTimeoutRef.current) {
+                clearTimeout(autoScrollTimeoutRef.current);
+            }
+        };
+    }, [isAutoScrollEnabled, hasNext, onNext]);
+
+    const [isMuted, setIsMuted] = useState(() => {
+        const savedPreference = localStorage.getItem('tiktok-sound-preference');
+        return savedPreference ? savedPreference === 'muted' : true;
+    });
     
     useEffect(() => {
         localStorage.setItem(
@@ -258,7 +289,7 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev }) {
                     ref={videoRef}
                     src={video.video.playAddr}
                     poster={video.video.cover}
-                    loop
+                    loop={!isAutoScrollEnabled}
                     playsInline
                     className={cx('video')}
                 />

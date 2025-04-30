@@ -2,6 +2,7 @@ import { Fragment } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { publicRoutes } from './routes';
 import DefaultLayout from '~/layouts';
+import { AutoScrollProvider } from './contexts/AutoScrollContext';
 
 function App() {
     return (
@@ -24,9 +25,11 @@ function App() {
                                 key={index}
                                 path={route.path}
                                 element={
-                                    <Layout>
-                                        <Page />
-                                    </Layout>
+                                    <AutoScrollProvider>
+                                        <Layout>
+                                            <Page />
+                                        </Layout>
+                                    </AutoScrollProvider>
                                 }
                             />
                         );
