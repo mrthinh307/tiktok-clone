@@ -20,11 +20,11 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev }) {
         showPlayPauseOverlay,
         isAutoScrollEnabled,
         togglePlay,
-        toggleMute
+        toggleMute,
     } = useVideoControl({
         videoId: video.id,
         hasNext,
-        onNext
+        onNext,
     });
 
     const toggleDescription = useCallback((e) => {
@@ -33,37 +33,39 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev }) {
     }, []);
 
     return (
-        <div className={cx('video-container')}>
+        <div className={cx('wrapper')}>
             {/* Video Player */}
-            <div className={cx('video-player-wrapper')} onClick={togglePlay}>
-                <video
-                    ref={videoRef}
-                    src={video.video.playAddr}
-                    poster={video.video.cover}
-                    loop={!isAutoScrollEnabled}
-                    playsInline
-                    className={cx('video')}
-                />
+            <div className={cx('container')}>
+                <div className={cx('video-player')} onClick={togglePlay}>
+                    <video
+                        ref={videoRef}
+                        src={video.video.playAddr}
+                        poster={video.video.cover}
+                        loop={!isAutoScrollEnabled}
+                        playsInline
+                        className={cx('video')}
+                    />
 
-                {/* Video Controls (Play/Pause overlay, Progress bar, Sound Button) */}
-                <VideoControls 
-                    isPlaying={isPlaying}
-                    isMuted={isMuted}
-                    progress={progress}
-                    showPlayPauseOverlay={showPlayPauseOverlay}
-                    toggleMute={toggleMute}
-                />
+                    {/* Video Controls (Play/Pause overlay, Progress bar, Sound Button) */}
+                    <VideoControls
+                        isPlaying={isPlaying}
+                        isMuted={isMuted}
+                        progress={progress}
+                        showPlayPauseOverlay={showPlayPauseOverlay}
+                        toggleMute={toggleMute}
+                    />
 
-                {/* Video Info (User info and description) */}
-                <VideoInfo 
-                    video={video} 
-                    expandedDescription={expandedDescription} 
-                    toggleDescription={toggleDescription}
-                />
+                    {/* Video Info (User info and description) */}
+                    <VideoInfo
+                        video={video}
+                        expandedDescription={expandedDescription}
+                        toggleDescription={toggleDescription}
+                    />
+                </div>
+                <VideoActions video={video} />
             </div>
 
             {/* Action Buttons */}
-            <VideoActions video={video} />
         </div>
     );
 }

@@ -2,18 +2,27 @@
     display: flex;
     width: 100vw;
     max-width: 100%;
-    flex: 1 1 auto;
-    justify-content: space-between;
 }
 
 .container {
+    margin-top: 0px;
     display: flex;
     width: 100%;
-    height: 100%;
-    background-color: #fff;
+    justify-content: space-between;
+    align-self: center;
+    flex: 1 1 auto;
+    background-color: var(--ui-page-flat-1);
 }
 
 .content {
-    flex: 0 0 calc(100vw - 240px);
+    // flex: 0 0 calc(100vw - 240px);
+    position: relative;
+    margin: 0px auto;
+    width: 100%;
+    min-width: 420px;
+    flex-shrink: 1; 
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
 }
 
