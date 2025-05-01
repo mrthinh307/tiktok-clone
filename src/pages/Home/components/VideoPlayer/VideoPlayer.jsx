@@ -14,6 +14,7 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev }) {
     // Use custom hook to manage video controls
     const {
         videoRef,
+        videoLoaded,
         isPlaying,
         isMuted,
         progress,
@@ -37,23 +38,34 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev }) {
             {/* Video Player */}
             <div className={cx('container')}>
                 <div className={cx('video-player')} onClick={togglePlay}>
+                    {!videoLoaded && (
+                        <div className={cx('video-skeleton')}>
+                            <div className={cx('skeleton-poster')} 
+                                 style={{ backgroundImage: `url(${video.video.cover})` }}>
+                                <div className={cx('skeleton-overlay')}></div>
+                            </div>
+                        </div>
+                    )}
+                    
                     <video
                         ref={videoRef}
                         src={video.video.playAddr}
                         poster={video.video.cover}
                         loop={!isAutoScrollEnabled}
                         playsInline
-                        className={cx('video')}
+                        className={cx('video', { 'video-hidden': !videoLoaded })}
                     />
 
                     {/* Video Controls (Play/Pause overlay, Progress bar, Sound Button) */}
-                    <VideoControls
-                        isPlaying={isPlaying}
-                        isMuted={isMuted}
-                        progress={progress}
-                        showPlayPauseOverlay={showPlayPauseOverlay}
-                        toggleMute={toggleMute}
-                    />
+                    {videoLoaded && (
+                        <VideoControls
+                            isPlaying={isPlaying}
+                            isMuted={isMuted}
+                            progress={progress}
+                            showPlayPauseOverlay={showPlayPauseOverlay}
+                            toggleMute={toggleMute}
+                        />
+                    )}
 
                     {/* Video Info (User info and description) */}
                     <VideoInfo
@@ -64,8 +76,6 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev }) {
                 </div>
                 <VideoActions video={video} />
             </div>
-
-            {/* Action Buttons */}
         </div>
     );
 }
@@ -78,5 +88,4 @@ VideoPlayer.propTypes = {
     hasPrev: PropTypes.bool.isRequired,
 };
 
-// Sử dụng memo để tránh re-render không cần thiết khi props không thay đổi
 export default memo(VideoPlayer);
