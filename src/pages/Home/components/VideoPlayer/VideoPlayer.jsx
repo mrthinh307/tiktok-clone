@@ -27,7 +27,6 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev }) {
         onNext
     });
 
-    // Xử lý toggle description với useCallback để không tạo lại function khi re-render
     const toggleDescription = useCallback((e) => {
         if (e) e.stopPropagation();
         setExpandedDescription((prev) => !prev);

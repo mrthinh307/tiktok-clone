@@ -1,5 +1,6 @@
 import { AutoScrollIcon, CaptionIcon, MarkIrrelevantIcon, MiniPlayerIcon, ReportIcon } from "~/assets/images/icons";
 import { ToggleButton } from "~/components/Button";
+import { useAutoScroll } from "~/contexts/AutoScrollContext";
 
 export const ELLIPSIS_OPTIONS = [
     {
@@ -9,7 +10,12 @@ export const ELLIPSIS_OPTIONS = [
     {
         icon: <AutoScrollIcon />,
         title: 'Auto scroll',
-        icon2: <ToggleButton />,
+        icon2: <ToggleButton 
+            useContext={true}
+            contextHook={useAutoScroll}
+            contextStateKey="isAutoScrollEnabled"
+            contextToggleKey="toggleAutoScroll"
+        />,
     },
     {
         icon: <MiniPlayerIcon />,
