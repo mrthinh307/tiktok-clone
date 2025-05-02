@@ -1,5 +1,6 @@
 .wrapper {
     min-height: calc(0px + 100vh);
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -23,7 +24,7 @@
 }
 
 .container {
-    height: max-content;
+    height: 100%;
     display: flex;
     flex-grow: 1;
     justify-content: center;
@@ -36,25 +37,81 @@
 }
 
 .video-player {
-    width: 458px;
     height: 100%;
-    max-height: 100%;
     position: relative;
     display: flex;
     border-radius: 16px;
     cursor: pointer;
+    overflow: hidden;
+    background: var(--ui-page-flat-1);
 
     &:hover {
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
     }
 }
 
-.video {
+// Add skeleton loader styles
+.skeleton-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    display: block;
+    background: #18181c;
     border-radius: 16px;
+    overflow: hidden;
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.skeleton-shimmer {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+.video {
+    border-radius: 16px;
+    transition: opacity 0.3s ease;
+    display: block;
+    
+    /* Các lớp CSS khác nhau cho video dọc và ngang */
+    &.video-vertical {
+        object-fit: contain; /* Hiển thị toàn bộ video theo tỷ lệ 9:16 */
+        max-height: 100%;
+    }
+    
+    &.video-horizontal {
+        object-fit: cover; /* Lấp đầy toàn bộ không gian, có thể cắt một phần */
+        object-position: center; /* Luôn căn giữa video */
+    }
+    
+    &.video-hidden {
+        opacity: 0;
+    }
+    
+    &.loaded {
+        opacity: 1;
+        z-index: 6;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
 }
 
 // Improved play/pause overlay with smoother animations
@@ -154,22 +211,26 @@
 //     }
 // }
 
-// Keeping existing code...
 .progress-container {
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 100%;
+    right: 0;
+    width: calc(100% - 2px);
     height: 4px;
     background-color: rgba(255, 255, 255, 0.5);
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
     overflow: hidden;
     z-index: 10;
+    margin: 0 1px 0 1px;
 }
 
 .progress-bar {
     height: 100%;
     width: 100%;
     position: relative;
+    overflow: hidden;
 }
 
 .progress-filled {
@@ -179,6 +240,7 @@
     top: 0;
     left: 0;
     transition: width 0.1s linear;
+    border-bottom-left-radius: 16px;
 }
 
 // Nút âm thanh
@@ -346,54 +408,6 @@
 //         max-width: 300px;
 //     }
 // }
-
-
-// Add these styles somewhere in your file
-
-.video-skeleton {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 16px;
-    overflow: hidden;
-    z-index: 5;
-}
-
-.skeleton-poster {
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    position: relative;
-}
-
-.skeleton-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-}
-
-.video-hidden {
-    opacity: 0;
-}
-
-@keyframes shimmer {
-    0% {
-        background-position: -200% 0;
-    }
-    100% {
-        background-position: 200% 0;
-    }
-}
-
-
 
 @media screen and (max-width: 1280px) {
     .wrapper {

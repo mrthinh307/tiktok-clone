@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAutoScroll } from '~/contexts/AutoScrollContext';
 
-export default function useVideoControl({ videoId, hasNext, onNext }) {
+export default function useVideoControl({ videoId, hasNext, onNext, isActive = false }) {
     const [videoLoaded, setVideoLoaded] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -11,6 +11,7 @@ export default function useVideoControl({ videoId, hasNext, onNext }) {
         const savedPreference = localStorage.getItem('tiktok-sound-preference');
         return savedPreference ? savedPreference === 'muted' : true;
     });
+    const [forcePlay, setForcePlay] = useState(false);
 
     const videoRef = useRef(null);
     const autoScrollTimeoutRef = useRef(null);
@@ -24,8 +25,10 @@ export default function useVideoControl({ videoId, hasNext, onNext }) {
         );
     }, [isMuted]);
 
-    // Handle auto scroll
+    // Handle auto scroll and video end
     useEffect(() => {
+        if (!videoRef.current || !isActive) return;
+
         const handleVideoEnded = () => {
             if (isAutoScrollEnabled && hasNext && onNext) {
                 autoScrollTimeoutRef.current = setTimeout(() => {
@@ -39,9 +42,7 @@ export default function useVideoControl({ videoId, hasNext, onNext }) {
             }
         };
 
-        if (videoRef.current) {
-            videoRef.current.addEventListener('ended', handleVideoEnded);
-        }
+        videoRef.current.addEventListener('ended', handleVideoEnded);
 
         return () => {
             if (videoRef.current) {
@@ -51,15 +52,16 @@ export default function useVideoControl({ videoId, hasNext, onNext }) {
                 clearTimeout(autoScrollTimeoutRef.current);
             }
         };
-    }, [isAutoScrollEnabled, hasNext, onNext]);
+    }, [isAutoScrollEnabled, hasNext, onNext, isActive]);
 
-    // Handle video when change or mounted
+    // Handle video when source changes or active state changes
     useEffect(() => {
-        if (!videoRef.current) return;
+        if (!videoRef.current || !videoRef.current.src) return;
 
         // Reset state when video changes
-        setVideoLoaded(false);
-        setIsPlaying(false);
+        if (!videoLoaded) {
+            setProgress(0);
+        }
 
         // Sync volume state - ALWAYS MUTE ON LOAD TO MAKE SURE AUTOPLAY
         videoRef.current.muted = true;
@@ -70,12 +72,12 @@ export default function useVideoControl({ videoId, hasNext, onNext }) {
         };
 
         const handleCanPlay = () => {
-            if (!isPlaying) {
+            if (isActive && !isPlaying) {
                 videoRef.current
                     .play()
                     .then(() => {
                         setIsPlaying(true);
-                        // only remove MUTE if user setted UNMUTE
+                        // Only remove MUTE if user set UNMUTE
                         setTimeout(() => {
                             if (videoRef.current && !isMuted) {
                                 videoRef.current.muted = false;
@@ -92,8 +94,10 @@ export default function useVideoControl({ videoId, hasNext, onNext }) {
         videoRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
         videoRef.current.addEventListener('canplay', handleCanPlay);
 
-        // Explicit play attempt
+        // Explicit play attempt if this is the active video
         const attemptPlay = async () => {
+            if (!isActive) return;
+            
             try {
                 await videoRef.current.play();
                 setIsPlaying(true);
@@ -102,23 +106,48 @@ export default function useVideoControl({ videoId, hasNext, onNext }) {
             }
         };
 
-        // Thử phát ngay và thử lại sau 500ms nếu cần
-        attemptPlay();
-        const retryTimeout = setTimeout(() => {
-            if (!isPlaying && videoRef.current) {
-                attemptPlay();
-            }
-        }, 500);
+        // Try to play immediately for active videos and retry after 500ms if needed
+        if (isActive) {
+            attemptPlay();
+            const retryTimeout = setTimeout(() => {
+                if (!isPlaying && videoRef.current && isActive) {
+                    attemptPlay();
+                }
+            }, 500);
+            
+            return () => clearTimeout(retryTimeout);
+        }
 
         return () => {
-            clearTimeout(retryTimeout);
             if (videoRef.current) {
-                videoRef.current.pause();
                 videoRef.current.removeEventListener('loadedmetadata', handleLoadedMetadata);
                 videoRef.current.removeEventListener('canplay', handleCanPlay);
             }
         };
-    }, [videoId, isMuted]);
+    }, [videoId, isMuted, videoRef.current?.src, isActive]);
+
+    // Pause video when not active
+    useEffect(() => {
+        if (!isActive && videoRef.current && isPlaying) {
+            videoRef.current.pause();
+            setIsPlaying(false);
+        }
+    }, [isActive]);
+
+    // Handle force play request
+    useEffect(() => {
+        if (forcePlay && videoRef.current && isActive) {
+            videoRef.current.play()
+                .then(() => {
+                    setIsPlaying(true);
+                    setForcePlay(false);
+                })
+                .catch(error => {
+                    console.error('Force play failed:', error);
+                    setForcePlay(false);
+                });
+        }
+    }, [forcePlay, isActive]);
 
     // Update volume state in video
     useEffect(() => {
@@ -129,7 +158,7 @@ export default function useVideoControl({ videoId, hasNext, onNext }) {
 
     // Update progress bar
     useEffect(() => {
-        if (!videoRef.current || !isPlaying) return;
+        if (!videoRef.current || !isPlaying || !isActive) return;
 
         const updateProgress = () => {
             if (videoRef.current && videoRef.current.duration > 0) {
@@ -141,7 +170,7 @@ export default function useVideoControl({ videoId, hasNext, onNext }) {
 
         const intervalId = setInterval(updateProgress, 100);
         return () => clearInterval(intervalId);
-    }, [isPlaying]);
+    }, [isPlaying, isActive]);
 
     // Play/pause overlay animation
     useEffect(() => {
@@ -155,17 +184,18 @@ export default function useVideoControl({ videoId, hasNext, onNext }) {
     }, [showPlayPauseOverlay]);
 
     const togglePlay = () => {
-        if (videoRef.current) {
-            if (isPlaying) {
-                videoRef.current.pause();
-                setIsPlaying(false);
-            } else {
-                videoRef.current.play();
-                setIsPlaying(true);
-            }
-
-            setShowPlayPauseOverlay(true);
+        if (!videoRef.current || !videoRef.current.src) return;
+        
+        if (isPlaying) {
+            videoRef.current.pause();
+            setIsPlaying(false);
+        } else {
+            videoRef.current.play()
+                .then(() => setIsPlaying(true))
+                .catch(err => console.error('Play failed on toggle:', err));
         }
+
+        setShowPlayPauseOverlay(true);
     };
 
     // Handle event turn on/off sound
@@ -190,5 +220,6 @@ export default function useVideoControl({ videoId, hasNext, onNext }) {
         isAutoScrollEnabled,
         togglePlay,
         toggleMute,
+        setForcePlay,
     };
 }

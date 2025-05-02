@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Home.module.scss';
@@ -12,33 +13,170 @@ function Home() {
     const [videos, setVideos] = useState([]);
     const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [loadedMap, setLoadedMap] = useState({});
+    const [currentPage, setCurrentPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [isFetchingMore, setIsFetchingMore] = useState(false);
+
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [transitionDirection, setTransitionDirection] = useState(null);
-    const [showNavigationIndicator, setShowNavigationIndicator] =
-        useState(false);
+    const [showNavigationIndicator, setShowNavigationIndicator] = useState(false);
+
     const containerRef = useRef(null);
     const scrollTimeoutRef = useRef(null);
     const navigationTimeoutRef = useRef(null);
+    
+    // Fetch videos from Pexels API
 
-    // Load videos from API
-    useEffect(() => {
-        const loadVideos = async () => {
-            try {
-                setLoading(true);
-
-                const data = await fetchVideos();
-                setVideos(data);
-            } catch (error) {
-                console.error('Failed to fetch videos:', error);
-                // mock api
-                setVideos(MOCK_VIDEOS);
-            } finally {
-                setLoading(false);
+    const loadVideos = async (isInitial = true) => {
+        try {
+            if (isInitial) setLoading(true);
+            else setIsFetchingMore(true);
+            
+            // Use currentPage instead of calculating from cursor
+            const page = isInitial ? 1 : currentPage + 1;
+            
+            console.log(`Fetching page ${page} videos...`);
+            const pexelsVideos = await fetchVideos('trending', 10, page);
+            
+            if (!pexelsVideos || pexelsVideos.length === 0) {
+                setHasMore(false);
+                return;
             }
-        };
+            
+            const filtered = pexelsVideos.filter((v) => v.height > v.width);
+            
+            if (filtered.length === 0) {
+                setHasMore(false);
+                return;
+            }
+            
+            const mappedVideos = filtered.map((item, index) => ({
+                id: item.id.toString(),
+                user: {
+                    id: item.user?.id,
+                    nickname: `Pexels User ${page}-${index + 1}`,
+                    avatar: item.user?.url || 'https://via.placeholder.com/100',
+                    verified: true,
+                },
+                description: item.url || 'Pexels Video',
+                music: 'Original sound',
+                video: {
+                    cover: item.image,
+                    playAddr: item.video_files.find(
+                        (v) => v.quality === 'hd',
+                    )?.link,
+                    width: item.width,
+                    height: item.height,
+                    duration: item.duration,
+                },
+                stats: {
+                    likes: Math.floor(Math.random() * 10000),
+                    comments: Math.floor(Math.random() * 1000),
+                    saves: Math.floor(Math.random() * 5000),
+                    shares: Math.floor(Math.random() * 2000),
+                },
+                caption: 'Pexels Feed',
+            }));
 
+            // Update page number for next fetch
+            setCurrentPage(page);
+
+            // Update videos storage and loadedMap
+            if (isInitial) {
+                setVideos(mappedVideos);
+                
+                // Initialize loadedMap for the first 3 videos
+                const initialLoadedMap = {};
+                mappedVideos.slice(0, 3).forEach(video => {
+                    initialLoadedMap[video.id] = true;
+                });
+                setLoadedMap(initialLoadedMap);
+            } else {
+                const newVideos = [...videos, ...mappedVideos];
+                setVideos(newVideos);
+                
+                // Mark videos that need preloading in the new batch
+                const updatedLoadedMap = { ...loadedMap };
+                
+                // If we're near the end of current list, mark first few new videos as loaded
+                if (currentVideoIndex >= videos.length - 3) {
+                    const videosToPreload = mappedVideos.slice(0, 3);
+                    videosToPreload.forEach(video => {
+                        updatedLoadedMap[video.id] = true;
+                    });
+                    setLoadedMap(updatedLoadedMap);
+                }
+            }
+            
+            console.log(`Successfully loaded page ${page}, got ${mappedVideos.length} videos`);
+        } catch (error) {
+            console.error('Failed to fetch videos:', error);
+            setHasMore(false);
+        } finally {
+            if (isInitial) setLoading(false);
+            else setIsFetchingMore(false);
+        }
+    };
+
+    // Load more videos when approaching the end with improved threshold
+    const loadMoreIfNeeded = () => {
+        if (
+            !loading && 
+            !isFetchingMore && 
+            hasMore && 
+            videos.length > 0 &&
+            currentVideoIndex >= videos.length - 5  // Increased threshold to load earlier
+        ) {
+            console.log(`Near the end (index ${currentVideoIndex} of ${videos.length}), loading more videos...`);
+            // isInitial is false to indicate loading more videos
+            loadVideos(false);
+        }
+    };
+
+    // Load videos on initial mount
+    useEffect(() => {
         loadVideos();
     }, []);
+
+    // Check if need to load more videos
+    useEffect(() => {
+        loadMoreIfNeeded();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentVideoIndex]);
+
+    // Preload videos (mark them as should be loaded)
+    const preloadVideos = (index) => {
+        if (!videos.length) return;
+        
+        // Consider more videos for preloading (up to 2 in each direction)
+        const indicesToLoad = [index - 2, index - 1, index, index + 1, index + 2].filter(
+            idx => idx >= 0 && idx < videos.length
+        );
+        
+        // Update loadedMap for these indices
+        const updatedLoadedMap = { ...loadedMap };
+        let hasChanges = false;
+        
+        indicesToLoad.forEach(idx => {
+            const videoId = videos[idx]?.id;
+            if (videoId && !updatedLoadedMap[videoId]) {
+                updatedLoadedMap[videoId] = true;
+                hasChanges = true;
+            }
+        });
+        
+        if (hasChanges) {
+            console.log(`Marking videos for preload: indices ${indicesToLoad.join(', ')}`);
+            setLoadedMap(updatedLoadedMap);
+        }
+    };
+
+    // Update preloaded videos when current index changes
+    useEffect(() => {
+        preloadVideos(currentVideoIndex);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentVideoIndex, videos]);
 
     // Handle keyboard navigation with visual feedback
     useEffect(() => {
@@ -186,6 +324,17 @@ function Home() {
             handleVideoTransition(currentVideoIndex - 1, 'prev');
         }
     };
+    
+    // Get videos to render (current and adjacent videos)
+    const videosToRender = videos.filter((_, index) => {
+        return Math.abs(index - currentVideoIndex) <= 1;
+    });
+
+    // Debug info for development
+    useEffect(() => {
+        console.log(`Current video index: ${currentVideoIndex}, Total videos: ${videos.length}`);
+        console.log(`Videos in loadedMap: ${Object.keys(loadedMap).length}`);
+    }, [currentVideoIndex, videos.length, loadedMap]);
 
     return (
         <div className={cx('wrapper')} ref={containerRef}>
@@ -195,13 +344,26 @@ function Home() {
                 <>
                     {videos.length > 0 && (
                         <div className={cx('video-wrapper')}>
-                            <VideoPlayer
-                                video={videos[currentVideoIndex]}
-                                onNext={handleNextVideo}
-                                onPrev={handlePrevVideo}
-                                hasNext={currentVideoIndex < videos.length - 1}
-                                hasPrev={currentVideoIndex > 0}
-                            />
+                            {videosToRender.map((video) => (
+                                <div
+                                    key={video.id}
+                                    style={{
+                                        display: currentVideoIndex === videos.indexOf(video) ? 'block' : 'none',
+                                        height: '100%',
+                                    }}
+                                >
+                                    <VideoPlayer
+                                        video={video}
+                                        onNext={handleNextVideo}
+                                        onPrev={handlePrevVideo}
+                                        hasNext={videos.indexOf(video) < videos.length - 1}
+                                        hasPrev={videos.indexOf(video) > 0}
+                                        isLoaded={!!loadedMap[video.id]}
+                                        shouldPlay={currentVideoIndex === videos.indexOf(video)}
+                                        shouldPreload={Math.abs(currentVideoIndex - videos.indexOf(video)) <= 1}
+                                    />
+                                </div>
+                            ))}
                         </div>
                     )}
 
@@ -230,94 +392,17 @@ function Home() {
                                 <FontAwesomeIcon icon={faChevronDown} />
                             </div>
                         )}
+
+                    {/* Loading indicator when fetching more videos */}
+                    {isFetchingMore && (
+                        <div className={cx('loading-more')}>
+                            Loading more videos...
+                        </div>
+                    )}
                 </>
             )}
         </div>
     );
 }
-
-// Mock data
-const MOCK_VIDEOS = [
-    {
-        id: '1',
-        user: {
-            id: 'viralworld',
-            nickname: 'beatvn_viralworld',
-            avatar: 'https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/651f773def2501f5f2d6c1390499e8b9~c5_100x100.jpeg?x-expires=1714608000&x-signature=CZcYTJOvVJIl9uGq0NvkNVzDM8U%3D',
-            verified: true,
-        },
-        description:
-            "watching designers discover what's possible with new tools... #design #testing #ui #productivity",
-        music: 'original sound',
-        video: {
-            cover: 'https://p16-sign-va.tiktokcdn.com/obj/tos-useast5-p-0068-tx/470e7757182144b189c308dc60705e9f_1714356490?x-expires=1714608000&x-signature=cyC%2BDerhviDKJpE30KZbSbuO42g%3D',
-            playAddr:
-                'https://v16-webapp-prime.tiktok.com/video/tos/useast5/tos-useast5-pve-0068-tx/oQCIAnh6k2IoMEL8BBuAuCvEhgAzACEDzKafEW/?a=1988&ch=0&cr=3&dr=0&lr=tiktok_m&cd=0%7C0%7C1%7C3&cv=1&br=1408&bt=704&cs=0&ds=3&ft=_p.C~yIVtbsZPvLWfh_vjjcby7LYvGeSN2vJwJngjN0P&mime_type=video_mp4&qs=0&rc=aDxlZzNlZjc3ZzhlZzM5OUBpM2c4OTQ6ZmdpZTMzZzczNEBfLjUuMzE0XmExNS5jMzVfYSMtZmEzcjQwLWFgLS1k',
-            width: 576,
-            height: 1024,
-            duration: 15.12,
-        },
-        stats: {
-            likes: 103500,
-            comments: 2853,
-            saves: 3379,
-            shares: 4522,
-        },
-        caption: 'VIRAL WORLD',
-    },
-    {
-        id: '2',
-        user: {
-            id: 'techcreator',
-            nickname: 'TechCreator',
-            avatar: 'https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/a63b67ab75d4d651b0c1d58681bb1638~c5_100x100.jpeg?x-expires=1714608000&x-signature=soMeFakeSignature%3D',
-            verified: true,
-        },
-        description: 'Check out this new AI tool! #tech #ai #future',
-        music: 'original sound - TechCreator',
-        video: {
-            cover: 'https://p16-sign-va.tiktokcdn.com/obj/tos-useast5-p-0068-tx/someothercover_1714356123?x-expires=1714608000&x-signature=anotherFakeSignature%3D',
-            playAddr:
-                'https://v16-webapp-prime.tiktok.com/video/tos/useast5/someotherid/?mime_type=video_mp4',
-            width: 576,
-            height: 1024,
-            duration: 22.5,
-        },
-        stats: {
-            likes: 45600,
-            comments: 312,
-            saves: 12300,
-            shares: 2800,
-        },
-        caption: 'THE FUTURE IS NOW',
-    },
-    {
-        id: '3',
-        user: {
-            id: 'memecreator',
-            nickname: 'Meme_Master',
-            avatar: 'https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/fake_avatar_3.jpeg?x-expires=1714608000&x-signature=thirdFakeSignature%3D',
-            verified: false,
-        },
-        description:
-            'When you finally understand React 😂 #programming #memes #coder',
-        music: 'Oh No - Kreepa',
-        video: {
-            cover: 'https://p16-sign-va.tiktokcdn.com/obj/tos-useast5-p-0068-tx/thirdcover_1714356000?x-expires=1714608000&x-signature=yetAnotherFakeSignature%3D',
-            playAddr:
-                'https://v16-webapp-prime.tiktok.com/video/tos/useast5/thirdvideo/?mime_type=video_mp4',
-            width: 576,
-            height: 1024,
-            duration: 10.3,
-        },
-        stats: {
-            likes: 98200,
-            comments: 1243,
-            saves: 8900,
-            shares: 5100,
-        },
-        caption: 'CODING LIFE',
-    },
-];
 
 export default Home;
