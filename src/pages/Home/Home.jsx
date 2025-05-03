@@ -25,7 +25,7 @@ function Home() {
     const containerRef = useRef(null);
     const scrollTimeoutRef = useRef(null);
     const navigationTimeoutRef = useRef(null);
-    
+        
     // Fetch videos from Pexels API
 
     const loadVideos = async (isInitial = true) => {
@@ -339,7 +339,7 @@ function Home() {
     return (
         <div className={cx('wrapper')} ref={containerRef}>
             {loading ? (
-                <div className={cx('loading')}></div>
+                <div className={cx('loading')}>Loading</div>
             ) : (
                 <>
                     {videos.length > 0 && (

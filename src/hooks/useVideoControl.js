@@ -2,7 +2,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAutoScroll } from '~/contexts/AutoScrollContext';
 
-export default function useVideoControl({ videoId, hasNext, onNext, isActive = false }) {
+export default function useVideoControl({
+    videoId,
+    hasNext,
+    onNext,
+    isActive = false,
+}) {
     const [videoLoaded, setVideoLoaded] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -12,6 +17,7 @@ export default function useVideoControl({ videoId, hasNext, onNext, isActive = f
         return savedPreference ? savedPreference === 'muted' : true;
     });
     const [forcePlay, setForcePlay] = useState(false);
+    const [isBuffering, setIsBuffering] = useState(false);
 
     const videoRef = useRef(null);
     const autoScrollTimeoutRef = useRef(null);
@@ -64,7 +70,9 @@ export default function useVideoControl({ videoId, hasNext, onNext, isActive = f
         }
 
         // Sync volume state - ALWAYS MUTE ON LOAD TO MAKE SURE AUTOPLAY
-        videoRef.current.muted = true;
+        if (videoRef.current) {
+            videoRef.current.muted = true;
+        }
 
         // Event handlers
         const handleLoadedMetadata = () => {
@@ -72,7 +80,10 @@ export default function useVideoControl({ videoId, hasNext, onNext, isActive = f
         };
 
         const handleCanPlay = () => {
+            if (!videoRef.current || !isActive) return;
+
             if (isActive && !isPlaying) {
+                if (!videoRef.current) return;
                 videoRef.current
                     .play()
                     .then(() => {
@@ -91,36 +102,47 @@ export default function useVideoControl({ videoId, hasNext, onNext, isActive = f
         };
 
         // Add event listeners
-        videoRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
-        videoRef.current.addEventListener('canplay', handleCanPlay);
+        if (videoRef.current) {
+            videoRef.current.addEventListener(
+                'loadedmetadata',
+                handleLoadedMetadata,
+            );
+            videoRef.current.addEventListener('canplay', handleCanPlay);
+        }
 
         // Explicit play attempt if this is the active video
         const attemptPlay = async () => {
-            if (!isActive) return;
-            
+            if (!isActive || !videoRef.current) return;
+
             try {
                 await videoRef.current.play();
                 setIsPlaying(true);
             } catch (error) {
-                console.log('Initial autoplay prevented, waiting for canplay event:', error);
+                console.log(
+                    'Initial autoplay prevented, waiting for canplay event:',
+                    error,
+                );
             }
         };
 
         // Try to play immediately for active videos and retry after 500ms if needed
-        if (isActive) {
+        if (isActive && videoRef.current) {
             attemptPlay();
             const retryTimeout = setTimeout(() => {
                 if (!isPlaying && videoRef.current && isActive) {
                     attemptPlay();
                 }
             }, 500);
-            
+
             return () => clearTimeout(retryTimeout);
         }
 
         return () => {
             if (videoRef.current) {
-                videoRef.current.removeEventListener('loadedmetadata', handleLoadedMetadata);
+                videoRef.current.removeEventListener(
+                    'loadedmetadata',
+                    handleLoadedMetadata,
+                );
                 videoRef.current.removeEventListener('canplay', handleCanPlay);
             }
         };
@@ -137,12 +159,13 @@ export default function useVideoControl({ videoId, hasNext, onNext, isActive = f
     // Handle force play request
     useEffect(() => {
         if (forcePlay && videoRef.current && isActive) {
-            videoRef.current.play()
+            videoRef.current
+                .play()
                 .then(() => {
                     setIsPlaying(true);
                     setForcePlay(false);
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error('Force play failed:', error);
                     setForcePlay(false);
                 });
@@ -163,7 +186,8 @@ export default function useVideoControl({ videoId, hasNext, onNext, isActive = f
         const updateProgress = () => {
             if (videoRef.current && videoRef.current.duration > 0) {
                 const currentProgress =
-                    (videoRef.current.currentTime / videoRef.current.duration) * 100;
+                    (videoRef.current.currentTime / videoRef.current.duration) *
+                    100;
                 setProgress(currentProgress);
             }
         };
@@ -185,18 +209,55 @@ export default function useVideoControl({ videoId, hasNext, onNext, isActive = f
 
     const togglePlay = () => {
         if (!videoRef.current || !videoRef.current.src) return;
-        
+
         if (isPlaying) {
-            videoRef.current.pause();
-            setIsPlaying(false);
+            if (videoRef.current) {
+                videoRef.current.pause();
+                setIsPlaying(false);
+            }
         } else {
-            videoRef.current.play()
-                .then(() => setIsPlaying(true))
-                .catch(err => console.error('Play failed on toggle:', err));
+            if (videoRef.current) {
+                videoRef.current
+                    .play()
+                    .then(() => setIsPlaying(true))
+                    .catch((err) =>
+                        console.error('Play failed on toggle:', err),
+                    );
+            }
         }
 
         setShowPlayPauseOverlay(true);
     };
+
+    useEffect(() => {
+        if (!videoRef.current || !videoRef.current.src) return;
+
+        // Xử lý sự kiện waiting (video bị dừng do đang buffer)
+        const handleWaiting = () => {
+            if (isPlaying) {
+                setIsBuffering(true);
+            }
+        };
+
+        // Xử lý sự kiện playing (video đã buffer xong và đang phát)
+        const handlePlaying = () => {
+            setIsBuffering(false);
+        };
+
+        // Thêm event listeners
+        if (videoRef.current) {
+            videoRef.current.addEventListener('waiting', handleWaiting);
+            videoRef.current.addEventListener('playing', handlePlaying);
+        }
+
+        // Cleanup
+        return () => {
+            if (videoRef.current) {
+                videoRef.current.removeEventListener('waiting', handleWaiting);
+                videoRef.current.removeEventListener('playing', handlePlaying);
+            }
+        };
+    }, [videoRef.current?.src, isPlaying]);
 
     // Handle event turn on/off sound
     const toggleMute = (e) => {
@@ -218,6 +279,7 @@ export default function useVideoControl({ videoId, hasNext, onNext, isActive = f
         progress,
         showPlayPauseOverlay,
         isAutoScrollEnabled,
+        isBuffering,
         togglePlay,
         toggleMute,
         setForcePlay,

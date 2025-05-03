@@ -24,6 +24,7 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev, isLoaded, should
         progress,
         showPlayPauseOverlay,
         isAutoScrollEnabled,
+        isBuffering,
         togglePlay,
         toggleMute,
         setForcePlay,
@@ -105,6 +106,7 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev, isLoaded, should
                             progress={progress}
                             showPlayPauseOverlay={showPlayPauseOverlay}
                             toggleMute={toggleMute}
+                            isBuffering={isBuffering}
                         />
                     )}
 
