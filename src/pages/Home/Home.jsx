@@ -1,56 +1,76 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Home.module.scss';
 import VideoPlayer from './components/VideoPlayer';
 import { fetchVideos } from '~/services/apiServices/videoService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { useVideoNavigation } from '~/hooks';
 
 const cx = classNames.bind(styles);
 
 function Home() {
     const [videos, setVideos] = useState([]);
-    const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
     const [loading, setLoading] = useState(true);
     const [loadedMap, setLoadedMap] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [isFetchingMore, setIsFetchingMore] = useState(false);
 
-    const [isTransitioning, setIsTransitioning] = useState(false);
-    const [transitionDirection, setTransitionDirection] = useState(null);
-    const [showNavigationIndicator, setShowNavigationIndicator] = useState(false);
-
     const containerRef = useRef(null);
-    const scrollTimeoutRef = useRef(null);
-    const navigationTimeoutRef = useRef(null);
-        
+
+    const {
+        currentIndex: currentVideoIndex,
+        transitionDirection,
+        showNavigationIndicator,
+        navigateToNext,
+        navigateToPrev,
+        cleanup: cleanupNavigation,
+    } = useVideoNavigation({
+        initialIndex: 0,
+        totalItems: videos.length,
+        isEnabled: !loading,
+        containerRef,
+        classNameFormatter: cx,
+        onIndexChange: (newIndex) => {
+            // Gọi loadMoreIfNeeded sau khi index thay đổi
+            // Đặt trong setTimeout để đảm bảo state đã cập nhật
+            setTimeout(() => loadMoreIfNeeded(newIndex), 0);
+        },
+    });
+
+    useEffect(() => {
+        return () => {
+            cleanupNavigation();
+        };
+    }, [cleanupNavigation]);
+
     // Fetch videos from Pexels API
 
     const loadVideos = async (isInitial = true) => {
         try {
             if (isInitial) setLoading(true);
             else setIsFetchingMore(true);
-            
+
             // Use currentPage instead of calculating from cursor
             const page = isInitial ? 1 : currentPage + 1;
-            
+
             console.log(`Fetching page ${page} videos...`);
             const pexelsVideos = await fetchVideos('trending', 10, page);
-            
+
             if (!pexelsVideos || pexelsVideos.length === 0) {
                 setHasMore(false);
                 return;
             }
-            
+
             const filtered = pexelsVideos.filter((v) => v.height > v.width);
-            
+
             if (filtered.length === 0) {
                 setHasMore(false);
                 return;
             }
-            
+
             const mappedVideos = filtered.map((item, index) => ({
                 id: item.id.toString(),
                 user: {
@@ -63,9 +83,8 @@ function Home() {
                 music: 'Original sound',
                 video: {
                     cover: item.image,
-                    playAddr: item.video_files.find(
-                        (v) => v.quality === 'hd',
-                    )?.link,
+                    playAddr: item.video_files.find((v) => v.quality === 'hd')
+                        ?.link,
                     width: item.width,
                     height: item.height,
                     duration: item.duration,
@@ -85,31 +104,33 @@ function Home() {
             // Update videos storage and loadedMap
             if (isInitial) {
                 setVideos(mappedVideos);
-                
+
                 // Initialize loadedMap for the first 3 videos
                 const initialLoadedMap = {};
-                mappedVideos.slice(0, 3).forEach(video => {
+                mappedVideos.slice(0, 3).forEach((video) => {
                     initialLoadedMap[video.id] = true;
                 });
                 setLoadedMap(initialLoadedMap);
             } else {
                 const newVideos = [...videos, ...mappedVideos];
                 setVideos(newVideos);
-                
+
                 // Mark videos that need preloading in the new batch
                 const updatedLoadedMap = { ...loadedMap };
-                
+
                 // If we're near the end of current list, mark first few new videos as loaded
                 if (currentVideoIndex >= videos.length - 3) {
                     const videosToPreload = mappedVideos.slice(0, 3);
-                    videosToPreload.forEach(video => {
+                    videosToPreload.forEach((video) => {
                         updatedLoadedMap[video.id] = true;
                     });
                     setLoadedMap(updatedLoadedMap);
                 }
             }
-            
-            console.log(`Successfully loaded page ${page}, got ${mappedVideos.length} videos`);
+
+            console.log(
+                `Successfully loaded page ${page}, got ${mappedVideos.length} videos`,
+            );
         } catch (error) {
             console.error('Failed to fetch videos:', error);
             setHasMore(false);
@@ -122,13 +143,15 @@ function Home() {
     // Load more videos when approaching the end with improved threshold
     const loadMoreIfNeeded = () => {
         if (
-            !loading && 
-            !isFetchingMore && 
-            hasMore && 
+            !loading &&
+            !isFetchingMore &&
+            hasMore &&
             videos.length > 0 &&
-            currentVideoIndex >= videos.length - 5  // Increased threshold to load earlier
+            currentVideoIndex >= videos.length - 5 // Increased threshold to load earlier
         ) {
-            console.log(`Near the end (index ${currentVideoIndex} of ${videos.length}), loading more videos...`);
+            console.log(
+                `Near the end (index ${currentVideoIndex} of ${videos.length}), loading more videos...`,
+            );
             // isInitial is false to indicate loading more videos
             loadVideos(false);
         }
@@ -148,26 +171,34 @@ function Home() {
     // Preload videos (mark them as should be loaded)
     const preloadVideos = (index) => {
         if (!videos.length) return;
-        
+
         // Consider more videos for preloading (up to 2 in each direction)
-        const indicesToLoad = [index - 2, index - 1, index, index + 1, index + 2].filter(
-            idx => idx >= 0 && idx < videos.length
-        );
-        
+        const indicesToLoad = [
+            index - 2,
+            index - 1,
+            index,
+            index + 1,
+            index + 2,
+        ].filter((idx) => idx >= 0 && idx < videos.length);
+
         // Update loadedMap for these indices
         const updatedLoadedMap = { ...loadedMap };
         let hasChanges = false;
-        
-        indicesToLoad.forEach(idx => {
+
+        indicesToLoad.forEach((idx) => {
             const videoId = videos[idx]?.id;
             if (videoId && !updatedLoadedMap[videoId]) {
                 updatedLoadedMap[videoId] = true;
                 hasChanges = true;
             }
         });
-        
+
         if (hasChanges) {
-            console.log(`Marking videos for preload: indices ${indicesToLoad.join(', ')}`);
+            console.log(
+                `Marking videos for preload: indices ${indicesToLoad.join(
+                    ', ',
+                )}`,
+            );
             setLoadedMap(updatedLoadedMap);
         }
     };
@@ -178,161 +209,22 @@ function Home() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentVideoIndex, videos]);
 
-    // Handle keyboard navigation with visual feedback
-    useEffect(() => {
-        const handleKeyDown = (event) => {
-            if (loading || isTransitioning) return;
-
-            // Prevent default behavior for arrow keys
-            if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-                event.preventDefault();
-            }
-
-            switch (event.key) {
-                case 'ArrowUp':
-                    if (currentVideoIndex > 0) {
-                        showNavigationCue('prev');
-                        handleVideoTransition(currentVideoIndex - 1, 'prev');
-                    }
-                    break;
-                case 'ArrowDown':
-                    if (currentVideoIndex < videos.length - 1) {
-                        showNavigationCue('next');
-                        handleVideoTransition(currentVideoIndex + 1, 'next');
-                    }
-                    break;
-                default:
-                    break;
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentVideoIndex, loading, videos.length, isTransitioning]);
-
-    // Handle wheel events with improved behavior
-    useEffect(() => {
-        const handleScroll = (event) => {
-            if (loading || isTransitioning) return;
-
-            // Clear any pending scroll timeouts
-            if (scrollTimeoutRef.current) {
-                clearTimeout(scrollTimeoutRef.current);
-            }
-
-            // Debounce scroll events to prevent rapid firing
-            scrollTimeoutRef.current = setTimeout(() => {
-                const delta = event.deltaY;
-                if (delta > 20 && currentVideoIndex < videos.length - 1) {
-                    // Scroll down - next video
-                    showNavigationCue('next');
-                    handleVideoTransition(currentVideoIndex + 1, 'next');
-                } else if (delta < 20 && currentVideoIndex > 0) {
-                    // Scroll up - previous video
-                    showNavigationCue('prev');
-                    handleVideoTransition(currentVideoIndex - 1, 'prev');
-                }
-            }, 50);
-        };
-
-        window.addEventListener('wheel', handleScroll, { passive: false });
-
-        return () => {
-            window.removeEventListener('wheel', handleScroll);
-            if (scrollTimeoutRef.current) {
-                clearTimeout(scrollTimeoutRef.current);
-            }
-            if (navigationTimeoutRef.current) {
-                clearTimeout(navigationTimeoutRef.current);
-            }
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentVideoIndex, loading, videos.length, isTransitioning]);
-
-    // Show navigation indicator briefly
-    const showNavigationCue = (direction) => {
-        // Clear any existing timeout
-        if (navigationTimeoutRef.current) {
-            clearTimeout(navigationTimeoutRef.current);
-        }
-
-        setTransitionDirection(direction);
-        setShowNavigationIndicator(true);
-
-        // Hide after animation
-        navigationTimeoutRef.current = setTimeout(() => {
-            setShowNavigationIndicator(false);
-        }, 500);
-    };
-
-    // Handle smooth scroll transition with direction parameter
-    const handleVideoTransition = (newIndex, direction = null) => {
-        if (isTransitioning) return;
-
-        setIsTransitioning(true);
-
-        // Determine direction if not provided
-        if (!direction) {
-            direction = newIndex > currentVideoIndex ? 'next' : 'prev';
-        }
-
-        setTransitionDirection(direction);
-
-        // Apply transition class to container
-        if (containerRef.current) {
-            containerRef.current.classList.add(cx('transitioning'));
-            containerRef.current.classList.add(
-                cx(`transitioning-${direction}`),
-            );
-
-            // Set timeout to allow CSS transition to complete
-            setTimeout(() => {
-                setCurrentVideoIndex(newIndex);
-
-                // After index is updated, remove transition classes
-                setTimeout(() => {
-                    if (containerRef.current) {
-                        containerRef.current.classList.remove(
-                            cx('transitioning'),
-                        );
-                        containerRef.current.classList.remove(
-                            cx(`transitioning-${direction}`),
-                        );
-                    }
-                    setIsTransitioning(false);
-                    setTransitionDirection(null);
-                }, 50);
-            }, 200);
-        } else {
-            setCurrentVideoIndex(newIndex);
-            setIsTransitioning(false);
-        }
-    };
-
-    // Handle button navigation
-    const handleNextVideo = () => {
-        if (currentVideoIndex < videos.length - 1) {
-            showNavigationCue('next');
-            handleVideoTransition(currentVideoIndex + 1, 'next');
-        }
-    };
-
-    const handlePrevVideo = () => {
-        if (currentVideoIndex > 0) {
-            showNavigationCue('prev');
-            handleVideoTransition(currentVideoIndex - 1, 'prev');
-        }
-    };
-    
     // Get videos to render (current and adjacent videos)
     const videosToRender = videos.filter((_, index) => {
         return Math.abs(index - currentVideoIndex) <= 1;
     });
 
+    const NavigationIndicator = memo(({ direction, icon }) => (
+        <div className={cx('navigation-indicator', direction, 'visible')}>
+            <FontAwesomeIcon icon={icon} />
+        </div>
+    ));
+
     // Debug info for development
     useEffect(() => {
-        console.log(`Current video index: ${currentVideoIndex}, Total videos: ${videos.length}`);
+        console.log(
+            `Current video index: ${currentVideoIndex}, Total videos: ${videos.length}`,
+        );
         console.log(`Videos in loadedMap: ${Object.keys(loadedMap).length}`);
     }, [currentVideoIndex, videos.length, loadedMap]);
 
@@ -348,19 +240,34 @@ function Home() {
                                 <div
                                     key={video.id}
                                     style={{
-                                        display: currentVideoIndex === videos.indexOf(video) ? 'block' : 'none',
+                                        display:
+                                            currentVideoIndex ===
+                                            videos.indexOf(video)
+                                                ? 'block'
+                                                : 'none',
                                         height: '100%',
                                     }}
                                 >
                                     <VideoPlayer
                                         video={video}
-                                        onNext={handleNextVideo}
-                                        onPrev={handlePrevVideo}
-                                        hasNext={videos.indexOf(video) < videos.length - 1}
+                                        onNext={navigateToNext}
+                                        onPrev={navigateToPrev}
+                                        hasNext={
+                                            videos.indexOf(video) <
+                                            videos.length - 1
+                                        }
                                         hasPrev={videos.indexOf(video) > 0}
                                         isLoaded={!!loadedMap[video.id]}
-                                        shouldPlay={currentVideoIndex === videos.indexOf(video)}
-                                        shouldPreload={Math.abs(currentVideoIndex - videos.indexOf(video)) <= 1}
+                                        shouldPlay={
+                                            currentVideoIndex ===
+                                            videos.indexOf(video)
+                                        }
+                                        shouldPreload={
+                                            Math.abs(
+                                                currentVideoIndex -
+                                                    videos.indexOf(video),
+                                            ) <= 1
+                                        }
                                     />
                                 </div>
                             ))}
@@ -368,30 +275,16 @@ function Home() {
                     )}
 
                     {/* Navigation direction indicators */}
-                    {showNavigationIndicator &&
-                        transitionDirection === 'prev' && (
-                            <div
-                                className={cx(
-                                    'navigation-indicator',
-                                    'prev',
-                                    'visible',
-                                )}
-                            >
-                                <FontAwesomeIcon icon={faChevronUp} />
-                            </div>
-                        )}
-                    {showNavigationIndicator &&
-                        transitionDirection === 'next' && (
-                            <div
-                                className={cx(
-                                    'navigation-indicator',
-                                    'next',
-                                    'visible',
-                                )}
-                            >
-                                <FontAwesomeIcon icon={faChevronDown} />
-                            </div>
-                        )}
+                    {showNavigationIndicator && (
+                        <NavigationIndicator
+                            direction={transitionDirection}
+                            icon={
+                                transitionDirection === 'prev'
+                                    ? faChevronUp
+                                    : faChevronDown
+                            }
+                        />
+                    )}
 
                     {/* Loading indicator when fetching more videos */}
                     {isFetchingMore && (
