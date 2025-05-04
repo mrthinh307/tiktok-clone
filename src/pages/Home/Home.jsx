@@ -4,8 +4,6 @@ import classNames from 'classnames/bind';
 import styles from './Home.module.scss';
 import VideoPlayer from './components/VideoPlayer';
 import { fetchVideos } from '~/services/apiServices/videoService';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { useVideoNavigation } from '~/hooks';
 
 const cx = classNames.bind(styles);
@@ -22,8 +20,6 @@ function Home() {
 
     const {
         currentIndex: currentVideoIndex,
-        transitionDirection,
-        showNavigationIndicator,
         navigateToNext,
         navigateToPrev,
         cleanup: cleanupNavigation,
@@ -214,9 +210,15 @@ function Home() {
         return Math.abs(index - currentVideoIndex) <= 1;
     });
 
-    const NavigationIndicator = memo(({ direction, icon }) => (
-        <div className={cx('navigation-indicator', direction, 'visible')}>
-            <FontAwesomeIcon icon={icon} />
+    const VideoContainer = memo(({ video, shouldPlay, ...props }) => (
+        <div
+            key={video.id}
+            style={{
+                display: shouldPlay ? 'block' : 'none',
+                height: '100%',
+            }}
+        >
+            <VideoPlayer video={video} {...props} />
         </div>
     ));
 
@@ -271,25 +273,6 @@ function Home() {
                                     />
                                 </div>
                             ))}
-                        </div>
-                    )}
-
-                    {/* Navigation direction indicators */}
-                    {showNavigationIndicator && (
-                        <NavigationIndicator
-                            direction={transitionDirection}
-                            icon={
-                                transitionDirection === 'prev'
-                                    ? faChevronUp
-                                    : faChevronDown
-                            }
-                        />
-                    )}
-
-                    {/* Loading indicator when fetching more videos */}
-                    {isFetchingMore && (
-                        <div className={cx('loading-more')}>
-                            Loading more videos...
                         </div>
                     )}
                 </>

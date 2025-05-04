@@ -1,7 +1,6 @@
 import { useRef, useState, useCallback } from 'react';
 import useKeyboardNavigation from './useKeyboardNavigation';
 import useWheelNavigation from './useWheelNavigation';
-import useNavigationIndicator from './useNavigationIndicator';
 import useVideoTransition from './useVideoTransition';
 
 /**
@@ -30,13 +29,6 @@ function useVideoNavigation({
 
     // Define className binding function
     const cx = useRef(classNameFormatter || ((name) => name)).current;
-
-    // Navigation indicator hook
-    const {
-        showNavigationIndicator,
-        transitionDirection,
-        showNavigationCue,
-    } = useNavigationIndicator(indicatorDuration);
 
     // Transition class management
     const applyTransitionClass = useCallback(
@@ -69,9 +61,6 @@ function useVideoNavigation({
         direction: transitioningDirection,
         handleTransition,
     } = useVideoTransition({
-        onTransitionStart: (direction) => {
-            showNavigationCue(direction);
-        },
         onTransitionComplete: (index) => {
             setCurrentIndex(index);
             if (onIndexChange) onIndexChange(index);
@@ -143,8 +132,7 @@ function useVideoNavigation({
     return {
         currentIndex,
         isTransitioning,
-        transitionDirection: transitioningDirection || transitionDirection,
-        showNavigationIndicator,
+        transitionDirection: transitioningDirection,
         navigateToNext,
         navigateToPrev,
         navigateTo,

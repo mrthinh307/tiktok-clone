@@ -110,44 +110,6 @@
     100% { content: '.'; }
 }
 
-// Add loading more indicator
-.loading-more {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(22, 24, 35, 0.8);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 14px;
-    z-index: 100;
-    animation: fade-in-up 0.3s ease;
-    backdrop-filter: blur(4px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    display: flex;
-    align-items: center;
-    
-    // Loading spinner
-    &::before {
-        content: '';
-        width: 16px;
-        height: 16px;
-        margin-right: 8px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-top-color: white;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-}
-
-// Animation for spinner
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
 /* Navigation indicators */
 .navigation-indicators {
     position: fixed;
@@ -251,54 +213,3 @@
 }
 
 /* Support for keyboard navigation indicator */
-
-// Add visual indicators for navigation
-.navigation-indicator {
-    position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-    backdrop-filter: blur(4px);
-
-    svg {
-        color: white;
-        font-size: 20px;
-    }
-
-    &.prev {
-        top: 20px;
-        animation: pulse 1.5s infinite;
-    }
-
-    &.next {
-        bottom: 20px;
-        animation: pulse 1.5s infinite;
-    }
-
-    &.visible {
-        opacity: 1;
-        transition: opacity 0.2s ease;
-    }
-}
-
-@keyframes pulse {
-    0% {
-        transform: translateX(-50%) scale(1);
-    }
-    50% {
-        transform: translateX(-50%) scale(1.1);
-    }
-    100% {
-        transform: translateX(-50%) scale(1);
-    }
-}
