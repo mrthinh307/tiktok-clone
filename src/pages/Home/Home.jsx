@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Home.module.scss';
-import VideoPlayer from './components/VideoPlayer';
 import { fetchVideos } from '~/services/apiServices/videoService';
 import { useVideoNavigation } from '~/hooks';
+import VideoList from './components/VideoList';
 
 const cx = classNames.bind(styles);
 
@@ -53,7 +53,7 @@ function Home() {
             const page = isInitial ? 1 : currentPage + 1;
 
             console.log(`Fetching page ${page} videos...`);
-            const pexelsVideos = await fetchVideos('trending', 10, page);
+            const pexelsVideos = await fetchVideos('vertical', 10, page);
 
             if (!pexelsVideos || pexelsVideos.length === 0) {
                 setHasMore(false);
@@ -161,8 +161,7 @@ function Home() {
     // Check if need to load more videos
     useEffect(() => {
         loadMoreIfNeeded();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentVideoIndex]);
+    }, [currentVideoIndex, loading, isFetchingMore, hasMore, videos.length]);
 
     // Preload videos (mark them as should be loaded)
     const preloadVideos = (index) => {
@@ -189,6 +188,44 @@ function Home() {
             }
         });
 
+        // Thêm logic giới hạn số lượng video cache
+        const MAX_CACHED_VIDEOS = 20;
+        const totalCachedVideos = Object.keys(updatedLoadedMap).length;
+
+        if (totalCachedVideos > MAX_CACHED_VIDEOS) {
+            console.log(
+                `Cache limit reached (${totalCachedVideos}/${MAX_CACHED_VIDEOS}), cleaning up...`,
+            );
+
+            // Xác định range videos cần giữ lại (ưu tiên videos gần với vị trí hiện tại)
+            const startIdx = Math.max(0, index - 10);
+            const endIdx = Math.min(videos.length, index + 10);
+
+            const videosToKeep = videos
+                .slice(startIdx, endIdx)
+                .map((v) => v.id);
+
+            // Tạo loadedMap mới chỉ chứa các videos cần giữ lại
+            const newLoadedMap = {};
+            videosToKeep.forEach((id) => {
+                if (updatedLoadedMap[id]) newLoadedMap[id] = true;
+            });
+
+            // Đảm bảo video hiện tại và các video lân cận luôn được giữ lại
+            indicesToLoad.forEach((idx) => {
+                const videoId = videos[idx]?.id;
+                if (videoId) newLoadedMap[videoId] = true;
+            });
+
+            console.log(
+                `Reduced cache from ${totalCachedVideos} to ${
+                    Object.keys(newLoadedMap).length
+                } videos`,
+            );
+            setLoadedMap(newLoadedMap);
+            return; 
+        }
+
         if (hasChanges) {
             console.log(
                 `Marking videos for preload: indices ${indicesToLoad.join(
@@ -210,18 +247,6 @@ function Home() {
         return Math.abs(index - currentVideoIndex) <= 1;
     });
 
-    const VideoContainer = memo(({ video, shouldPlay, ...props }) => (
-        <div
-            key={video.id}
-            style={{
-                display: shouldPlay ? 'block' : 'none',
-                height: '100%',
-            }}
-        >
-            <VideoPlayer video={video} {...props} />
-        </div>
-    ));
-
     // Debug info for development
     useEffect(() => {
         console.log(
@@ -236,45 +261,15 @@ function Home() {
                 <div className={cx('loading')}>Loading</div>
             ) : (
                 <>
-                    {videos.length > 0 && (
-                        <div className={cx('video-wrapper')}>
-                            {videosToRender.map((video) => (
-                                <div
-                                    key={video.id}
-                                    style={{
-                                        display:
-                                            currentVideoIndex ===
-                                            videos.indexOf(video)
-                                                ? 'block'
-                                                : 'none',
-                                        height: '100%',
-                                    }}
-                                >
-                                    <VideoPlayer
-                                        video={video}
-                                        onNext={navigateToNext}
-                                        onPrev={navigateToPrev}
-                                        hasNext={
-                                            videos.indexOf(video) <
-                                            videos.length - 1
-                                        }
-                                        hasPrev={videos.indexOf(video) > 0}
-                                        isLoaded={!!loadedMap[video.id]}
-                                        shouldPlay={
-                                            currentVideoIndex ===
-                                            videos.indexOf(video)
-                                        }
-                                        shouldPreload={
-                                            Math.abs(
-                                                currentVideoIndex -
-                                                    videos.indexOf(video),
-                                            ) <= 1
-                                        }
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                    <VideoList
+                        videos={videos}
+                        currentVideoIndex={currentVideoIndex}
+                        videosToRender={videosToRender}
+                        navigateToNext={navigateToNext}
+                        navigateToPrev={navigateToPrev}
+                        loadedMap={loadedMap}
+                        className={cx('video-wrapper')}
+                    />
                 </>
             )}
         </div>
