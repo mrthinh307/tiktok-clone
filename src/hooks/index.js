@@ -7,3 +7,4 @@ export { default as useVideoTransition } from './useVideoTransition';
 export { default as useVideoNavigation } from './useVideoNavigation';
 export { default as useKeyboardNavigation } from './useKeyboardNavigation';
 export { default as useWheelNavigation } from './useWheelNavigation';
+export { default as useVideoData } from './useVideoData';
