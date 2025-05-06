@@ -9,10 +9,19 @@ import { VideoControls, VideoInfo } from './components';
 
 const cx = classNames.bind(styles);
 
-function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev, isLoaded, shouldPlay, shouldPreload }) {
+function VideoPlayer({
+    video,
+    onNext,
+    onPrev,
+    hasNext,
+    hasPrev,
+    isLoaded,
+    shouldPlay,
+}) {
     const [expandedDescription, setExpandedDescription] = useState(false);
     const [videoSrc, setVideoSrc] = useState(null);
     const [videoOrientation, setVideoOrientation] = useState('vertical'); // 'vertical' hoặc 'horizontal'
+
     const videoContainerRef = useRef(null);
 
     // Use custom hook to manage video controls
@@ -32,31 +41,36 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev, isLoaded, should
         videoId: video.id,
         hasNext,
         onNext,
-        isActive: shouldPlay
+        isActive: shouldPlay,
     });
 
     // Detect video ratio has video when loaded
     const handleVideoMetadata = useCallback(() => {
         if (videoRef.current) {
             const { videoWidth, videoHeight } = videoRef.current;
-            setVideoOrientation(videoWidth / videoHeight >= 0.8 ? 'horizontal' : 'vertical');
+            setVideoOrientation(
+                videoWidth / videoHeight >= 0.8 ? 'horizontal' : 'vertical',
+            );
         }
     }, []);
 
     // Only set the video source when it's needed (visible or preloading)
     useEffect(() => {
-        if ((shouldPlay || shouldPreload) && isLoaded) {
+        if (shouldPlay && isLoaded) {
             setVideoSrc(video.video.playAddr);
         }
+        
         return () => {
-            // Clean up video source when component unmounts or when no longer needed
-            if (!shouldPlay && !shouldPreload && videoRef.current) {
-                videoRef.current.pause();
-                videoRef.current.removeAttribute('src');
-                videoRef.current.load();
-            }
+            // Nếu component unmount hoặc video không còn cần thiết
+            // if (videoRef.current && !shouldPlay) {
+            //     console.log(`Cleaning up video ${video.id} resources`);
+            //     videoRef.current.pause();
+            //     videoRef.current.removeAttribute('src');
+            //     videoRef.current.load();
+            //     setVideoSrc(null);
+            // }
         };
-    }, [shouldPlay, shouldPreload, video.video.playAddr, isLoaded, videoRef]);
+    }, [shouldPlay, video.video.playAddr, isLoaded, video.id]);
 
     // Force play when shouldPlay changes to true
     useEffect(() => {
@@ -76,25 +90,30 @@ function VideoPlayer({ video, onNext, onPrev, hasNext, hasPrev, isLoaded, should
     return (
         <div className={cx('wrapper')}>
             <div className={cx('container')}>
-                <div className={cx('video-player')} onClick={togglePlay} ref={videoContainerRef}>
+                <div
+                    className={cx('video-player')}
+                    onClick={togglePlay}
+                    ref={videoContainerRef}
+                >
                     {renderSkeleton && (
                         <div className={cx('skeleton-loader')}>
                             <div className={cx('skeleton-shimmer')}></div>
                         </div>
                     )}
-                    
+
                     <video
                         ref={videoRef}
                         src={videoSrc}
                         poster={video.video.cover}
                         loop={!isAutoScrollEnabled}
                         playsInline
-                        preload={shouldPreload ? "auto" : "none"}
-                        className={cx('video', { 
+                        preload={isLoaded ? 'auto' : 'none'}
+                        className={cx('video', {
                             'video-hidden': !videoLoaded || !videoSrc,
-                            'loaded': videoLoaded && videoSrc,
-                            'video-horizontal': videoOrientation === 'horizontal',
-                            'video-vertical': videoOrientation === 'vertical'
+                            loaded: videoLoaded && videoSrc,
+                            'video-horizontal':
+                                videoOrientation === 'horizontal',
+                            'video-vertical': videoOrientation === 'vertical',
                         })}
                         onLoadedMetadata={handleVideoMetadata}
                     />

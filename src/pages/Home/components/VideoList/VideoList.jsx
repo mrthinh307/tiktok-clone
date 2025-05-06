@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import VideoPlayer from '../VideoPlayer';
 
+
 const VideoList = ({
     videos,
     currentVideoIndex,
@@ -10,6 +11,7 @@ const VideoList = ({
     loadedMap,
     className,
 }) => {
+
     return (
         <div className={className}>
             {videosToRender.map((video) => {
@@ -28,18 +30,16 @@ const VideoList = ({
                     >
                         <VideoPlayer
                             video={video}
+
                             onNext={navigateToNext}
                             onPrev={navigateToPrev}
+                    
                             hasNext={videoIndex < videos.length - 1}
                             hasPrev={videoIndex > 0}
+
                             isLoaded={!!loadedMap[video.id]}
                             shouldPlay={
                                 currentVideoIndex === videoIndex
-                            }
-                            shouldPreload={
-                                Math.abs(
-                                    currentVideoIndex - videoIndex,
-                                ) <= 1
                             }
                         />
                     </div>

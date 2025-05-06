@@ -110,18 +110,6 @@ function Home() {
             } else {
                 const newVideos = [...videos, ...mappedVideos];
                 setVideos(newVideos);
-
-                // Mark videos that need preloading in the new batch
-                const updatedLoadedMap = { ...loadedMap };
-
-                // If we're near the end of current list, mark first few new videos as loaded
-                if (currentVideoIndex >= videos.length - 3) {
-                    const videosToPreload = mappedVideos.slice(0, 3);
-                    videosToPreload.forEach((video) => {
-                        updatedLoadedMap[video.id] = true;
-                    });
-                    setLoadedMap(updatedLoadedMap);
-                }
             }
 
             console.log(
@@ -223,7 +211,7 @@ function Home() {
                 } videos`,
             );
             setLoadedMap(newLoadedMap);
-            return; 
+            return;
         }
 
         if (hasChanges) {
@@ -271,6 +259,28 @@ function Home() {
                         className={cx('video-wrapper')}
                     />
                 </>
+            )}
+            {process.env.NODE_ENV === 'development' && (
+                <button
+                    onClick={() => {
+                        if (window.performance && window.performance.memory) {
+                            console.log(
+                                `Used JS Heap: ${
+                                    window.performance.memory.usedJSHeapSize /
+                                    1048576
+                                } MB`,
+                            );
+                        }
+                    }}
+                    style={{
+                        position: 'fixed',
+                        top: 10,
+                        right: 10,
+                        zIndex: 9999,
+                    }}
+                >
+                    Check Memory
+                </button>
             )}
         </div>
     );
