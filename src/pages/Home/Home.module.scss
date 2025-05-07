@@ -213,3 +213,8 @@
 }
 
 /* Support for keyboard navigation indicator */
+@media screen and (max-width: 768px) {
+    .wrapper {
+        padding: 0;
+    }
+}

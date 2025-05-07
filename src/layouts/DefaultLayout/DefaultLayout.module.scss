@@ -18,11 +18,20 @@
     // flex: 0 0 calc(100vw - 240px);
     position: relative;
     margin: 0px auto;
-    width: 100%;
+    margin-left: 240px; 
+    width: calc(100% - 240px); 
     min-width: 420px;
     flex-shrink: 1; 
     display: flex;
     justify-content: center;
     align-items: stretch;
+    transition: margin-left 0.4s ease;
+}
+
+@media screen and (max-width: 1024px) {
+    .content {
+        margin-left: 72px;
+        width: calc(100% - 72px);
+    }
 }
 

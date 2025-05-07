@@ -1,4 +1,5 @@
 .wrapper {
+    position: fixed;
     width: 240px;
     flex-shrink: 0;
     z-index: 99;
@@ -40,7 +41,7 @@
     max-height: 100vh;
     position: fixed;
     left: 72px;
-    z-index: 1;
+    z-index: 98;
     background: rgba(255, 255, 255, 1);
     transform: translateX(-50px);
     opacity: 0;
@@ -211,5 +212,18 @@
             justify-content: center;
             fill: rgba(22, 24, 35, 0.3) !important; 
         }
+    }
+}
+
+.login-btn {
+    width: 200px !important;
+    height: 40px !important;
+    background-color: var(--primary-color) !important;
+    color: #fff !important;
+    justify-content: center !important;
+    border-radius: 6px !important;
+
+    &:hover {
+        background-color: rgba(234, 40, 78, 1) !important;
     }
 }
