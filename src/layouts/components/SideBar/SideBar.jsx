@@ -8,6 +8,8 @@ import Menu from './Menu';
 import { useDrawer } from '~/hooks';
 import DrawerContainer from './DrawContainer';
 import { DarkLogoIcon, OnlyDarkLogoIcon } from '~/assets/images/icons';
+import Button from '~/components/Button';
+import { useAuth } from '~/contexts/AuthContext';
 
 const cx = classNames.bind(styles);
 
@@ -27,10 +29,8 @@ function SideBar() {
         [],
     );
 
-    const { showDrawer, drawerRef } = useDrawer(
-        isCollapsed,
-        drawerOptions,
-    );
+    const { showDrawer, drawerRef } = useDrawer(isCollapsed, drawerOptions);
+    const { toggleLoginForm } = useAuth();
 
     // Handle responsive behavior
     useEffect(() => {
@@ -103,6 +103,10 @@ function SideBar() {
         [handleCloseDrawer, currentMenuTitle],
     );
 
+    const handleLoginButtonClick = useCallback(() => {
+        toggleLoginForm();
+    }, [toggleLoginForm]);
+
     return (
         <aside
             className={cx('wrapper', { collapsed: isCollapsed })}
@@ -110,13 +114,20 @@ function SideBar() {
         >
             <div className={cx('container')}>
                 <Link to={config.routes.home} className={cx('header-logo')}>
-                    {(!isCollapsed && !isResponsiveCollapsed) ? (
+                    {!isCollapsed && !isResponsiveCollapsed ? (
                         <DarkLogoIcon className={cx('logo')} />
                     ) : (
                         <OnlyDarkLogoIcon className={cx('logo')} />
                     )}
                 </Link>
                 <Menu {...menuProps} />
+                <Button
+                    primary
+                    className={cx('login-btn')}
+                    onClick={handleLoginButtonClick}
+                >
+                    Log in
+                </Button>
                 {showDrawer && (
                     <DrawerContainer ref={drawerRef} {...drawerProps} />
                 )}
