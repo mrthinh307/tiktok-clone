@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useRef } from 'react';
 import { useAutoScroll } from '~/contexts/AutoScrollContext';
+import { useVolume } from '~/contexts/VolumeContext';
 
 export default function useVideoControl({
     videoId,
@@ -10,26 +11,14 @@ export default function useVideoControl({
 }) {
     const [videoLoaded, setVideoLoaded] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [progress, setProgress] = useState(0);
     const [showPlayPauseOverlay, setShowPlayPauseOverlay] = useState(false);
-    const [isMuted, setIsMuted] = useState(() => {
-        const savedPreference = localStorage.getItem('tiktok-sound-preference');
-        return savedPreference ? savedPreference === 'muted' : true;
-    });
-    const [forcePlay, setForcePlay] = useState(false);
     const [isBuffering, setIsBuffering] = useState(false);
+
+    const { isGloballyMuted, toggleGlobalMute } = useVolume();
 
     const videoRef = useRef(null);
     const autoScrollTimeoutRef = useRef(null);
     const { isAutoScrollEnabled } = useAutoScroll();
-
-    // Storage sound preference
-    useEffect(() => {
-        localStorage.setItem(
-            'tiktok-sound-preference',
-            isMuted ? 'muted' : 'unmuted',
-        );
-    }, [isMuted]);
 
     // Handle auto scroll and video end
     useEffect(() => {
@@ -64,11 +53,6 @@ export default function useVideoControl({
     useEffect(() => {
         if (!videoRef.current || !videoRef.current.src) return;
 
-        // Reset state when video changes
-        if (!videoLoaded) {
-            setProgress(0);
-        }
-
         // Sync volume state - ALWAYS MUTE ON LOAD TO MAKE SURE AUTOPLAY
         if (videoRef.current) {
             videoRef.current.muted = true;
@@ -90,7 +74,7 @@ export default function useVideoControl({
                         setIsPlaying(true);
                         // Only remove MUTE if user set UNMUTE
                         setTimeout(() => {
-                            if (videoRef.current && !isMuted) {
+                            if (videoRef.current && !isGloballyMuted) {
                                 videoRef.current.muted = false;
                             }
                         }, 100);
@@ -146,7 +130,7 @@ export default function useVideoControl({
                 videoRef.current.removeEventListener('canplay', handleCanPlay);
             }
         };
-    }, [videoId, isMuted, videoRef.current?.src, isActive]);
+    }, [videoId, videoRef.current?.src, isActive, isGloballyMuted]);
 
     // Pause video when not active
     useEffect(() => {
@@ -155,46 +139,6 @@ export default function useVideoControl({
             setIsPlaying(false);
         }
     }, [isActive]);
-
-    // Handle force play request
-    useEffect(() => {
-        if (forcePlay && videoRef.current && isActive) {
-            videoRef.current
-                .play()
-                .then(() => {
-                    setIsPlaying(true);
-                    setForcePlay(false);
-                })
-                .catch((error) => {
-                    console.error('Force play failed:', error);
-                    setForcePlay(false);
-                });
-        }
-    }, [forcePlay, isActive]);
-
-    // Update volume state in video
-    useEffect(() => {
-        if (videoRef.current && isPlaying) {
-            videoRef.current.muted = isMuted;
-        }
-    }, [isMuted, isPlaying]);
-
-    // Update progress bar
-    useEffect(() => {
-        if (!videoRef.current || !isPlaying || !isActive) return;
-
-        const updateProgress = () => {
-            if (videoRef.current && videoRef.current.duration > 0) {
-                const currentProgress =
-                    (videoRef.current.currentTime / videoRef.current.duration) *
-                    100;
-                setProgress(currentProgress);
-            }
-        };
-
-        const intervalId = setInterval(updateProgress, 100);
-        return () => clearInterval(intervalId);
-    }, [isPlaying, isActive]);
 
     // Play/pause overlay animation
     useEffect(() => {
@@ -259,29 +203,28 @@ export default function useVideoControl({
         };
     }, [videoRef.current?.src, isPlaying]);
 
-    // Handle event turn on/off sound
-    const toggleMute = (e) => {
-        if (e) e.stopPropagation();
-
-        const newMutedState = !isMuted;
-        setIsMuted(newMutedState);
-
-        if (videoRef.current) {
-            videoRef.current.muted = newMutedState;
+    // Update volume state in video
+    useEffect(() => {
+        if (videoRef.current && isPlaying) {
+            videoRef.current.muted = isGloballyMuted;
         }
+    }, [isGloballyMuted, isPlaying]);
+
+    // Handle event turn on/off sound
+    const handleToggleMute = (e) => {
+        if (e) e.stopPropagation();
+        toggleGlobalMute();
     };
 
     return {
         videoRef,
         videoLoaded,
         isPlaying,
-        isMuted,
-        progress,
+        isMuted: isGloballyMuted,
         showPlayPauseOverlay,
         isAutoScrollEnabled,
         isBuffering,
         togglePlay,
-        toggleMute,
-        setForcePlay,
+        toggleMute: handleToggleMute,
     };
 }
