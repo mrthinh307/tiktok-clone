@@ -6,6 +6,7 @@ import DefaultLayout from '~/layouts';
 import { AutoScrollProvider } from './contexts/AutoScrollContext';
 import { AuthProvider } from './contexts/AuthContext';
 import LoginForm from './components/LoginForm';
+import { VolumeProvider } from './contexts/VolumeContext';
 
 function App() {
     return (
@@ -31,9 +32,11 @@ function App() {
                                     path={route.path}
                                     element={
                                         <AutoScrollProvider>
-                                            <Layout>
-                                                <Page />
-                                            </Layout>
+                                            <VolumeProvider>
+                                                <Layout>
+                                                    <Page />
+                                                </Layout>
+                                            </VolumeProvider>
                                         </AutoScrollProvider>
                                     }
                                 />

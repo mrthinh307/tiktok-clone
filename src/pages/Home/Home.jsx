@@ -1,7 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import classNames from 'classnames/bind';
-import styles from './Home.module.scss';import { useVideoData, useVideoNavigation } from '~/hooks';
+import styles from './Home.module.scss';
+import { useVideoData, useVideoNavigation } from '~/hooks';
 import VideoList from './components/VideoList';
 
 const cx = classNames.bind(styles);
@@ -13,8 +14,6 @@ function Home() {
         videos,
         loadedMap,
         loading,
-        isFetchingMore,
-        hasMore,
         loadVideos,
         loadMoreIfNeeded,
         preloadVideos,
@@ -31,17 +30,11 @@ function Home() {
         isEnabled: !loading,
         containerRef,
         classNameFormatter: cx,
-        onIndexChange: (newIndex) => {
-            // Gọi loadMoreIfNeeded sau khi index thay đổi
-            // Đặt trong setTimeout để đảm bảo state đã cập nhật
-            setTimeout(() => loadMoreIfNeeded(newIndex), 0);
-        },
     });
 
+    // Cleanup navigation khi unmount
     useEffect(() => {
-        return () => {
-            cleanupNavigation();
-        };
+        return cleanupNavigation;
     }, [cleanupNavigation]);
 
     // Load videos on initial mount
@@ -50,8 +43,8 @@ function Home() {
     }, []);
 
     useEffect(() => {
-        loadMoreIfNeeded();
-    }, [currentVideoIndex, loading, isFetchingMore, hasMore, videos.length]);
+        loadMoreIfNeeded(currentVideoIndex);
+    }, [currentVideoIndex, videos.length]);
 
     // Update preloaded videos when current index changes
     useEffect(() => {
@@ -59,23 +52,17 @@ function Home() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentVideoIndex, videos]);
 
-    // Get videos to render (current and adjacent videos)
-    const videosToRender = videos.filter((_, index) => {
-        return Math.abs(index - currentVideoIndex) <= 1;
-    });
-
-    // Debug info for development
-    useEffect(() => {
-        console.log(
-            `Current video index: ${currentVideoIndex}, Total videos: ${videos.length}`,
-        );
-        console.log(`Videos in loadedMap: ${Object.keys(loadedMap).length}`);
-    }, [currentVideoIndex, videos.length, loadedMap]);
+    // Tính toán video cần render bằng useMemo để tránh tính lại khi re-render
+    const videosToRender = useMemo(() => {
+        return videos.filter((_, index) => {
+            return Math.abs(index - currentVideoIndex) <= 1;
+        });
+    }, [videos, currentVideoIndex]);
 
     return (
         <div className={cx('wrapper')} ref={containerRef}>
             {loading ? (
-                <div className={cx('loading')}>Loading</div>
+                <div className={cx('loading')}>Loading...</div>
             ) : (
                 <>
                     <VideoList
