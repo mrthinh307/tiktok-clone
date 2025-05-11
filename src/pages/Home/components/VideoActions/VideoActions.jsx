@@ -4,6 +4,7 @@ import classNames from 'classnames/bind';
 import styles from './VideoActions.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCommentDots, faShare } from '@fortawesome/free-solid-svg-icons';
+import { ClickSpark } from '~/components/Animations';
 
 import {
     BookmarkIcon,
@@ -11,35 +12,36 @@ import {
     TickFollowIcon,
     TymIcon,
 } from '~/assets/images/icons';
-import { useFlashAnimation } from '~/hooks';
+import { useAuth } from '~/contexts/AuthContext';
 
 const cx = classNames.bind(styles);
 
 const ActionButton = React.memo(
-    ({ icon, count, onClick, isActive, flashClass }) => (
-        <button
-            className={cx('action-btn', { active: isActive })}
-            onClick={onClick}
+    ({ icon, count, onClick, isActive, sparkColor }) => (
+        <ClickSpark
+            sparkColor={sparkColor}
+            sparkSize={10}
+            sparkRadius={15}
+            sparkCount={8}
+            duration={400}
         >
-            <div className={cx('icon-wrapper', { [flashClass]: !!flashClass })}>
-                {icon}
-            </div>
-            <span className={cx('count')}>{count}</span>
-        </button>
+            <button
+                className={cx('action-btn', { active: isActive })}
+                onClick={onClick}
+            >
+                <div className={cx('icon-wrapper')}>{icon}</div>
+                <span className={cx('count')}>{count}</span>
+            </button>
+        </ClickSpark>
     ),
 );
 
 function VideoActions({ video }) {
-    const { stats } = video;
+    const { user, toggleLoginForm } = useAuth();
 
     const [liked, setLiked] = useState(false);
     const [saved, setSaved] = useState(false);
     const [followed, setFollowed] = useState(false);
-
-    const [likedFlash, triggerLikedFlash] = useFlashAnimation();
-    const [commentFlash, triggerCommentFlash] = useFlashAnimation();
-    const [savedFlash, triggerSavedFlash] = useFlashAnimation();
-    const [sharedFlash, triggerSharedFlash] = useFlashAnimation();
 
     const formatCount = useCallback((count) => {
         if (count >= 1000000) {
@@ -53,66 +55,66 @@ function VideoActions({ video }) {
 
     const formattedCounts = useMemo(
         () => ({
-            likes: formatCount(stats.likes),
-            comments: formatCount(stats.comments),
-            saves: formatCount(stats.saves),
-            shares: formatCount(stats.shares),
+            likes: formatCount(video.likes_count),
+            comments: formatCount(video.comments_count),
+            saves: formatCount(Math.floor(Math.random() * 200)),
+            shares: formatCount(video.shares_count),
         }),
-        [stats, formatCount],
+        [video, formatCount],
     );
 
-    const handleLike = useCallback(
-        (e) => {
-            e.stopPropagation();
-            setLiked((prev) => !prev);
-            triggerLikedFlash();
+    // Wrapper to check if user is logged in before executing action
+    const requireAuth = useCallback(
+        (action) => (e) => {
+            if (!user) {
+                toggleLoginForm();
+                return;
+            }
+            action(e);
         },
-        [triggerLikedFlash],
+        [user, toggleLoginForm],
     );
 
-    const handleSave = useCallback(
-        (e) => {
-            e.stopPropagation();
-            setSaved((prev) => !prev);
-            triggerSavedFlash();
-        },
-        [triggerSavedFlash],
-    );
-
-    const handleComment = useCallback(
-        (e) => {
-            e.stopPropagation();
-            triggerCommentFlash();
-        },
-        [triggerCommentFlash],
-    );
-
-    const handleShare = useCallback(
-        (e) => {
-            e.stopPropagation();
-            triggerSharedFlash();
-        },
-        [triggerSharedFlash],
-    );
-
-    const handleFollow = useCallback((e) => {
-        e.stopPropagation();
-        setFollowed((prev) => !prev);
+    const handleLike = useCallback((e) => {
+        setLiked((prev) => !prev);
     }, []);
+
+    const handleSave = useCallback((e) => {
+        setSaved((prev) => !prev);
+    }, []);
+
+    const handleComment = useCallback((e) => {}, []);
+
+    const handleShare = useCallback((e) => {}, []);
+
+    const handleFollowButtonClick = useCallback(
+        (e) => {
+            e.stopPropagation();
+
+            if (!user) {
+                toggleLoginForm();
+                return;
+            }
+
+            setFollowed((prev) => !prev);
+        },
+        [user, toggleLoginForm],
+    );
 
     return (
         <div className={cx('action-buttons')}>
-            <button className={cx('avatar-container')}>
+            <button
+                className={cx('avatar-container')}
+                onClick={requireAuth(() => {})}
+            >
                 <img
-                    // src={video.user.avatar}
-                    // alt={video.user.nickname}
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJDRALoJakgEuuuGmBvBi-eSbPMe5B9fSdtA&s"
-                    alt="DEFAULT_AVATAR"
+                    src={video.user.avatar}
+                    alt="avatar"
                     className={cx('avatar')}
                 />
                 <div
                     className={cx('follow-btn', { followed: followed })}
-                    onClick={handleFollow}
+                    onClick={handleFollowButtonClick}
                 >
                     {!followed ? (
                         <PlusIcon className={cx('plus-icon')} />
@@ -125,36 +127,39 @@ function VideoActions({ video }) {
             <ActionButton
                 icon={<TymIcon />}
                 count={formattedCounts.likes}
-                onClick={handleLike}
+                onClick={requireAuth(handleLike)}
                 isActive={liked}
-                flashClass={likedFlash ? 'liked-flash' : ''}
+                sparkColor={liked ? '#fe2c55' : '#000'}
             />
 
             <ActionButton
                 icon={<FontAwesomeIcon icon={faCommentDots} />}
                 count={formattedCounts.comments}
-                onClick={handleComment}
+                onClick={requireAuth(handleComment)}
                 isActive={false}
-                flashClass={commentFlash ? 'comment-flash' : ''}
+                sparkColor="transparent"
             />
 
             <ActionButton
                 icon={<BookmarkIcon className={cx('bookmark')} />}
                 count={formattedCounts.saves}
-                onClick={handleSave}
+                onClick={requireAuth(handleSave)}
                 isActive={saved}
-                flashClass={savedFlash ? 'saved-flash' : ''}
+                sparkColor={saved ? '#f3cd00' : '#000'}
             />
 
             <ActionButton
                 icon={<FontAwesomeIcon icon={faShare} />}
                 count={formattedCounts.shares}
-                onClick={handleShare}
+                onClick={requireAuth(handleShare)}
                 isActive={false}
-                flashClass={sharedFlash ? 'shared-flash' : ''}
+                sparkColor="transparent"
             />
 
-            <button className={cx('sound-container')}>
+            <button
+                className={cx('sound-container')}
+                onClick={requireAuth(() => {})}
+            >
                 <img
                     src="https://avatar-ex-swe.nixcdn.com/song/2024/09/17/i/O/M/T/1726557845569_640.jpg"
                     alt="sound-default"
@@ -181,7 +186,7 @@ ActionButton.propTypes = {
     count: PropTypes.string.isRequired,
     onClick: PropTypes.func.isRequired,
     isActive: PropTypes.bool,
-    flashClass: PropTypes.string,
+    sparkColor: PropTypes.string,
 };
 
 export default VideoActions;
