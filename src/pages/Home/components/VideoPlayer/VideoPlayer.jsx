@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useCallback, memo, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
@@ -6,9 +5,9 @@ import styles from './VideoPlayer.module.scss';
 import useVideoControl from '~/hooks/useVideoControl';
 import VideoActions from '../VideoActions';
 import { VideoControls, VideoInfo } from './components';
+import LoadingSpinner from '~/components/LoadingSpinner';
 
 const cx = classNames.bind(styles);
-
 function VideoPlayer({
     video,
     onNext,
@@ -30,13 +29,11 @@ function VideoPlayer({
         videoLoaded,
         isPlaying,
         isMuted,
-        progress,
         showPlayPauseOverlay,
         isAutoScrollEnabled,
         isBuffering,
         togglePlay,
         toggleMute,
-        setForcePlay,
     } = useVideoControl({
         videoId: video.id,
         hasNext,
@@ -52,14 +49,15 @@ function VideoPlayer({
                 videoWidth / videoHeight >= 0.8 ? 'horizontal' : 'vertical',
             );
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Only set the video source when it's needed (visible or preloading)
     useEffect(() => {
-        if (shouldPlay && isLoaded) {
-            setVideoSrc(video.video.playAddr);
+        if ((shouldPlay || isLoaded) && video.file_url) {
+            setVideoSrc(video.file_url);
         }
-        
+
         return () => {
             // Nếu component unmount hoặc video không còn cần thiết
             // if (videoRef.current && !shouldPlay) {
@@ -70,22 +68,12 @@ function VideoPlayer({
             //     setVideoSrc(null);
             // }
         };
-    }, [shouldPlay, video.video.playAddr, isLoaded, video.id]);
-
-    // Force play when shouldPlay changes to true
-    useEffect(() => {
-        if (shouldPlay && videoRef.current && videoSrc) {
-            setForcePlay(true);
-        }
-    }, [shouldPlay, videoSrc, videoRef, setForcePlay]);
+    }, [shouldPlay, video.file_url, isLoaded, video.id]);
 
     const toggleDescription = useCallback((e) => {
         if (e) e.stopPropagation();
         setExpandedDescription((prev) => !prev);
     }, []);
-
-    // Show skeleton loader when video is not loaded
-    const renderSkeleton = !videoLoaded || !isLoaded;
 
     return (
         <div className={cx('wrapper')}>
@@ -95,22 +83,22 @@ function VideoPlayer({
                     onClick={togglePlay}
                     ref={videoContainerRef}
                 >
-                    {renderSkeleton && (
-                        <div className={cx('skeleton-loader')}>
-                            <div className={cx('skeleton-shimmer')}></div>
-                        </div>
+                    {!videoLoaded && (
+                        <LoadingSpinner
+                            video={video}
+                        />
                     )}
 
                     <video
                         ref={videoRef}
                         src={videoSrc}
-                        poster={video.video.cover}
+                        poster={video.thumb_url}
                         loop={!isAutoScrollEnabled}
                         playsInline
                         preload={isLoaded ? 'auto' : 'none'}
                         className={cx('video', {
-                            'video-hidden': !videoLoaded || !videoSrc,
-                            loaded: videoLoaded && videoSrc,
+                            hiden: !videoLoaded || !isLoaded,
+                            loaded: videoLoaded && isLoaded,
                             'video-horizontal':
                                 videoOrientation === 'horizontal',
                             'video-vertical': videoOrientation === 'vertical',
@@ -120,9 +108,10 @@ function VideoPlayer({
 
                     {videoLoaded && (
                         <VideoControls
+                            videoRef={videoRef}
+                            isActive={shouldPlay}
                             isPlaying={isPlaying}
                             isMuted={isMuted}
-                            progress={progress}
                             showPlayPauseOverlay={showPlayPauseOverlay}
                             toggleMute={toggleMute}
                             isBuffering={isBuffering}
