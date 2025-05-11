@@ -2,6 +2,7 @@ import { memo } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
 import styles from '../VideoPlayer.module.scss';
+import useVideoProgress from '~/hooks/useVideoProgress';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPause, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -14,18 +15,22 @@ import {
     ELLIPSIS_OPTIONS,
     ELLIPSIS_POPPER_PROPS,
 } from '~/constants/videoConstant';
+import LoadingSpinner from '~/components/LoadingSpinner';
 
 const cx = classNames.bind(styles);
 
 const VideoControls = memo(
     ({
+        videoRef,
+        isActive,
         isPlaying,
         isMuted,
-        progress,
         showPlayPauseOverlay,
         toggleMute,
         isBuffering,
     }) => {
+        const progress = useVideoProgress(videoRef, isPlaying, isActive);
+
         return (
             <>
                 {/* Play/Pause Overlay */}
@@ -47,11 +52,7 @@ const VideoControls = memo(
 
                 {/* Buffering overlay - hiển thị khi đang buffer */}
                 {isBuffering && (
-                    <div className={cx('buffering-overlay')}>
-                        <div className={cx('buffering-spinner')}>
-                            <FontAwesomeIcon icon={faSpinner} />
-                        </div>
-                    </div>
+                    <LoadingSpinner />
                 )}
 
                 {/* Progress video */}
@@ -101,9 +102,10 @@ const VideoControls = memo(
 VideoControls.displayName = 'VideoControls';
 
 VideoControls.propTypes = {
+    videoRef: PropTypes.object.isRequired,
+    isActive: PropTypes.bool.isRequired,
     isPlaying: PropTypes.bool.isRequired,
     isMuted: PropTypes.bool.isRequired,
-    progress: PropTypes.number.isRequired,
     showPlayPauseOverlay: PropTypes.bool.isRequired,
     toggleMute: PropTypes.func.isRequired,
     isBuffering: PropTypes.bool,
