@@ -11,15 +11,19 @@
     position: relative;
 
     .title {
-        flex: 1;
         font-size: 1.6rem;
         line-height: 21px;
-        white-space: nowrap; 
+        white-space: nowrap;
         opacity: 1;
         overflow: hidden;
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
+
+        &.has-right-icon {
+            flex: 1;
+            justify-content: space-between;
+        }
 
         &.title-small {
             font-size: 1.4rem;
@@ -51,7 +55,7 @@
         align-items: center;
         justify-content: center;
         color: var(--text-color) !important;
-        flex-shrink: 0; 
+        flex-shrink: 0;
 
         &.icon-small {
             width: 20px;
@@ -80,7 +84,6 @@
         opacity: 0.5;
     }
 }
-
 
 // Padding sizes of button
 .padding-none {
@@ -134,7 +137,6 @@
     }
 }
 
-
 // Font types
 .font-regular {
     font-family: var(--font-family-regular);
@@ -147,4 +149,3 @@
 .font-bold {
     font-family: var(--font-family-bold);
 }
-

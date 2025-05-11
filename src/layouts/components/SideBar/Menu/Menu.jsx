@@ -1,14 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import PropTypes from 'prop-types';
 import MenuItem from './MenuItem';
-import { useState, useCallback, useImperativeHandle, forwardRef } from 'react';
+import { useState, useCallback, useImperativeHandle, forwardRef, useEffect, useMemo } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Menu.module.scss';
-import { SIDEBAR_MENU_ITEMS } from '~/constants/sidebarConstants';
+import { SIDEBAR_MENU_ITEMS, UNAUTHENTICATED_SIDEBAR_MENU_ITEMS } from '~/constants/sidebarConstants';
 
 const cx = classNames.bind(styles);
 
-const Menu = forwardRef(function Menu({ collapsed, onToggleCollapse, onSetTitle }, ref) {
+const Menu = forwardRef(function Menu({ user, collapsed, onToggleCollapse, onSetTitle }, ref) {
     const [activeItemIndex, setActiveItemIndex] = useState(null);
     
     const hasNonNavLinkActive = activeItemIndex !== null && collapsed;
@@ -52,9 +52,17 @@ const Menu = forwardRef(function Menu({ collapsed, onToggleCollapse, onSetTitle 
         [activeItemIndex, collapsed],
     );
 
+    const filteredMenuItems = useMemo(() => {
+        if (user) {
+            return SIDEBAR_MENU_ITEMS;
+        } else {
+            return SIDEBAR_MENU_ITEMS.filter(item => UNAUTHENTICATED_SIDEBAR_MENU_ITEMS.includes(item.title));
+        }
+    }, [user]);
+
     return (
         <div className={cx('menu-wrapper')}>
-            {SIDEBAR_MENU_ITEMS.map((item, index) => {
+            {filteredMenuItems.map((item, index) => {
                 const clickHandler = getClickHandler(item, index);
 
                 return (
@@ -62,10 +70,9 @@ const Menu = forwardRef(function Menu({ collapsed, onToggleCollapse, onSetTitle 
                         key={index}
                         title={item.title}
                         to={item.to}
-                        icon={item.icon}
+                        icon={item.unauthenticatedIcon && !user ? item.unauthenticatedIcon : item.icon}
                         activeIcon={item.activeIcon}
                         iconSize={item.iconSize || 'large'}
-
                         collapsed={collapsed}
                         onClick={clickHandler}
                         isActive={activeItemIndex === index}

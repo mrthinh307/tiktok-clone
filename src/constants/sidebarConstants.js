@@ -1,7 +1,5 @@
-import {  RightArrowIcon } from '~/assets/images/icons';
+import { LiveIcon, LiveSolidIcon, RightArrowIcon } from '~/assets/images/icons';
 import { LANGUAGE_LISTS } from '~/constants/headerConstants';
-import classNames from 'classnames/bind';
-import styles from '~/layouts/components/SideBar/Menu/Menu.module.scss';
 import config from '~/config';
 
 import {
@@ -16,14 +14,11 @@ import {
     HomeSolidIcon,
     InboxRegularIcon,
     InboxSolidIcon,
-    LiveIcon,
     MessageReuglarIcon,
     MessageSolidIcon,
     UploadIcon,
     SearchIcon,
 } from '~/assets/images/icons';
-
-const cx = classNames.bind(styles);
 
 export const SIDEBAR_MENU_ITEMS = [
     {
@@ -83,17 +78,19 @@ export const SIDEBAR_MENU_ITEMS = [
     {
         title: 'LIVE',
         to: config.routes.live,
-        icon: (
-            <div className={cx('live-icon-wrapper')}>
-                <LiveIcon />
-                <img
-                    loading="lazy"
-                    alt=""
-                    src="https://p9-sign-sg.tiktokcdn.com/tos-alisg-avt-0068/81dbf011111004f2b9b3275b3808a749~tplv-tiktokx-cropcenter:100:100.webp?dr=14579&amp;refresh_token=87c72164&amp;x-expires=1745643600&amp;x-signature=s62m6hGqxMD6ZoCofAfPAlH0JnQ%3D&amp;t=4d5b0474&amp;ps=13740610&amp;shp=a5d48078&amp;shcp=fdd36af4&amp;idc=my"
-                    class="css-1zpj2q-ImgAvatar e1e9er4e1"
-                ></img>
-            </div>
-        ),
+        icon: <LiveIcon />,
+        activeIcon: <LiveSolidIcon />,
+        // icon: (
+        //     <div className={cx('live-icon-wrapper')}>
+        //         <LiveFrameIcon />
+        //         <img
+        //             loading="lazy"
+        //             alt=""
+        //             src="https://p9-sign-sg.tiktokcdn.com/tos-alisg-avt-0068/81dbf011111004f2b9b3275b3808a749~tplv-tiktokx-cropcenter:100:100.webp?dr=14579&amp;refresh_token=87c72164&amp;x-expires=1745643600&amp;x-signature=s62m6hGqxMD6ZoCofAfPAlH0JnQ%3D&amp;t=4d5b0474&amp;ps=13740610&amp;shp=a5d48078&amp;shcp=fdd36af4&amp;idc=my"
+        //             class="css-1zpj2q-ImgAvatar e1e9er4e1"
+        //         ></img>
+        //     </div>
+        // ),
         iconSize: 'large',
     },
     {
@@ -183,4 +180,13 @@ export const MORE_CONTENTS = [
     {
         title: 'Log out',
     },
+];
+
+export const UNAUTHENTICATED_SIDEBAR_MENU_ITEMS = [
+    'Search',
+    'For You',
+    'Explore',
+    'Following',
+    'LIVE',
+    'More',
 ];

@@ -226,4 +226,28 @@
     &:hover {
         background-color: rgba(234, 40, 78, 1) !important;
     }
+
+    &.hide {
+        display: none;
+    }
+}
+
+.collapsed .login-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px !important; 
+    height: 40px !important;
+    border-radius: 50px !important;
+    background-color: var(--primary-color) !important;
+    color: #fff !important;
+    transition: all 0.25s ease !important;
+    position: relative !important;
+    overflow: hidden !important;
+
+    &:hover {
+        background-color: rgba(234, 40, 78, 1) !important;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
 }

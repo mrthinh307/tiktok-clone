@@ -33,11 +33,9 @@ function MenuItem({
     };
 
     return (
-        <Component {...componentProps}>
+        <Component {...componentProps} onClick={onClick}>
             <span
-                className={cx('icon', `icon-${iconSize}`, {
-                    'keep-visible': title === 'LIVE',
-                })}
+                className={cx('icon', `icon-${iconSize}`)}
             >
                 {icon}
             </span>

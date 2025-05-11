@@ -51,7 +51,7 @@ function LoginForm() {
         setError('');
     };
 
-    const handleClose = () => {
+    const handleClose = (e) => {
         resetForm();
         toggleLoginForm();
     };

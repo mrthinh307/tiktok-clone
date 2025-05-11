@@ -10,6 +10,8 @@ import DrawerContainer from './DrawContainer';
 import { DarkLogoIcon, OnlyDarkLogoIcon } from '~/assets/images/icons';
 import Button from '~/components/Button';
 import { useAuth } from '~/contexts/AuthContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowRightToBracket } from '@fortawesome/free-solid-svg-icons';
 
 const cx = classNames.bind(styles);
 
@@ -30,7 +32,7 @@ function SideBar() {
     );
 
     const { showDrawer, drawerRef } = useDrawer(isCollapsed, drawerOptions);
-    const { toggleLoginForm } = useAuth();
+    const { user, toggleLoginForm } = useAuth();
 
     // Handle responsive behavior
     useEffect(() => {
@@ -87,12 +89,13 @@ function SideBar() {
 
     const menuProps = useMemo(
         () => ({
+            user: user,
             collapsed: isCollapsed,
             onToggleCollapse: handleToggleCollapse,
             onSetTitle: handleMenuTitleChange,
             ref: menuRef,
         }),
-        [isCollapsed, handleToggleCollapse, handleMenuTitleChange],
+        [user, isCollapsed, handleToggleCollapse, handleMenuTitleChange],
     );
 
     const drawerProps = useMemo(
@@ -123,10 +126,10 @@ function SideBar() {
                 <Menu {...menuProps} />
                 <Button
                     primary
-                    className={cx('login-btn')}
+                    className={cx('login-btn', {'hide': !!user})}
                     onClick={handleLoginButtonClick}
                 >
-                    Log in
+                    {isCollapsed ? <FontAwesomeIcon icon={faArrowRightToBracket} /> : 'Log in'}
                 </Button>
                 {showDrawer && (
                     <DrawerContainer ref={drawerRef} {...drawerProps} />
