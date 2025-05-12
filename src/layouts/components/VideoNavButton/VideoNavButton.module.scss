@@ -1,0 +1,35 @@
+.btn-wrapper {
+    @apply flex items-center justify-center w-[48px] h-[48px] rounded-full bg-[rgba(0,0,0,0.05)] cursor-pointer transition-all duration-300;
+}
+
+.btn-wrapper:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+    transform: scale(1.05);
+}
+
+.icon {
+    font-size: 1.8rem;
+    color: var(--text-color);
+}
+
+.btn-wrapper.disabled {
+    @apply opacity-50;
+}
+
+.btn-wrapper.disabled:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: none;
+    cursor: not-allowed;
+}
+
+@media (max-width: 1024px) {
+    .wrapper {
+        right: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .wrapper {
+        display: none;
+    }
+}

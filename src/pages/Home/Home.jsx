@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef, useMemo, useCallback } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Home.module.scss';
 import { useVideoData, useVideoNavigation } from '~/hooks';
 import VideoList from './components/VideoList';
+import VideoNavButton from '~/layouts/components/VideoNavButton';
 
 const cx = classNames.bind(styles);
 
@@ -32,6 +33,14 @@ function Home() {
         classNameFormatter: cx,
     });
 
+    // Memoized navigation handlers to prevent unnecessary re-renders
+    const memoizedNavigateToNext = useCallback(navigateToNext, [
+        navigateToNext,
+    ]);
+    const memoizedNavigateToPrev = useCallback(navigateToPrev, [
+        navigateToPrev,
+    ]);
+
     // Cleanup navigation khi unmount
     useEffect(() => {
         return cleanupNavigation;
@@ -59,6 +68,15 @@ function Home() {
         });
     }, [videos, currentVideoIndex]);
 
+    // Kiểm tra có thể điều hướng lên/xuống hay không - memoize to prevent re-renders
+    const navigationState = useMemo(
+        () => ({
+            canNavigatePrev: currentVideoIndex > 0,
+            canNavigateNext: currentVideoIndex < videos.length - 1,
+        }),
+        [currentVideoIndex, videos.length],
+    );
+
     return (
         <div className={cx('wrapper')} ref={containerRef}>
             {loading ? (
@@ -69,34 +87,18 @@ function Home() {
                         videos={videos}
                         currentVideoIndex={currentVideoIndex}
                         videosToRender={videosToRender}
-                        navigateToNext={navigateToNext}
-                        navigateToPrev={navigateToPrev}
+                        navigateToNext={memoizedNavigateToNext}
+                        navigateToPrev={memoizedNavigateToPrev}
                         loadedMap={loadedMap}
                         className={cx('video-wrapper')}
                     />
+                    <VideoNavButton
+                        onNext={memoizedNavigateToNext}
+                        onPrev={memoizedNavigateToPrev}
+                        canNavigateNext={navigationState.canNavigateNext}
+                        canNavigatePrev={navigationState.canNavigatePrev}
+                    />
                 </>
-            )}
-            {process.env.NODE_ENV === 'development' && (
-                <button
-                    onClick={() => {
-                        if (window.performance && window.performance.memory) {
-                            console.log(
-                                `Used JS Heap: ${
-                                    window.performance.memory.usedJSHeapSize /
-                                    1048576
-                                } MB`,
-                            );
-                        }
-                    }}
-                    style={{
-                        position: 'fixed',
-                        top: 10,
-                        right: 10,
-                        zIndex: 9999,
-                    }}
-                >
-                    Check Memory
-                </button>
             )}
         </div>
     );
