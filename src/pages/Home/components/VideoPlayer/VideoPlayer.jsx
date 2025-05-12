@@ -5,7 +5,7 @@ import styles from './VideoPlayer.module.scss';
 import useVideoControl from '~/hooks/useVideoControl';
 import VideoActions from '../VideoActions';
 import { VideoControls, VideoInfo } from './components';
-import LoadingSpinner from '~/components/LoadingSpinner';
+import LoadingSpinner from '~/layouts/components/LoadingSpinner';
 
 const cx = classNames.bind(styles);
 function VideoPlayer({
@@ -83,11 +83,7 @@ function VideoPlayer({
                     onClick={togglePlay}
                     ref={videoContainerRef}
                 >
-                    {!videoLoaded && (
-                        <LoadingSpinner
-                            video={video}
-                        />
-                    )}
+                    {!videoLoaded && <LoadingSpinner video={video} />}
 
                     <video
                         ref={videoRef}

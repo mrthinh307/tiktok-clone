@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 import styles from '../VideoPlayer.module.scss';
 import useVideoProgress from '~/hooks/useVideoProgress';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPause, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
 import {
     MuteVolumeIcon,
     UnmuteVolumeIcon,
@@ -15,7 +15,7 @@ import {
     ELLIPSIS_OPTIONS,
     ELLIPSIS_POPPER_PROPS,
 } from '~/constants/videoConstant';
-import LoadingSpinner from '~/components/LoadingSpinner';
+import LoadingSpinner from '~/layouts/components/LoadingSpinner';
 
 const cx = classNames.bind(styles);
 
@@ -51,9 +51,7 @@ const VideoControls = memo(
                 )}
 
                 {/* Buffering overlay - hiển thị khi đang buffer */}
-                {isBuffering && (
-                    <LoadingSpinner />
-                )}
+                {isBuffering && <LoadingSpinner />}
 
                 {/* Progress video */}
                 <div className={cx('progress-container')}>
