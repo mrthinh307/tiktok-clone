@@ -4,6 +4,19 @@ const httpRequest = axios.create({
     baseURL: process.env.REACT_APP_BASE_URL,
 });
 
+httpRequest.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
 export const get = async (path, options = {}) => {
     const response = await httpRequest.get(path, options);
     return response.data;

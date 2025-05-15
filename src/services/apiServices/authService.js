@@ -52,9 +52,9 @@ export const checkAuth = async () => {
 
         // Call API to validate token and get user info
         const response = await request.get('auth/me', {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+            // headers: {
+            //     Authorization: `Bearer ${token}`,
+            // },
         });
 
         if (response && response.data) {

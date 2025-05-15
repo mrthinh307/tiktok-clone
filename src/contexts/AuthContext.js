@@ -1,8 +1,10 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import { DEFAULT_AVATAR } from '~/constants/common';
 import * as authService from '~/services/apiServices/authService';
+import * as followServices from '~/services/apiServices/followServices';
 
 const AuthContext = createContext();
+const FOLLOWING_PER_PAGE = 5;
 
 export const useAuth = () => useContext(AuthContext);
 
@@ -11,6 +13,9 @@ export const AuthProvider = ({ children }) => {
     const [showLoginForm, setShowLoginForm] = useState(false);
     const [isRegistering, setIsRegistering] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+
+    const [totalFollowingPages, setTotalFollowingPages] = useState(0);
+    const [followingIds, setFollowingIds] = useState([]);
 
     // Check authentication status when the app loads
     useEffect(() => {
@@ -22,8 +27,11 @@ export const AuthProvider = ({ children }) => {
                 if (userData) {
                     setUser(userData);
                     console.log('User authenticated on startup');
+                    fetchFollowingData();
                 } else {
                     setUser(null);
+                    setFollowingIds([]);
+                    setTotalFollowingPages(0);
                     console.log('No valid authentication found');
                 }
             } catch (error) {
@@ -35,6 +43,7 @@ export const AuthProvider = ({ children }) => {
         };
 
         checkAuthentication();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const toggleLoginForm = () => {
@@ -55,6 +64,7 @@ export const AuthProvider = ({ children }) => {
                 const userData = await authService.checkAuth();
                 if (userData) {
                     setUser(userData);
+                    fetchFollowingData();
                 } else {
                     // Fallback in case user data fetch fails
                     setUser({
@@ -85,6 +95,8 @@ export const AuthProvider = ({ children }) => {
                 const userData = await authService.checkAuth();
                 if (userData) {
                     setUser(userData);
+                    setFollowingIds([]);
+                    setTotalFollowingPages(0);
                 } else {
                     // Fallback in case user data fetch fails
                     setUser({
@@ -97,7 +109,10 @@ export const AuthProvider = ({ children }) => {
                 setIsRegistering(false);
                 return { success: true };
             }
-            return { success: false, message: 'Registration failed. Please try again.' };
+            return {
+                success: false,
+                message: 'Registration failed. Please try again.',
+            };
         } catch (error) {
             console.error('Registration error:', error);
             return {
@@ -112,6 +127,50 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
+    const fetchFollowingData = async () => {
+        if (!user) return;
+
+        try {
+            // Lấy tổng số trang
+            const totalPages = await followServices.getTotalFollowingPages();
+            setTotalFollowingPages(totalPages);
+
+            // Lấy danh sách IDs
+            const allIds = await followServices.getAllFollowingIds(totalPages);
+            setFollowingIds(allIds);
+        } catch (error) {
+            console.error('Error loading following data:', error);
+        }
+    };
+
+    const handleFollow = async (userId) => {
+        try {
+            await followServices.followUser(userId);
+            // Cập nhật state
+            setFollowingIds((prev) => [...prev, userId]);
+            setTotalFollowingPages(Math.ceil(followingIds.length / FOLLOWING_PER_PAGE));
+        } catch (error) {
+            console.error('Error following user:', error);
+            throw error;
+        }
+    };
+
+    const handleUnfollow = async (userId) => {
+        try {
+            await followServices.unfollowUser(userId);
+            // Cập nhật state
+            setFollowingIds((prev) => prev.filter((id) => id !== userId));
+            setTotalFollowingPages(Math.ceil(followingIds.length / FOLLOWING_PER_PAGE));
+        } catch (error) {
+            console.error('Error unfollowing user:', error);
+            throw error;
+        }
+    };
+
+    const isFollowing = (userId) => {
+        return followingIds.includes(userId);
+    };
+
     const value = {
         user,
         showLoginForm,
@@ -122,6 +181,11 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
+        followingIds,
+        totalFollowingPages,
+        handleFollow,
+        handleUnfollow,
+        isFollowing,
     };
 
     return (

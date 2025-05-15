@@ -1,10 +1,11 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
 import styles from './VideoActions.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCommentDots, faShare } from '@fortawesome/free-solid-svg-icons';
 import { ClickSpark } from '~/components/Animations';
+import * as followServices from '~/services/apiServices/followServices';
 
 import {
     BookmarkIcon,
@@ -37,11 +38,23 @@ const ActionButton = React.memo(
 );
 
 function VideoActions({ video }) {
-    const { user, toggleLoginForm } = useAuth();
+    const {
+        user,
+        toggleLoginForm,
+        isFollowing,
+        handleFollow,
+        handleUnfollow,
+        followingIds,
+    } = useAuth();
 
     const [liked, setLiked] = useState(false);
     const [saved, setSaved] = useState(false);
-    const [followed, setFollowed] = useState(false);
+    const [followed, setFollowed] = useState(isFollowing(video.user.id));
+
+    // Cập nhật trạng thái followed khi followingIds thay đổi
+    useEffect(() => {
+        setFollowed(isFollowing(video.user.id));
+    }, [video.user.id, isFollowing, followingIds]);
 
     const formatCount = useCallback((count) => {
         if (count >= 1000000) {
@@ -88,7 +101,7 @@ function VideoActions({ video }) {
     const handleShare = useCallback((e) => {}, []);
 
     const handleFollowButtonClick = useCallback(
-        (e) => {
+        async (e) => {
             e.stopPropagation();
 
             if (!user) {
@@ -96,9 +109,26 @@ function VideoActions({ video }) {
                 return;
             }
 
-            setFollowed((prev) => !prev);
+            try {
+                if (!isFollowing(video.user.id)) {
+                    setFollowed(true);
+                    await handleFollow(video.user.id);
+                } else {
+                    setFollowed(false);
+                    await handleUnfollow(video.user.id);
+                }
+            } catch (error) {
+                console.error('Error handling follow/unfollow:', error);
+            }
         },
-        [user, toggleLoginForm],
+        [
+            user,
+            toggleLoginForm,
+            video,
+            isFollowing,
+            handleFollow,
+            handleUnfollow,
+        ],
     );
 
     return (
