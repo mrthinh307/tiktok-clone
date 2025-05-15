@@ -1,51 +1,71 @@
-import { forwardRef, useState, useMemo, useCallback } from 'react';
+import { forwardRef, useState, useMemo, useCallback, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import styles from './SideBar.module.scss';
 import PropTypes from 'prop-types';
 
-import { MORE_CONTENTS } from '~/constants/sidebarConstants';
 import Search from '../Search';
 import AccountItem from '~/components/AccountItem';
+import LogoutConfirmation from '~/components/LogoutConfirmation';
 import { BackIcon, CloseIcon } from '~/assets/images/icons';
+import { useAuth } from '~/contexts/AuthContext';
+import {
+    MORE_CONTENTS,
+    UNAUTHENTICATED_MORE_CONTENTS,
+} from '~/constants/sidebarConstants';
 
 const cx = classNames.bind(styles);
 
 const DrawerContainer = forwardRef(function DrawerContainer(
-    { onClose, titleData = {
-        title: '',
-        indexTitle: null
-    } },
+    {
+        onClose,
+        titleData = {
+            title: '',
+            indexTitle: null,
+        },
+    },
     ref,
 ) {
     const [searchResults, setSearchResults] = useState([]);
     const [history, setHistory] = useState([{ data: MORE_CONTENTS }]);
+    const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
+    const [contentVisible, setContentVisible] = useState(false);
+
+    const { user, logout } = useAuth();
 
     const current = useMemo(() => history[history.length - 1], [history]);
 
-    // useEffect(() => {
-    //     if (titleData && titleData.title && history.length === 1) {
-    //         setHistory([{ title: titleData.title, data: MORE_CONTENTS }]);
-    //     }
-    // }, [titleData, history]);
+    // Add effect to handle content visibility with a slight delay
+    useEffect(() => {
+        // Set content to visible with a delay after drawer is mounted
+        const timer = setTimeout(() => {
+            setContentVisible(true);
+        }, 100);
+
+        return () => {
+            clearTimeout(timer);
+            // Reset contentVisible state when component unmounts
+            setContentVisible(false);
+        };
+    }, []);
 
     const handleSearchResults = useCallback((results) => {
         setSearchResults(results);
     }, []);
 
     const handleClose = () => {
-        if (onClose) {
-            onClose();
-        }
-    };
-
-    const handleItemClick = (item, isParent) => {
-        if (isParent) {
-            setHistory((prev) => [...prev, item.children]);
-        }
+        // Hide content before closing drawer
+        setContentVisible(false);
+        setTimeout(() => {
+            if (onClose) {
+                onClose();
+            }
+        }, 100);
     };
 
     const handleBack = () => {
-        setHistory((prev) => prev.slice(0, prev.length - 1));
+        setTimeout(() => {
+            setHistory((prev) => prev.slice(0, prev.length - 1));
+        }, 50);
     };
 
     const getTitle = () => {
@@ -58,7 +78,11 @@ const DrawerContainer = forwardRef(function DrawerContainer(
 
     const renderSearchContent = useCallback(() => {
         return (
-            <div className={cx('search-container')}>
+            <div
+                className={cx('search-container', {
+                    'content-visible': contentVisible,
+                })}
+            >
                 <Search
                     className={cx('search-form')}
                     inputClassName={cx('search-input')}
@@ -84,12 +108,21 @@ const DrawerContainer = forwardRef(function DrawerContainer(
                 )}
             </div>
         );
-    }, [searchResults, handleSearchResults]);
+    }, [searchResults, handleSearchResults, contentVisible]);
 
     const renderMoreContent = () => {
         return (
-            <div className={cx('more-contents')}>
-                {current.data.map((item, index) => {
+            <div
+                className={cx('more-contents', {
+                    'content-visible': contentVisible,
+                })}
+            >
+                {(user
+                    ? current.data
+                    : current.data.filter((item) =>
+                          UNAUTHENTICATED_MORE_CONTENTS.includes(item.title),
+                      )
+                ).map((item, index) => {
                     const isParent = !!item.children;
                     return (
                         <div
@@ -119,9 +152,33 @@ const DrawerContainer = forwardRef(function DrawerContainer(
         }
     };
 
+    const handleItemClick = (item, isParent) => {
+        if (isParent) {
+            setHistory((prev) => [...prev, item.children]);
+        } else if (item.field === 'logout') {
+            // Show logout confirmation dialog
+            setShowLogoutConfirmation(true);
+        }
+    };
+
+    const handleConfirmLogout = () => {
+        // Handle logout after confirmation
+        logout();
+        setShowLogoutConfirmation(false);
+        handleClose();
+    };
+
+    const handleCancelLogout = () => {
+        setShowLogoutConfirmation(false);
+    };
+
     return (
         <div ref={ref} className={cx('drawer-container')}>
-            <div className={cx('header-search-bar')}>
+            <div
+                className={cx('header-search-bar', {
+                    'content-visible': contentVisible,
+                })}
+            >
                 <div className={cx('title-container')}>
                     {history.length > 1 && (
                         <BackIcon
@@ -139,6 +196,14 @@ const DrawerContainer = forwardRef(function DrawerContainer(
                 )}
             </div>
             {renderContent()}
+
+            {/* Logout confirmation dialog */}
+            {showLogoutConfirmation && (
+                <LogoutConfirmation
+                    onConfirm={handleConfirmLogout}
+                    onCancel={handleCancelLogout}
+                />
+            )}
         </div>
     );
 });

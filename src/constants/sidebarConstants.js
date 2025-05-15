@@ -19,6 +19,7 @@ import {
     UploadIcon,
     SearchIcon,
 } from '~/assets/images/icons';
+import { DEFAULT_AVATAR } from './common';
 
 export const SIDEBAR_MENU_ITEMS = [
     {
@@ -99,13 +100,13 @@ export const SIDEBAR_MENU_ITEMS = [
         icon: (
             <img
                 alt="user"
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJDRALoJakgEuuuGmBvBi-eSbPMe5B9fSdtA&amp;s"
+                src={DEFAULT_AVATAR}
             />
         ),
         activeIcon: (
             <img
                 alt="user"
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJDRALoJakgEuuuGmBvBi-eSbPMe5B9fSdtA&amp;s"
+                src={DEFAULT_AVATAR}
             />
         ),
     },
@@ -116,6 +117,33 @@ export const SIDEBAR_MENU_ITEMS = [
         iconSize: 'medium',
     },
 ];
+
+export const DARK_MODE_LISTS = [
+    {
+        title: 'Automatic',
+    },
+    {
+        title: 'Dark mode',
+    },
+    {
+        title: 'Light mode',
+    },
+]
+
+export const CREATOR_TOOLS_LISTS = [
+    {
+        title: 'Promote post',
+    },
+    {
+        title: 'View Analytics',
+    },
+    {
+        title: 'LIVE Creator Hub',
+    },
+    {
+        title: 'LIVE Studio',
+    },
+]
 
 export const MORE_CONTENTS = [
     {
@@ -129,20 +157,7 @@ export const MORE_CONTENTS = [
         icon: <RightArrowIcon />,
         children: {
             title: 'Creator tools',
-            data: [
-                {
-                    title: 'Promote post',
-                },
-                {
-                    title: 'View Analytics',
-                },
-                {
-                    title: 'LIVE Creator Hub',
-                },
-                {
-                    title: 'LIVE Studio',
-                },
-            ],
+            data: CREATOR_TOOLS_LISTS,
         },
     },
     {
@@ -158,17 +173,7 @@ export const MORE_CONTENTS = [
         icon: <RightArrowIcon />,
         children: {
             title: 'Theme mode',
-            data: [
-                {
-                    title: 'Automatic',
-                },
-                {
-                    title: 'Dark mode',
-                },
-                {
-                    title: 'Light mode',
-                },
-            ],
+            data: DARK_MODE_LISTS,
         },
     },
     {
@@ -179,6 +184,8 @@ export const MORE_CONTENTS = [
     },
     {
         title: 'Log out',
+        field: 'logout',
+        separate: true,
     },
 ];
 
@@ -190,3 +197,14 @@ export const UNAUTHENTICATED_SIDEBAR_MENU_ITEMS = [
     'LIVE',
     'More',
 ];
+
+export const UNAUTHENTICATED_MORE_CONTENTS = [
+    'Create TikTok effects',
+    'Creator tools',
+    'English (US)',
+    'Dark mode',
+    'Feedback and help',
+    ...LANGUAGE_LISTS.map(item => item.title),
+    ...DARK_MODE_LISTS.map(item => item.title),
+    ...CREATOR_TOOLS_LISTS.map(item => item.title),
+]

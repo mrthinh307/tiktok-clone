@@ -1,12 +1,41 @@
-import { useState, useEffect, useRef } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
 import classNames from 'classnames/bind';
+import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faXmark, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-
+import {
+    faXmark,
+    faEye,
+    faEyeSlash,
+    faSpinner,
+    faCheck,
+    faExclamationCircle,
+} from '@fortawesome/free-solid-svg-icons';
+import { createPortal } from 'react-dom';
 import styles from './LoginForm.module.scss';
 import { useAuth } from '~/contexts/AuthContext';
+import { useDebounce } from '~/hooks';
+import { DEBOUNCE_DELAY } from '~/constants/common';
+import * as authService from '~/services/apiServices/authService';
 
 const cx = classNames.bind(styles);
+
+// Global notification component using React Portal
+const GlobalNotification = ({ message, type, onClose }) => {
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            onClose();
+        }, 3000);
+
+        return () => clearTimeout(timer);
+    }, [onClose]);
+
+    return createPortal(
+        <div className={cx('notification', `notification-${type}`)}>
+            {message}
+        </div>,
+        document.body,
+    );
+};
 
 function LoginForm() {
     const {
@@ -19,36 +48,52 @@ function LoginForm() {
     } = useAuth();
 
     // Login state
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    // Field errors state
+    const [fieldErrors, setFieldErrors] = useState({});
+
     // Register state
-    const [registerUsername, setRegisterUsername] = useState('');
-    const [registerName, setRegisterName] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [registerEmail, setRegisterEmail] = useState('');
     const [registerPassword, setRegisterPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
+    // Email validation state
+    const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+    const [emailStatus, setEmailStatus] = useState(null); // null, 'checking', 'valid', 'invalid'
+
+    // Debounced email for API calls
+    const debouncedEmail = useDebounce(registerEmail, DEBOUNCE_DELAY);
+
     // Common state
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [globalNotification, setGlobalNotification] = useState(null);
+
     const formRef = useRef(null);
     const modalRef = useRef(null);
 
     const resetForm = () => {
         // Reset login form
-        setUsername('');
+        setEmail('');
         setPassword('');
 
         // Reset register form
-        setRegisterUsername('');
-        setRegisterName('');
+        setFirstName('');
+        setLastName('');
         setRegisterEmail('');
         setRegisterPassword('');
         setConfirmPassword('');
 
-        setError('');
+        // Reset email status
+        setEmailStatus(null);
+        setIsCheckingEmail(false);
+
+        setFieldErrors({});
     };
 
     const handleClose = (e) => {
@@ -56,91 +101,224 @@ function LoginForm() {
         toggleLoginForm();
     };
 
-    const handleSubmitLogin = (e) => {
-        e.preventDefault();
+    const validateLoginForm = () => {
+        const errors = {};
+        let isValid = true;
 
-        setError('');
+        if (!email.trim()) {
+            errors.email = 'Please enter your email';
+            isValid = false;
+        }
 
-        // Kiểm tra validation đơn giản
-        if (!username.trim()) {
-            setError('Vui lòng nhập tên đăng nhập');
-            return;
+        if (!isValidEmail(email)) {
+            errors.email = 'Please enter a valid email';
+            isValid = false;
         }
 
         if (!password) {
-            setError('Vui lòng nhập mật khẩu');
-            return;
+            errors.password = 'Please enter your password';
+            isValid = false;
         }
 
-        // Gọi hàm login từ context
-        const success = login(username, password);
-
-        if (!success) {
-            setError(
-                'Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.',
-            );
-        }
+        setFieldErrors(errors);
+        return isValid;
     };
 
-    const handleSubmitRegister = (e) => {
-        e.preventDefault();
+    const validateRegisterForm = () => {
+        const errors = {};
+        let isValid = true;
 
-        setError('');
-
-        // Validate register form
-        if (!registerUsername.trim()) {
-            setError('Vui lòng nhập tên đăng nhập');
-            return;
+        if (!firstName.trim()) {
+            errors.firstName = 'Please enter your first name';
+            isValid = false;
         }
 
-        if (!registerName.trim()) {
-            setError('Vui lòng nhập tên hiển thị');
-            return;
+        if (!lastName.trim()) {
+            errors.lastName = 'Please enter your last name';
+            isValid = false;
         }
 
         if (!registerEmail.trim()) {
-            setError('Vui lòng nhập email');
-            return;
+            errors.registerEmail = 'Please enter your email';
+            isValid = false;
         } else if (!isValidEmail(registerEmail)) {
-            setError('Vui lòng nhập email hợp lệ');
-            return;
+            errors.registerEmail = 'Please enter a valid email';
+            isValid = false;
         }
 
         if (!registerPassword) {
-            setError('Vui lòng nhập mật khẩu');
-            return;
-        }
-
-        if (registerPassword.length < 6) {
-            setError('Mật khẩu phải có ít nhất 6 ký tự');
-            return;
+            errors.registerPassword = 'Please enter your password';
+            isValid = false;
+        } else if (registerPassword.length < 6) {
+            errors.registerPassword = 'Password must be at least 6 characters';
+            isValid = false;
         }
 
         if (!confirmPassword) {
-            setError('Vui lòng xác nhận mật khẩu');
+            errors.confirmPassword = 'Please confirm your password';
+            isValid = false;
+        } else if (registerPassword !== confirmPassword) {
+            errors.confirmPassword = 'Password confirmation does not match';
+            isValid = false;
+        }
+
+        setFieldErrors(errors);
+        return isValid;
+    };
+
+    // Check email existence when debounced email changes
+    useEffect(() => {
+        const checkEmail = async () => {
+            // Only check if email is valid and not empty
+            if (debouncedEmail && isValidEmail(debouncedEmail)) {
+                setIsCheckingEmail(true);
+                setEmailStatus('checking');
+
+                try {
+                    const exists = await authService.checkEmailExists(
+                        debouncedEmail,
+                    );
+
+                    if (exists) {
+                        setEmailStatus('invalid');
+                        setFieldErrors((prev) => ({
+                            ...prev,
+                            registerEmail: 'This email is already registered',
+                        }));
+                    } else {
+                        setEmailStatus('valid');
+                        setFieldErrors((prev) => {
+                            const newErrors = { ...prev };
+                            if (
+                                newErrors.registerEmail ===
+                                'This email is already registered'
+                            ) {
+                                delete newErrors.registerEmail;
+                            }
+                            return newErrors;
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error checking email:', error);
+                } finally {
+                    setIsCheckingEmail(false);
+                }
+            } else {
+                setEmailStatus(null);
+            }
+        };
+
+        checkEmail();
+    }, [debouncedEmail]);
+
+    // Show notification function
+    const showNotification = (message, type) => {
+        if (type === 'success') {
+            // For success notifications, show them globally
+            setGlobalNotification({ message, type });
+        } else {
+            // For error notifications, show them in the modal
+            setGlobalNotification({ message, type });
+        }
+    };
+
+    const handleSubmitLogin = async (e) => {
+        e.preventDefault();
+
+        if (!validateLoginForm()) {
             return;
         }
 
-        if (registerPassword !== confirmPassword) {
-            setError('Mật khẩu xác nhận không khớp');
+        setIsLoading(true);
+
+        try {
+            // Call login function from context
+            const success = await login(email, password);
+
+            if (success) {
+                // Show notification and close form
+                showNotification(
+                    'Login successful! You are now logged in.',
+                    'success',
+                );
+                // Close form with a small delay
+                setTimeout(() => {
+                    toggleLoginForm();
+                }, 300);
+            } else {
+                showNotification(
+                    'Login failed. Please check your information.',
+                    'error',
+                );
+            }
+        } catch (error) {
+            showNotification(
+                'An unexpected error occurred. Please try again.',
+                'error',
+            );
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleSubmitRegister = async (e) => {
+        e.preventDefault();
+
+        if (!validateRegisterForm() || emailStatus !== 'valid') {
+            showNotification(
+                'Please enter valid information.',
+                'error',
+            );
             return;
         }
 
-        // Gọi hàm register từ context
-        const success = register(
-            registerUsername,
-            registerName,
-            registerEmail,
-            registerPassword,
-        );
+        setIsLoading(true);
 
-        if (!success) {
-            setError('Đăng ký không thành công. Vui lòng thử lại.');
+        try {
+            // Call register function from context
+            const result = await register(
+                firstName,
+                lastName,
+                registerEmail,
+                registerPassword,
+            );
+
+            if (result.success) {                // Show notification before closing the form
+                showNotification(
+                    'Registration successful! You are now logged in.',
+                    'success',
+                );
+
+                // Small delay before closing form to ensure notification is seen
+                setTimeout(() => {
+                    toggleLoginForm();
+                }, 300);
+            } else {
+                // Show specific error message
+                if (result.message === 'Email already exists') {
+                    setFieldErrors({
+                        ...fieldErrors,
+                        registerEmail: 'This email is already registered',
+                    });
+                } else {
+                    showNotification(
+                            'Registration failed. Please try again.',
+                        'error',
+                    );
+                }
+            }
+        } catch (error) {
+            showNotification(
+                'An unexpected error occurred. Please try again.',
+                'error',
+            );
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const isValidEmail = (email) => {
-        return /\S+@\S+\.\S+/.test(email);
+        return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
     };
 
     const switchToRegister = () => {
@@ -179,8 +357,8 @@ function LoginForm() {
             const timer = setTimeout(() => {
                 const firstInput = formRef.current.querySelector(
                     isRegistering
-                        ? 'input[name="registerUsername"]'
-                        : 'input[name="username"]',
+                        ? 'input[name="firstName"]'
+                        : 'input[name="email"]',
                 );
                 if (firstInput) firstInput.focus();
             }, 300);
@@ -206,230 +384,490 @@ function LoginForm() {
         };
     }, [showLoginForm]);
 
-    if (!showLoginForm) return null;
+    // Email status icon
+    const getEmailStatusIcon = () => {
+        if (!registerEmail || !isValidEmail(registerEmail)) return null;
+
+        if (isCheckingEmail || emailStatus === 'checking') {
+            return (
+                <FontAwesomeIcon
+                    icon={faSpinner}
+                    spin
+                    className={cx('email-status-icon')}
+                />
+            );
+        } else if (emailStatus === 'valid') {
+            return (
+                <FontAwesomeIcon
+                    icon={faCheck}
+                    className={cx('email-status-icon', 'valid')}
+                />
+            );
+        } else if (emailStatus === 'invalid') {
+            return (
+                <FontAwesomeIcon
+                    icon={faExclamationCircle}
+                    className={cx('email-status-icon', 'invalid')}
+                />
+            );
+        }
+
+        return null;
+    };
 
     return (
-        <div ref={modalRef} className={cx('overlay', { show: showLoginForm })}>
-            <div
-                ref={formRef}
-                className={cx('form-container', { show: showLoginForm })}
-            >
-                <div className={cx('form-header')}>
-                    <h2 className={cx('form-title')}>
-                        {isRegistering
-                            ? 'Sign up for TikTok'
-                            : 'Log in to TikTok'}
-                    </h2>
-                    <button
-                        className={cx('close-button')}
-                        onClick={handleClose}
+        <>
+            {globalNotification && (
+                <GlobalNotification
+                    message={globalNotification.message}
+                    type={globalNotification.type}
+                    onClose={() => setGlobalNotification(null)}
+                />
+            )}
+
+            {showLoginForm && (
+                <div
+                    ref={modalRef}
+                    className={cx('overlay', { show: showLoginForm })}
+                >
+                    <div
+                        ref={formRef}
+                        className={cx('form-container', {
+                            show: showLoginForm,
+                        })}
                     >
-                        <FontAwesomeIcon icon={faXmark} />
-                    </button>
+                        <div className={cx('form-header')}>
+                            <h2 className={cx('form-title')}>
+                                {isRegistering
+                                    ? 'Sign up for TikTok'
+                                    : 'Log in to TikTok'}
+                            </h2>
+                            <button
+                                className={cx('close-button')}
+                                onClick={handleClose}
+                                tabIndex={1}
+                            >
+                                <FontAwesomeIcon icon={faXmark} />
+                            </button>
+                        </div>
+
+                        {!isRegistering ? (
+                            // Form đăng nhập
+                            <form
+                                onSubmit={handleSubmitLogin}
+                                className={cx('form')}
+                            >
+                                <div className={cx('form-group')}>
+                                    <label htmlFor="username">Email</label>
+                                    <input
+                                        id="email"
+                                        name="email"
+                                        type="text"
+                                        value={email}
+                                        onChange={(e) => {
+                                            setEmail(e.target.value);
+                                            if (fieldErrors.email) {
+                                                setFieldErrors({
+                                                    ...fieldErrors,
+                                                    email: '',
+                                                });
+                                            }
+                                        }}
+                                        placeholder="Enter your email"
+                                        className={cx('form-input', {
+                                            invalid: fieldErrors.email,
+                                        })}
+                                        tabIndex={2}
+                                        disabled={isLoading}
+                                    />
+                                    {fieldErrors.email && (
+                                        <div className={cx('field-error')}>
+                                            {fieldErrors.email}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className={cx('form-group')}>
+                                    <label htmlFor="password">Password</label>
+                                    <div
+                                        className={cx(
+                                            'password-input-container',
+                                        )}
+                                    >
+                                        <input
+                                            id="password"
+                                            name="password"
+                                            type={
+                                                showPassword
+                                                    ? 'text'
+                                                    : 'password'
+                                            }
+                                            value={password}
+                                            onChange={(e) => {
+                                                setPassword(e.target.value);
+                                                if (fieldErrors.password) {
+                                                    setFieldErrors({
+                                                        ...fieldErrors,
+                                                        password: '',
+                                                    });
+                                                }
+                                            }}
+                                            placeholder="Enter your password"
+                                            className={cx('form-input', {
+                                                invalid: fieldErrors.password,
+                                            })}
+                                            tabIndex={3}
+                                            disabled={isLoading}
+                                        />
+                                        <button
+                                            type="button"
+                                            className={cx('toggle-password')}
+                                            onClick={() =>
+                                                setShowPassword(!showPassword)
+                                            }
+                                            disabled={isLoading}
+                                        >
+                                            <FontAwesomeIcon
+                                                icon={
+                                                    showPassword
+                                                        ? faEyeSlash
+                                                        : faEye
+                                                }
+                                            />
+                                        </button>
+                                    </div>
+                                    {fieldErrors.password && (
+                                        <div className={cx('field-error')}>
+                                            {fieldErrors.password}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className={cx('forgot-password')}>
+                                    <a href="#" tabIndex={4}>
+                                        Forgot password?
+                                    </a>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className={cx('login-button')}
+                                    tabIndex={5}
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? (
+                                        <FontAwesomeIcon
+                                            icon={faSpinner}
+                                            spin
+                                        />
+                                    ) : (
+                                        'Log in'
+                                    )}
+                                </button>
+
+                                <div className={cx('form-footer')}>
+                                    <p>Don't have an account?</p>
+                                    <button
+                                        type="button"
+                                        className={cx('register-link')}
+                                        onClick={switchToRegister}
+                                        tabIndex={6}
+                                        disabled={isLoading}
+                                    >
+                                        Sign up
+                                    </button>
+                                </div>
+                            </form>
+                        ) : (
+                            // Form đăng ký
+                            <form
+                                onSubmit={handleSubmitRegister}
+                                className={cx('form')}
+                            >
+                                <div className={cx('name-fields-container')}>
+                                    <div
+                                        className={cx(
+                                            'form-group',
+                                            'name-field',
+                                        )}
+                                    >
+                                        <label htmlFor="firstName">
+                                            First Name
+                                        </label>
+                                        <input
+                                            id="firstName"
+                                            name="firstName"
+                                            type="text"
+                                            value={firstName}
+                                            onChange={(e) => {
+                                                setFirstName(e.target.value);
+                                                if (fieldErrors.firstName) {
+                                                    setFieldErrors({
+                                                        ...fieldErrors,
+                                                        firstName: '',
+                                                    });
+                                                }
+                                            }}
+                                            placeholder="First name"
+                                            className={cx('form-input', {
+                                                invalid: fieldErrors.firstName,
+                                            })}
+                                            tabIndex={3}
+                                            disabled={isLoading}
+                                        />
+                                        {fieldErrors.firstName && (
+                                            <div className={cx('field-error')}>
+                                                {fieldErrors.firstName}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div
+                                        className={cx(
+                                            'form-group',
+                                            'name-field',
+                                        )}
+                                    >
+                                        <label htmlFor="lastName">
+                                            Last Name
+                                        </label>
+                                        <input
+                                            id="lastName"
+                                            name="lastName"
+                                            type="text"
+                                            value={lastName}
+                                            onChange={(e) => {
+                                                setLastName(e.target.value);
+                                                if (fieldErrors.lastName) {
+                                                    setFieldErrors({
+                                                        ...fieldErrors,
+                                                        lastName: '',
+                                                    });
+                                                }
+                                            }}
+                                            placeholder="Last name"
+                                            className={cx('form-input', {
+                                                invalid: fieldErrors.lastName,
+                                            })}
+                                            tabIndex={4}
+                                            disabled={isLoading}
+                                        />
+                                        {fieldErrors.lastName && (
+                                            <div className={cx('field-error')}>
+                                                {fieldErrors.lastName}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className={cx('form-group')}>
+                                    <label htmlFor="registerEmail">Email</label>
+                                    <div
+                                        className={cx('email-input-container')}
+                                    >
+                                        <input
+                                            id="registerEmail"
+                                            name="registerEmail"
+                                            type="email"
+                                            value={registerEmail}
+                                            onChange={(e) => {
+                                                setRegisterEmail(
+                                                    e.target.value,
+                                                );
+                                                // Clear email-specific error
+                                                if (
+                                                    fieldErrors.registerEmail ===
+                                                    'This email is already registered'
+                                                ) {
+                                                    setFieldErrors({
+                                                        ...fieldErrors,
+                                                        registerEmail: '',
+                                                    });
+                                                    setEmailStatus(null);
+                                                }
+                                            }}
+                                            placeholder="abcxyz@gmail.com"
+                                            className={cx('form-input', {
+                                                invalid:
+                                                    fieldErrors.registerEmail,
+                                                valid: emailStatus === 'valid',
+                                            })}
+                                            tabIndex={5}
+                                            disabled={isLoading}
+                                        />
+                                        <div className={cx('email-status')}>
+                                            {getEmailStatusIcon()}
+                                        </div>
+                                    </div>
+                                    {fieldErrors.registerEmail && (
+                                        <div className={cx('field-error')}>
+                                            {fieldErrors.registerEmail}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className={cx('form-group')}>
+                                    <label htmlFor="registerPassword">
+                                        Password
+                                    </label>
+                                    <div
+                                        className={cx(
+                                            'password-input-container',
+                                        )}
+                                    >
+                                        <input
+                                            id="registerPassword"
+                                            name="registerPassword"
+                                            type={
+                                                showPassword
+                                                    ? 'text'
+                                                    : 'password'
+                                            }
+                                            value={registerPassword}
+                                            onChange={(e) => {
+                                                setRegisterPassword(
+                                                    e.target.value,
+                                                );
+                                                if (
+                                                    fieldErrors.registerPassword
+                                                ) {
+                                                    setFieldErrors({
+                                                        ...fieldErrors,
+                                                        registerPassword: '',
+                                                    });
+                                                }
+                                            }}
+                                            placeholder="Enter your password"
+                                            className={cx('form-input', {
+                                                invalid:
+                                                    fieldErrors.registerPassword,
+                                            })}
+                                            tabIndex={6}
+                                            disabled={isLoading}
+                                        />
+                                        <button
+                                            type="button"
+                                            className={cx('toggle-password')}
+                                            onClick={() =>
+                                                setShowPassword(!showPassword)
+                                            }
+                                            disabled={isLoading}
+                                        >
+                                            <FontAwesomeIcon
+                                                icon={
+                                                    showPassword
+                                                        ? faEyeSlash
+                                                        : faEye
+                                                }
+                                            />
+                                        </button>
+                                    </div>
+                                    {fieldErrors.registerPassword && (
+                                        <div className={cx('field-error')}>
+                                            {fieldErrors.registerPassword}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className={cx('form-group')}>
+                                    <label htmlFor="confirmPassword">
+                                        Confirm Password
+                                    </label>
+                                    <div
+                                        className={cx(
+                                            'password-input-container',
+                                        )}
+                                    >
+                                        <input
+                                            id="confirmPassword"
+                                            name="confirmPassword"
+                                            type={
+                                                showConfirmPassword
+                                                    ? 'text'
+                                                    : 'password'
+                                            }
+                                            value={confirmPassword}
+                                            onChange={(e) => {
+                                                setConfirmPassword(
+                                                    e.target.value,
+                                                );
+                                                if (
+                                                    fieldErrors.confirmPassword
+                                                ) {
+                                                    setFieldErrors({
+                                                        ...fieldErrors,
+                                                        confirmPassword: '',
+                                                    });
+                                                }
+                                            }}
+                                            placeholder="Re-enter your password"
+                                            className={cx('form-input', {
+                                                invalid:
+                                                    fieldErrors.confirmPassword,
+                                            })}
+                                            tabIndex={7}
+                                            disabled={isLoading}
+                                        />
+                                        <button
+                                            type="button"
+                                            className={cx('toggle-password')}
+                                            onClick={() =>
+                                                setShowConfirmPassword(
+                                                    !showConfirmPassword,
+                                                )
+                                            }
+                                            disabled={isLoading}
+                                        >
+                                            <FontAwesomeIcon
+                                                icon={
+                                                    showConfirmPassword
+                                                        ? faEyeSlash
+                                                        : faEye
+                                                }
+                                            />
+                                        </button>
+                                    </div>
+                                    {fieldErrors.confirmPassword && (
+                                        <div className={cx('field-error')}>
+                                            {fieldErrors.confirmPassword}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className={cx('login-button')}
+                                    tabIndex={8}
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? (
+                                        <FontAwesomeIcon
+                                            icon={faSpinner}
+                                            spin
+                                        />
+                                    ) : (
+                                        'Sign up'
+                                    )}
+                                </button>
+
+                                <div className={cx('form-footer')}>
+                                    <p>Already have an account?</p>
+                                    <button
+                                        type="button"
+                                        className={cx('register-link')}
+                                        onClick={switchToLogin}
+                                        tabIndex={9}
+                                        disabled={isLoading}
+                                    >
+                                        Log in
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+                    </div>
                 </div>
-
-                {error && <div className={cx('error-message')}>{error}</div>}
-
-                {!isRegistering ? (
-                    // Form đăng nhập
-                    <form onSubmit={handleSubmitLogin} className={cx('form')}>
-                        <div className={cx('form-group')}>
-                            <label htmlFor="username">Username</label>
-                            <input
-                                id="username"
-                                name="username"
-                                type="text"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                placeholder="Enter your username"
-                                className={cx('form-input')}
-                            />
-                        </div>
-
-                        <div className={cx('form-group')}>
-                            <label htmlFor="password">Password</label>
-                            <div className={cx('password-input-container')}>
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type={showPassword ? 'text' : 'password'}
-                                    value={password}
-                                    onChange={(e) =>
-                                        setPassword(e.target.value)
-                                    }
-                                    placeholder="Enter your password"
-                                    className={cx('form-input')}
-                                />
-                                <button
-                                    type="button"
-                                    className={cx('toggle-password')}
-                                    onClick={() =>
-                                        setShowPassword(!showPassword)
-                                    }
-                                >
-                                    <FontAwesomeIcon
-                                        icon={showPassword ? faEyeSlash : faEye}
-                                    />
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className={cx('forgot-password')}>
-                            <a href="#">Forgot password?</a>
-                        </div>
-
-                        <button type="submit" className={cx('login-button')}>
-                            Log in
-                        </button>
-
-                        <div className={cx('form-footer')}>
-                            <p>Don't have an account?</p>
-                            <button
-                                type="button"
-                                className={cx('register-link')}
-                                onClick={switchToRegister}
-                            >
-                                Sign up
-                            </button>
-                        </div>
-                    </form>
-                ) : (
-                    // Form đăng ký
-                    <form
-                        onSubmit={handleSubmitRegister}
-                        className={cx('form')}
-                    >
-                        <div className={cx('form-group')}>
-                            <label htmlFor="registerUsername">Username</label>
-                            <input
-                                id="registerUsername"
-                                name="registerUsername"
-                                type="text"
-                                value={registerUsername}
-                                onChange={(e) =>
-                                    setRegisterUsername(e.target.value)
-                                }
-                                placeholder="tiktok123"
-                                className={cx('form-input')}
-                            />
-                        </div>
-
-                        <div className={cx('form-group')}>
-                            <label htmlFor="registerName">Name</label>
-                            <input
-                                id="registerName"
-                                name="registerName"
-                                type="text"
-                                value={registerName}
-                                onChange={(e) =>
-                                    setRegisterName(e.target.value)
-                                }
-                                placeholder="Micheal Oliver"
-                                className={cx('form-input')}
-                            />
-                        </div>
-
-                        <div className={cx('form-group')}>
-                            <label htmlFor="registerEmail">Email</label>
-                            <input
-                                id="registerEmail"
-                                name="registerEmail"
-                                type="email"
-                                value={registerEmail}
-                                onChange={(e) =>
-                                    setRegisterEmail(e.target.value)
-                                }
-                                placeholder="abcxyz@gmail.com"
-                                className={cx('form-input')}
-                            />
-                        </div>
-
-                        <div className={cx('form-group')}>
-                            <label htmlFor="registerPassword">Password</label>
-                            <div className={cx('password-input-container')}>
-                                <input
-                                    id="registerPassword"
-                                    name="registerPassword"
-                                    type={showPassword ? 'text' : 'password'}
-                                    value={registerPassword}
-                                    onChange={(e) =>
-                                        setRegisterPassword(e.target.value)
-                                    }
-                                    placeholder="Enter your password"
-                                    className={cx('form-input')}
-                                />
-                                <button
-                                    type="button"
-                                    className={cx('toggle-password')}
-                                    onClick={() =>
-                                        setShowPassword(!showPassword)
-                                    }
-                                >
-                                    <FontAwesomeIcon
-                                        icon={showPassword ? faEyeSlash : faEye}
-                                    />
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className={cx('form-group')}>
-                            <label htmlFor="confirmPassword">
-                                Confirm Password
-                            </label>
-                            <div className={cx('password-input-container')}>
-                                <input
-                                    id="confirmPassword"
-                                    name="confirmPassword"
-                                    type={
-                                        showConfirmPassword
-                                            ? 'text'
-                                            : 'password'
-                                    }
-                                    value={confirmPassword}
-                                    onChange={(e) =>
-                                        setConfirmPassword(e.target.value)
-                                    }
-                                    placeholder="Re-enter your password"
-                                    className={cx('form-input')}
-                                />
-                                <button
-                                    type="button"
-                                    className={cx('toggle-password')}
-                                    onClick={() =>
-                                        setShowConfirmPassword(
-                                            !showConfirmPassword,
-                                        )
-                                    }
-                                >
-                                    <FontAwesomeIcon
-                                        icon={
-                                            showConfirmPassword
-                                                ? faEyeSlash
-                                                : faEye
-                                        }
-                                    />
-                                </button>
-                            </div>
-                        </div>
-
-                        <button type="submit" className={cx('login-button')}>
-                            Sign up
-                        </button>
-
-                        <div className={cx('form-footer')}>
-                            <p>Already have an account?</p>
-                            <button
-                                type="button"
-                                className={cx('register-link')}
-                                onClick={switchToLogin}
-                            >
-                                Log in
-                            </button>
-                        </div>
-                    </form>
-                )}
-            </div>
-        </div>
+            )}
+        </>
     );
 }
 

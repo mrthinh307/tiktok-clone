@@ -126,7 +126,7 @@ function SideBar() {
                 <Menu {...menuProps} />
                 <Button
                     primary
-                    className={cx('login-btn', {'hide': !!user})}
+                    className={cx('login-btn', {'hidden': !!user})}
                     onClick={handleLoginButtonClick}
                 >
                     {isCollapsed ? <FontAwesomeIcon icon={faArrowRightToBracket} /> : 'Log in'}

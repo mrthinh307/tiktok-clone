@@ -1,4 +1,6 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
+import { DEFAULT_AVATAR } from '~/constants/common';
+import * as authService from '~/services/apiServices/authService';
 
 const AuthContext = createContext();
 
@@ -8,6 +10,32 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [showLoginForm, setShowLoginForm] = useState(false);
     const [isRegistering, setIsRegistering] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Check authentication status when the app loads
+    useEffect(() => {
+        const checkAuthentication = async () => {
+            try {
+                setIsLoading(true);
+                const userData = await authService.checkAuth();
+
+                if (userData) {
+                    setUser(userData);
+                    console.log('User authenticated on startup');
+                } else {
+                    setUser(null);
+                    console.log('No valid authentication found');
+                }
+            } catch (error) {
+                console.error('Authentication check failed:', error);
+                setUser(null);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        checkAuthentication();
+    }, []);
 
     const toggleLoginForm = () => {
         setShowLoginForm((prev) => !prev);
@@ -18,39 +46,69 @@ export const AuthProvider = ({ children }) => {
         setIsRegistering((prev) => !prev);
     };
 
-    const login = (username, password) => {
-        // Đây là một mock login đơn giản
-        // Trong thực tế, bạn sẽ gọi API để xác thực người dùng
-        if (username && password) {
-            setUser({
-                username,
-                name: 'TikTok User',
-                avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJDRALoJakgEuuuGmBvBi-eSbPMe5B9fSdtA&s',
-            });
-            setShowLoginForm(false);
-            return true;
+    const login = async (email, password) => {
+        try {
+            const success = await authService.login(email, password);
+
+            if (success) {
+                // After successful login, fetch the user data
+                const userData = await authService.checkAuth();
+                if (userData) {
+                    setUser(userData);
+                } else {
+                    // Fallback in case user data fetch fails
+                    setUser({
+                        email,
+                        avatar: DEFAULT_AVATAR,
+                    });
+                }
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Login error:', error);
+            return false;
         }
-        return false;
     };
 
-    const register = (username, name, email, password) => {
-        // Đây là một mock register đơn giản
-        // Trong thực tế, bạn sẽ gọi API để đăng ký người dùng
-        if (username && name && email && password) {
-            setUser({
-                username,
-                name,
+    const register = async (firstName, lastName, email, password) => {
+        try {
+            const success = await authService.register(
+                firstName,
+                lastName,
                 email,
-                avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJDRALoJakgEuuuGmBvBi-eSbPMe5B9fSdtA&s',
-            });
-            setShowLoginForm(false);
-            setIsRegistering(false);
-            return true;
+                password,
+            );
+
+            if (success) {
+                // After successful registration, fetch the user data
+                const userData = await authService.checkAuth();
+                if (userData) {
+                    setUser(userData);
+                } else {
+                    // Fallback in case user data fetch fails
+                    setUser({
+                        firstName,
+                        lastName,
+                        email,
+                        avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJDRALoJakgEuuuGmBvBi-eSbPMe5B9fSdtA&s',
+                    });
+                }
+                setIsRegistering(false);
+                return { success: true };
+            }
+            return { success: false, message: 'Registration failed. Please try again.' };
+        } catch (error) {
+            console.error('Registration error:', error);
+            return {
+                success: false,
+                message: 'An error occurred during registration',
+            };
         }
-        return false;
     };
 
     const logout = () => {
+        authService.logout();
         setUser(null);
     };
 
@@ -58,6 +116,7 @@ export const AuthProvider = ({ children }) => {
         user,
         showLoginForm,
         isRegistering,
+        isLoading,
         toggleLoginForm,
         toggleRegisterMode,
         login,
