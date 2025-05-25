@@ -5,6 +5,7 @@ import { publicRoutes } from './routes';
 import DefaultLayout from '~/layouts';
 import { AutoScrollProvider } from './contexts/AutoScrollContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { SocialInteractionProvider } from './contexts/SocialInteractionContext';
 import { useAuth } from './contexts/AuthContext';
 import LoginForm from './components/LoginForm';
 import { VolumeProvider } from './contexts/VolumeContext';
@@ -70,9 +71,11 @@ const AppContent = () => {
 function App() {
     return (
         <AuthProvider>
-            <Router>
-                <AppContent />
-            </Router>
+            <SocialInteractionProvider>
+                <Router>
+                    <AppContent />
+                </Router>
+            </SocialInteractionProvider>
         </AuthProvider>
     );
 }

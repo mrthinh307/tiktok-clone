@@ -29,40 +29,38 @@ export const getTotalFollowingPages = async () => {
         const response = await request.get('me/followings', {
             params: {
                 page: 1,
-            }
+            },
         });
         return response.meta?.pagination?.total_pages || 0;
     } catch (error) {
         console.error('Error getting total following pages:', error);
         throw error;
     }
-}
+};
 
 export const getFollowingsList = async (page = 1) => {
     try {
         const response = await request.get('me/followings', {
             params: {
                 page,
-            }
-        })
+            },
+        });
         return response.data;
     } catch (error) {
         console.error('Error getting followings list:', error);
         throw error;
     }
-}
+};
 
 export const getAllFollowingIds = async (totalPages) => {
     const allFollowingIds = [];
     let page = 1;
 
     do {
-        const respone = await getFollowingsList(page);
-        allFollowingIds.push(...respone.map(user => user.id));
-        totalPages = respone.total_pages;
+        const response = await getFollowingsList(page);
+        allFollowingIds.push(...response.map((user) => user.id));
         page++;
     } while (page <= totalPages);
 
     return allFollowingIds;
-}
-
+};

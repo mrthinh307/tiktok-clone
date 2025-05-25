@@ -8,7 +8,7 @@ import VideoNavButton from '~/layouts/components/VideoNavButton';
 
 const cx = classNames.bind(styles);
 
-function Home() {
+function Home({ queryPage = 'for-you' }) {
     const containerRef = useRef(null);
 
     const {
@@ -18,7 +18,7 @@ function Home() {
         loadVideos,
         loadMoreIfNeeded,
         preloadVideos,
-    } = useVideoData();
+    } = useVideoData(queryPage);
 
     const {
         currentIndex: currentVideoIndex,

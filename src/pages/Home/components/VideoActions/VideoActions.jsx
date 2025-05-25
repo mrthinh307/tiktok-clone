@@ -1,11 +1,10 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, memo } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
 import styles from './VideoActions.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCommentDots, faShare } from '@fortawesome/free-solid-svg-icons';
 import { ClickSpark } from '~/components/Animations';
-import * as followServices from '~/services/apiServices/followServices';
 
 import {
     BookmarkIcon,
@@ -14,6 +13,7 @@ import {
     TymIcon,
 } from '~/assets/images/icons';
 import { useAuth } from '~/contexts/AuthContext';
+import { useSocialInteraction } from '~/contexts/SocialInteractionContext';
 
 const cx = classNames.bind(styles);
 
@@ -38,14 +38,9 @@ const ActionButton = React.memo(
 );
 
 function VideoActions({ video }) {
-    const {
-        user,
-        toggleLoginForm,
-        isFollowing,
-        handleFollow,
-        handleUnfollow,
-        followingIds,
-    } = useAuth();
+    const { user, toggleLoginForm } = useAuth();
+    const { isFollowing, handleFollow, handleUnfollow, followingIds } =
+        useSocialInteraction();
 
     const [liked, setLiked] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -119,12 +114,14 @@ function VideoActions({ video }) {
                 }
             } catch (error) {
                 console.error('Error handling follow/unfollow:', error);
+                // Revert the followed state in case of error
+                setFollowed(isFollowing(video.user.id));
             }
         },
         [
             user,
             toggleLoginForm,
-            video,
+            video.user.id,
             isFollowing,
             handleFollow,
             handleUnfollow,
@@ -143,7 +140,10 @@ function VideoActions({ video }) {
                     className={cx('avatar')}
                 />
                 <div
-                    className={cx('follow-btn', { followed: followed })}
+                    className={cx('follow-btn', {
+                        followed: followed,
+                        hidden: followingIds.length === 0,
+                    })}
                     onClick={handleFollowButtonClick}
                 >
                     {!followed ? (
@@ -219,4 +219,4 @@ ActionButton.propTypes = {
     sparkColor: PropTypes.string,
 };
 
-export default VideoActions;
+export default memo(VideoActions);
