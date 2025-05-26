@@ -61,12 +61,18 @@ function LoginForm() {
     const [registerPassword, setRegisterPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
+    // Debounced values for validation
+    const debouncedLoginEmail = useDebounce(email, DEBOUNCE_DELAY);
+    const debouncedLoginPassword = useDebounce(password, DEBOUNCE_DELAY);
+    const debouncedFirstName = useDebounce(firstName, DEBOUNCE_DELAY);
+    const debouncedLastName = useDebounce(lastName, DEBOUNCE_DELAY);
+    const debouncedRegisterEmailForValidation = useDebounce(registerEmail, DEBOUNCE_DELAY);
+    const debouncedRegisterPassword = useDebounce(registerPassword, DEBOUNCE_DELAY);
+    const debouncedConfirmPassword = useDebounce(confirmPassword, DEBOUNCE_DELAY);
+
     // Email validation state
     const [isCheckingEmail, setIsCheckingEmail] = useState(false);
     const [emailStatus, setEmailStatus] = useState(null); // null, 'checking', 'valid', 'invalid'
-
-    // Debounced email for API calls
-    const debouncedEmail = useDebounce(registerEmail, DEBOUNCE_DELAY);
 
     // Common state
     const [showPassword, setShowPassword] = useState(false);
@@ -101,82 +107,111 @@ function LoginForm() {
         toggleLoginForm();
     };
 
-    const validateLoginForm = () => {
-        const errors = {};
+    const validateLoginForm = (fieldName) => {
+        const errors = {...fieldErrors};
         let isValid = true;
 
-        if (!email.trim()) {
-            errors.email = 'Please enter your email';
-            isValid = false;
+        if (fieldName === 'email' || !fieldName) {
+            if (!email.trim()) {
+                errors.email = 'Please enter your email';
+                isValid = false;
+            } else if (!isValidEmail(email)) {
+                errors.email = 'Please enter a valid email';
+                isValid = false;
+            } else {
+                delete errors.email;
+            }
         }
 
-        if (!isValidEmail(email)) {
-            errors.email = 'Please enter a valid email';
-            isValid = false;
-        }
-
-        if (!password) {
-            errors.password = 'Please enter your password';
-            isValid = false;
+        if (fieldName === 'password' || !fieldName) {
+            if (!password) {
+                errors.password = 'Please enter your password';
+                isValid = false;
+            } else {
+                delete errors.password;
+            }
         }
 
         setFieldErrors(errors);
-        return isValid;
+        return isValid && Object.keys(errors).length === 0;
     };
 
-    const validateRegisterForm = () => {
-        const errors = {};
+    const validateRegisterForm = (fieldName) => {
+        const errors = {...fieldErrors};
         let isValid = true;
 
-        if (!firstName.trim()) {
-            errors.firstName = 'Please enter your first name';
-            isValid = false;
+        if (fieldName === 'firstName' || !fieldName) {
+            if (!firstName.trim()) {
+                errors.firstName = 'Please enter your first name';
+                isValid = false;
+            } else {
+                delete errors.firstName;
+            }
         }
 
-        if (!lastName.trim()) {
-            errors.lastName = 'Please enter your last name';
-            isValid = false;
+        if (fieldName === 'lastName' || !fieldName) {
+            if (!lastName.trim()) {
+                errors.lastName = 'Please enter your last name';
+                isValid = false;
+            } else {
+                delete errors.lastName;
+            }
         }
 
-        if (!registerEmail.trim()) {
-            errors.registerEmail = 'Please enter your email';
-            isValid = false;
-        } else if (!isValidEmail(registerEmail)) {
-            errors.registerEmail = 'Please enter a valid email';
-            isValid = false;
+        if (fieldName === 'registerEmail' || !fieldName) {
+            if (!registerEmail.trim()) {
+                errors.registerEmail = 'Please enter your email';
+                isValid = false;
+            } else if (!isValidEmail(registerEmail)) {
+                errors.registerEmail = 'Please enter a valid email';
+                isValid = false;
+            } else if (emailStatus === 'invalid' && errors.registerEmail !== 'This email is already registered') {
+                // Keep existing "already registered" error, otherwise clear
+                 delete errors.registerEmail;
+            } else if (emailStatus !== 'invalid') {
+                delete errors.registerEmail;
+            }
         }
 
-        if (!registerPassword) {
-            errors.registerPassword = 'Please enter your password';
-            isValid = false;
-        } else if (registerPassword.length < 6) {
-            errors.registerPassword = 'Password must be at least 6 characters';
-            isValid = false;
+        if (fieldName === 'registerPassword' || !fieldName) {
+            if (!registerPassword) {
+                errors.registerPassword = 'Please enter your password';
+                isValid = false;
+            } else if (registerPassword.length < 6) {
+                errors.registerPassword = 'Password must be at least 6 characters';
+                isValid = false;
+            } else {
+                delete errors.registerPassword;
+            }
         }
 
-        if (!confirmPassword) {
-            errors.confirmPassword = 'Please confirm your password';
-            isValid = false;
-        } else if (registerPassword !== confirmPassword) {
-            errors.confirmPassword = 'Password confirmation does not match';
-            isValid = false;
+        if (fieldName === 'confirmPassword' || !fieldName) {
+            if (!confirmPassword) {
+                errors.confirmPassword = 'Please confirm your password';
+                isValid = false;
+            } else if (registerPassword !== confirmPassword) {
+                errors.confirmPassword = 'Password confirmation does not match';
+                isValid = false;
+            } else {
+                delete errors.confirmPassword;
+            }
         }
 
         setFieldErrors(errors);
-        return isValid;
+        return isValid && Object.keys(errors).length === 0;
     };
 
     // Check email existence when debounced email changes
     useEffect(() => {
         const checkEmail = async () => {
             // Only check if email is valid and not empty
-            if (debouncedEmail && isValidEmail(debouncedEmail)) {
+            if (debouncedRegisterEmailForValidation && isValidEmail(debouncedRegisterEmailForValidation)) {
                 setIsCheckingEmail(true);
                 setEmailStatus('checking');
 
                 try {
                     const exists = await authService.checkEmailExists(
-                        debouncedEmail,
+                        debouncedRegisterEmailForValidation,
                     );
 
                     if (exists) {
@@ -209,7 +244,37 @@ function LoginForm() {
         };
 
         checkEmail();
-    }, [debouncedEmail]);
+    }, [debouncedRegisterEmailForValidation]);
+
+    // Debounced validation for Login form
+    useEffect(() => {
+        if (email) validateLoginForm('email');
+    }, [debouncedLoginEmail]);
+
+    useEffect(() => {
+        if (password) validateLoginForm('password');
+    }, [debouncedLoginPassword]);
+
+    // Debounced validation for Register form
+    useEffect(() => {
+        if (firstName) validateRegisterForm('firstName');
+    }, [debouncedFirstName]);
+
+    useEffect(() => {
+        if (lastName) validateRegisterForm('lastName');
+    }, [debouncedLastName]);
+
+    useEffect(() => {
+        if (registerEmail && emailStatus !== 'checking') validateRegisterForm('registerEmail');
+    }, [debouncedRegisterEmailForValidation, emailStatus]);
+
+    useEffect(() => {
+        if (registerPassword) validateRegisterForm('registerPassword');
+    }, [debouncedRegisterPassword]);
+
+    useEffect(() => {
+        if (confirmPassword) validateRegisterForm('confirmPassword');
+    }, [debouncedConfirmPassword]);
 
     // Show notification function
     const showNotification = (message, type) => {
@@ -265,8 +330,13 @@ function LoginForm() {
         e.preventDefault();
 
         if (!validateRegisterForm() || emailStatus !== 'valid') {
+            // Ensure all fields are validated before submitting
+            validateRegisterForm();
+            if (emailStatus !== 'valid' && registerEmail && isValidEmail(registerEmail) && !fieldErrors.registerEmail) {
+                 setFieldErrors(prev => ({...prev, registerEmail: 'Please wait for email validation or fix the invalid email.'}));
+            }
             showNotification(
-                'Please enter valid information.',
+                'Please enter valid information and ensure email is available.',
                 'error',
             );
             return;
@@ -675,16 +745,12 @@ function LoginForm() {
                                                     e.target.value,
                                                 );
                                                 // Clear email-specific error
-                                                if (
-                                                    fieldErrors.registerEmail ===
-                                                    'This email is already registered'
-                                                ) {
-                                                    setFieldErrors({
-                                                        ...fieldErrors,
-                                                        registerEmail: '',
-                                                    });
-                                                    setEmailStatus(null);
-                                                }
+                                                setFieldErrors((prev) => {
+                                                    const newErrors = { ...prev };
+                                                    delete newErrors.registerEmail;
+                                                    return newErrors;
+                                                });
+                                                setEmailStatus(null); // Reset email status on new input
                                             }}
                                             placeholder="abcxyz@gmail.com"
                                             className={cx('form-input', {

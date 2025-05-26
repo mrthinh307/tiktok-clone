@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
                 const userData = await authService.checkAuth();
 
                 if (userData) {
-                    setUser(userData);
+                    setUser(userData.user_metadata);
                     console.log('User authenticated on startup');
                 } else {
                     setUser(null);
@@ -74,18 +74,19 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (firstName, lastName, email, password) => {
         try {
-            const success = await authService.register(
+            const res = await authService.register(
                 firstName,
                 lastName,
                 email,
                 password,
             );
 
-            if (success) {
+            if (res.success) {
+                console.log(res.user)
                 // After successful registration, fetch the user data
-                const userData = await authService.checkAuth();
+                const userData = res.user.user_metadata;
                 if (userData) {
-                    window.location.href = '/';
+                    // window.location.href = '/';
                     setUser(userData);
                 } else {
                     // Fallback in case user data fetch fails
