@@ -4,19 +4,18 @@ export const fetchVideos = async (type = 'for-you', page = 1) => {
     try {
         const response = await request.get('videos', {
             params: {
-                type,
+                // type,
                 page,
+                videosPerPage: 10,
             },
         });
+
+        console.log(response.data);
 
         // Trả về cả data và meta từ response
         return {
             data: response.data,
-            meta: response.meta || {
-                total_pages: 10, // Giá trị mặc định nếu API không trả về
-                current_page: page,
-                per_page: response.data?.length || 10,
-            },
+            meta: response.meta
         };
     } catch (error) {
         console.error('Error fetching videos:', error);
@@ -24,10 +23,11 @@ export const fetchVideos = async (type = 'for-you', page = 1) => {
         return {
             data: [],
             meta: {
-                total_pages: 10,
-                current_page: page,
-                per_page: 10,
-            },
+                pagination: {
+                    page,
+                    videosPerPage: 10,
+                }
+            }
         };
     }
 };
@@ -36,9 +36,12 @@ export const fetchVideos = async (type = 'for-you', page = 1) => {
 export const fetchTotalPages = async (type = 'for-you') => {
     try {
         const response = await request.get('videos', {
-            params: { type, page: 1 },
+            params: {
+                page: 1,
+                videosPerPage: 10
+            },
         });
-        return response.meta?.pagination.total_pages || 10; // Default to 10 if API doesn't provide this info
+        return response.meta?.pagination.totalPages || 10; // Default to 10 if API doesn't provide this info
     } catch (error) {
         console.error('Error fetching total pages:', error);
         return 10; // Default value

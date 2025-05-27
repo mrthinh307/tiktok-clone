@@ -2,7 +2,7 @@
 import { useState, useCallback, useRef } from 'react';
 import * as videoService from '~/services/apiServices/videoService';
 
-function useVideoData() {
+function useVideoData(queryPage) {
     const [videos, setVideos] = useState([]);
     const [loadedMap, setLoadedMap] = useState({});
     const [hasMore, setHasMore] = useState(true);
@@ -16,21 +16,20 @@ function useVideoData() {
 
     // Hàm lựa chọn page ngẫu nhiên
     const getRandomPage = useCallback(() => {
-        console.log('Fetching random page...');
         const totalPages = totalPagesRef.current;
         const fetchedPages = fetchedPagesRef.current;
 
-        // Nếu đã fetch tất cả các trang, reset lại danh sách
-        if (fetchedPages.size >= totalPages) {
-            console.log(
-                'All pages have been fetched. Resetting fetched pages list.',
-            );
-            fetchedPages.clear();
-            // Có thể giữ lại trang cuối cùng để tránh trùng lặp ngay lập tức
-            if (lastFetchedPageRef > 0) {
-                fetchedPages.add(lastFetchedPageRef);
-            }
-        }
+        // Nếu đã fetch tất cả các trang, không reset lại danh 
+        // if (fetchedPages.size >= totalPages) {
+        //     console.log(
+        //         'All pages have been fetched.',
+        //     );
+        //     fetchedPages.clear();
+        //     // Có thể giữ lại trang cuối cùng để tránh trùng lặp ngay lập tức
+        //     if (lastFetchedPageRef > 0) {
+        //         fetchedPages.add(lastFetchedPageRef);
+        //     }
+        // }
 
         // Tạo mảng các trang chưa fetch
         const availablePages = [];
@@ -48,9 +47,6 @@ function useVideoData() {
         fetchedPages.add(selectedPage);
         lastFetchedPageRef.current = selectedPage;
 
-        console.log(
-            `Randomly selected page ${selectedPage} from ${availablePages.length} available pages`,
-        );
         return selectedPage;
     }, []);
 
@@ -63,16 +59,15 @@ function useVideoData() {
 
                 if (totalPagesRef.current === 0) {
                     totalPagesRef.current = await videoService.fetchTotalPages(
-                        'for-you',
+                        queryPage,
                     );
                 }
 
                 // Xác định page cần load
                 const page = getRandomPage();
 
-                console.log(`Fetching page ${page} videos...`);
                 const response = await videoService.fetchVideos(
-                    'for-you',
+                    queryPage,
                     page,
                 );
 
@@ -80,62 +75,50 @@ function useVideoData() {
                 const videosList = response.data || [];
 
                 if (!videosList || videosList.length === 0) {
-                    console.log('No videos available on this page');
-
                     // Nếu không có videos, thử load một trang khác
                     if (fetchedPagesRef.current.size < totalPagesRef.current) {
-                        console.log('Trying another page...');
-                        return loadVideos(isInitial);
-                    } else {
-                        setHasMore(false);
-                        console.log('No more videos available');
-                        return;
-                    }
-                }
-
-                const verticalVideos = videosList.filter(
-                    (v) =>
-                        v.meta.video.resolution_y > v.meta.video.resolution_x,
-                );
-
-                if (verticalVideos.length === 0) {
-                    console.log('No vertical videos on this page');
-
-                    // Nếu không có vertical videos, thử load một trang khác
-                    if (fetchedPagesRef.current.size < totalPagesRef.current) {
-                        console.log(
-                            'Trying another page for vertical videos...',
-                        );
                         return loadVideos(isInitial);
                     } else {
                         setHasMore(false);
                         return;
                     }
                 }
+
+                // const verticalVideos = videosList.filter(
+                //     (v) =>
+                //         v.meta.video.resolution_y > v.meta.video.resolution_x,
+                // );
+
+                // if (verticalVideos.length === 0) {
+                //     // Nếu không có vertical videos, thử load một trang khác
+                //     if (fetchedPagesRef.current.size < totalPagesRef.current) {
+                //         return loadVideos(isInitial);
+                //     } else {
+                //         setHasMore(false);
+                //         return;
+                //     }
+                // }
 
                 // Update videos storage and loadedMap
                 if (isInitial) {
-                    setVideos(verticalVideos);
+                    setVideos(videosList);
 
                     // Initialize loadedMap for the first 3 videos
                     const initialLoadedMap = {};
-                    verticalVideos.slice(0, 3).forEach((video) => {
+                    videosList.slice(0, 3).forEach((video) => {
                         initialLoadedMap[video.id] = true;
                     });
                     setLoadedMap(initialLoadedMap);
                 } else {
-                    const newVideos = [...videos, ...verticalVideos];
+                    const newVideos = [...videos, ...videosList];
                     setVideos(newVideos);
                 }
-
-                console.log(
-                    `Successfully loaded page ${page}, got ${verticalVideos.length} videos`,
-                );
 
                 // Reset hasMore nếu chúng ta đã load hết số trang
                 if (fetchedPagesRef.current.size >= totalPagesRef.current) {
                     console.log('All pages have been loaded at least once.');
                     // Không set hasMore = false để người dùng vẫn có thể load lại các trang
+                    setHasMore(false);
                 }
             } catch (error) {
                 console.error('Failed to fetch videos:', error);
@@ -144,7 +127,7 @@ function useVideoData() {
                 else setIsFetchingMore(false);
             }
         },
-        [videos, getRandomPage],
+        [videos, getRandomPage, queryPage],
     );
 
     // Check if need to load more videos
@@ -157,9 +140,6 @@ function useVideoData() {
                 videos.length > 0 &&
                 currentVideoIndex >= videos.length - 5 // Increased threshold to load earlier
             ) {
-                console.log(
-                    `Near the end (index ${currentVideoIndex} of ${videos.length}), loading more videos...`,
-                );
                 // isInitial is false to indicate loading more videos
                 loadVideos(false);
             }
@@ -198,10 +178,6 @@ function useVideoData() {
             const totalCachedVideos = Object.keys(updatedLoadedMap).length;
 
             if (totalCachedVideos > MAX_CACHED_VIDEOS) {
-                console.log(
-                    `Cache limit reached (${totalCachedVideos}/${MAX_CACHED_VIDEOS}), cleaning up...`,
-                );
-
                 // Xác định range videos cần giữ lại (ưu tiên videos gần với vị trí hiện tại)
                 const startIdx = Math.max(0, index - 10);
                 const endIdx = Math.min(videos.length, index + 10);
@@ -222,21 +198,11 @@ function useVideoData() {
                     if (videoId) newLoadedMap[videoId] = true;
                 });
 
-                console.log(
-                    `Reduced cache from ${totalCachedVideos} to ${
-                        Object.keys(newLoadedMap).length
-                    } videos`,
-                );
                 setLoadedMap(newLoadedMap);
                 return;
             }
 
             if (hasChanges) {
-                console.log(
-                    `Marking videos for preload: indices ${indicesToLoad.join(
-                        ', ',
-                    )}`,
-                );
                 setLoadedMap(updatedLoadedMap);
             }
         },
