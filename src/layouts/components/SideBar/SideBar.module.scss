@@ -9,7 +9,7 @@
 
 .wrapper.collapsed {
     width: 72px;
-}   
+}
 
 .container {
     width: 100%;
@@ -60,9 +60,47 @@
     }
 }
 
-@media screen and (max-width: 1024px) {
-    .wrapper {
-        width: 72px;
+// Add fade-in animation for drawer content
+.header-search-bar,
+.search-container,
+.more-contents {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    will-change: opacity, visibility;
+
+    &.content-visible {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+// Title specific animation
+.title {
+    transform: translateY(5px);
+    transition: transform 0.2s ease;
+
+    .content-visible & {
+        transform: translateY(0);
+    }
+}
+
+// More content items animation
+.more-content-item {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+
+    .content-visible & {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    // Staggered animation for items
+    @for $i from 1 through 10 {
+        &:nth-child(#{$i}) {
+            transition-delay: #{0.05 * $i}s;
+        }
     }
 }
 
@@ -93,7 +131,6 @@
     font-weight: 700;
 }
 
-
 .close-icon {
     width: 28px;
     height: 28px;
@@ -120,7 +157,7 @@
     border-radius: 50px;
     background: rgba(22, 24, 35, 0.06);
     cursor: pointer;
-    
+
     &:hover {
         background: rgba(22, 24, 35, 0.1);
     }
@@ -134,6 +171,7 @@
 
     & .search-input {
         font-size: 1.4rem !important;
+        box-shadow: none;
     }
 
     & .clear-icon {
@@ -205,12 +243,12 @@
 
     .icon {
         margin-left: 5px;
-        
+
         svg {
             display: flex;
             align-items: center;
             justify-content: center;
-            fill: rgba(22, 24, 35, 0.3) !important; 
+            fill: rgba(22, 24, 35, 0.3) !important;
         }
     }
 }
@@ -227,7 +265,7 @@
         background-color: rgba(234, 40, 78, 1) !important;
     }
 
-    &.hide {
+    &.hidden {
         display: none;
     }
 }
@@ -236,7 +274,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px !important; 
+    width: 40px !important;
     height: 40px !important;
     border-radius: 50px !important;
     background-color: var(--primary-color) !important;
@@ -249,5 +287,15 @@
         background-color: rgba(234, 40, 78, 1) !important;
         transform: translateY(-3px);
         box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    &.hidden {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .wrapper {
+        width: 72px;
     }
 }
