@@ -3,12 +3,9 @@ import { Fragment } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { publicRoutes } from './routes';
 import DefaultLayout from '~/layouts';
-import { AutoScrollProvider } from './contexts/AutoScrollContext';
-import { AuthProvider } from './contexts/AuthContext';
-import { SocialInteractionProvider } from './contexts/SocialInteractionContext';
+import { AutoScrollProvider, AuthProvider, SocialInteractionProvider, VolumeProvider } from './contexts';
 import { useAuth } from './contexts/AuthContext';
 import LoginForm from './components/LoginForm';
-import { VolumeProvider } from './contexts/VolumeContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
