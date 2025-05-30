@@ -1,4 +1,4 @@
-import supabase from '../supabaseClient'; // Import Supabase client
+import supabase from '../../config/supabaseClient'; // Import Supabase client
 
 export const login = async (email, password) => {
     try {
