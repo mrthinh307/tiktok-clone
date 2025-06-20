@@ -4,7 +4,9 @@ class VideosController {
   async getVideos(req: any, res: any) {
     // Sử dụng giá trị mặc định nếu tham số không hợp lệ
     const page = isNaN(parseInt(req.query.page)) ? 1 : parseInt(req.query.page);
-    const videosPerPage = isNaN(parseInt(req.query.videosPerPage)) ? 10 : parseInt(req.query.videosPerPage);
+    const videosPerPage = isNaN(parseInt(req.query.videosPerPage))
+      ? 10
+      : parseInt(req.query.videosPerPage);
     const offset = (page - 1) * videosPerPage;
 
     try {
