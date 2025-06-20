@@ -1,34 +1,33 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import * as followServices from '~/services/apiServices/followServices';
+import * as likeServices from '~/services/apiServices/likeServices';
 import { useAuth } from './AuthContext';
 
 const SocialInteractionContext = createContext();
-const FOLLOWING_PER_PAGE = 5;
 
 export const useSocialInteraction = () => useContext(SocialInteractionContext);
 
 export const SocialInteractionProvider = ({ children }) => {
     const { user } = useAuth();
     const [followingIds, setFollowingIds] = useState([]);
-    const [totalFollowingPages, setTotalFollowingPages] = useState(0);
+    const [likedVideoIds, setLikedVideoIds] = useState([]);
 
     useEffect(() => {
         if (user) {
             fetchFollowingData();
+            fetchLikedVideosData();
         } else {
             setFollowingIds([]);
-            setTotalFollowingPages(0);
+            setLikedVideoIds([]);
         }
     }, [user]);
 
     const fetchFollowingData = async () => {
         try {
-            // Lấy tổng số trang
-            const totalPages = await followServices.getTotalFollowingPages();
-            setTotalFollowingPages(totalPages);
 
             // Lấy danh sách IDs
-            const allIds = await followServices.getAllFollowingIds(totalPages);
+            const allIds = await followServices.getAllFollowingIds();
+            console.log('All following IDs:', allIds);
             setFollowingIds(allIds);
         } catch (error) {
             console.error('Error loading following data:', error);
@@ -38,11 +37,7 @@ export const SocialInteractionProvider = ({ children }) => {
     const handleFollow = async (userId) => {
         try {
             await followServices.followUser(userId);
-            // Cập nhật state
             setFollowingIds((prev) => [...prev, userId]);
-            setTotalFollowingPages(
-                Math.ceil((followingIds.length + 1) / FOLLOWING_PER_PAGE),
-            );
         } catch (error) {
             console.error('Error following user:', error);
             throw error;
@@ -52,13 +47,39 @@ export const SocialInteractionProvider = ({ children }) => {
     const handleUnfollow = async (userId) => {
         try {
             await followServices.unfollowUser(userId);
-            // Cập nhật state
             setFollowingIds((prev) => prev.filter((id) => id !== userId));
-            setTotalFollowingPages(
-                Math.ceil((followingIds.length - 1) / FOLLOWING_PER_PAGE),
-            );
         } catch (error) {
             console.error('Error unfollowing user:', error);
+            throw error;
+        }
+    };
+
+    const fetchLikedVideosData = async () => {
+        try {
+            // Lấy danh sách IDs
+            const allIds = await likeServices.getAllLikedVideoIds();
+            setLikedVideoIds(allIds);
+        } catch (error) {
+            console.error('Error loading liked videos data:', error);
+        }
+    };
+
+    const handleLikeVideo = async (videoId) => {
+        try {
+            await likeServices.likeVideo(videoId);
+            setLikedVideoIds((prev) => [...prev, videoId]);
+        } catch (error) {
+            console.error('Error like video:', error);
+            throw error;
+        }
+    };
+
+    const handleCancelLikeVideo = async (videoId) => {
+        try {
+            await likeServices.cancelLikeVideo(videoId);
+            setLikedVideoIds((prev) => prev.filter((id) => id !== videoId));
+        } catch (error) {
+            console.error('Error unlike video:', error);
             throw error;
         }
     };
@@ -67,12 +88,19 @@ export const SocialInteractionProvider = ({ children }) => {
         return followingIds.includes(userId);
     };
 
+    const isLikedVideo = (videoId) => {
+        return likedVideoIds.includes(videoId);
+    };
+
     const value = {
         followingIds,
-        totalFollowingPages,
+        likedVideoIds,
         handleFollow,
         handleUnfollow,
+        handleLikeVideo,
+        handleCancelLikeVideo,
         isFollowing,
+        isLikedVideo,
     };
 
     return (

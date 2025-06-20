@@ -39,17 +39,19 @@ const ActionButton = React.memo(
 
 function VideoActions({ video }) {
     const { user, toggleLoginForm } = useAuth();
-    const { isFollowing, handleFollow, handleUnfollow, followingIds } =
+    const { isFollowing, isLikedVideo, handleFollow, handleUnfollow, handleLikeVideo, handleCancelLikeVideo, followingIds, likedVideoIds } =
         useSocialInteraction();
 
-    const [liked, setLiked] = useState(false);
+    const [liked, setLiked] = useState(isLikedVideo(video.id));
+    const [likesCount, setLikesCount] = useState(video.likes_count);
     const [saved, setSaved] = useState(false);
     const [followed, setFollowed] = useState(isFollowing(video.user.id));
 
-    // Cập nhật trạng thái followed khi followingIds thay đổi
+    // Cập nhật trạng thái followed, liked khi followingIds, likedIds thay đổi
     useEffect(() => {
         setFollowed(isFollowing(video.user.id));
-    }, [video.user.id, isFollowing, followingIds]);
+        setLiked(isLikedVideo(video.id));
+    }, [video.user.id, isFollowing, followingIds, video.id, isLikedVideo, likedVideoIds]);
 
     const formatCount = useCallback((count) => {
         if (count >= 1000000) {
@@ -63,12 +65,12 @@ function VideoActions({ video }) {
 
     const formattedCounts = useMemo(
         () => ({
-            likes: formatCount(video.likes_count),
+            likes: formatCount(likesCount),
             comments: formatCount(video.comments_count),
             saves: formatCount(Math.floor(Math.random() * 200)),
             shares: formatCount(video.shares_count),
         }),
-        [video, formatCount],
+        [likesCount, video.comments_count, video.shares_count, formatCount],
     );
 
     // Wrapper to check if user is logged in before executing action
@@ -84,8 +86,17 @@ function VideoActions({ video }) {
     );
 
     const handleLike = useCallback((e) => {
+        if (!liked) {
+            handleLikeVideo(video.id);
+            setLikesCount((prev) => prev + 1);
+            video.likes_count += 1; // Update local video state
+        } else {
+            handleCancelLikeVideo(video.id);
+            setLikesCount((prev) => Math.max(prev - 1, 0));
+            video.likes_count = Math.max(video.likes_count - 1, 0); // Update local video state
+        }
         setLiked((prev) => !prev);
-    }, []);
+    }, [handleCancelLikeVideo, handleLikeVideo, liked, video]);
 
     const handleSave = useCallback((e) => {
         setSaved((prev) => !prev);
@@ -135,14 +146,14 @@ function VideoActions({ video }) {
                 onClick={requireAuth(() => {})}
             >
                 <img
-                    src={video.user.avatar}
+                    src={video.user.avatar_url}
                     alt="avatar"
                     className={cx('avatar')}
                 />
                 <div
                     className={cx('follow-btn', {
                         followed: followed,
-                        hidden: followingIds.length === 0,
+                        hidden: video.user.id === user?.sub,
                     })}
                     onClick={handleFollowButtonClick}
                 >

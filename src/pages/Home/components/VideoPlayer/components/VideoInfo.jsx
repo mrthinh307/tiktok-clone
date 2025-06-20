@@ -14,7 +14,7 @@ const VideoInfo = memo(({ video, expandedDescription, toggleDescription }) => {
                 <Link to={`/@${video.user.id}`} className={cx('username')}>
                     @{video.user.nickname}
                 </Link>
-                {video.user.verified && (
+                {video.user.tick && (
                     <span className={cx('verified-icon')}>
                         <BlueTickIcon />
                     </span>
