@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
                 const userData = await authService.checkAuth();
                 if (userData) {
                     window.location.href = '/';
-                    setUser(userData);
+                    setUser(userData.user_metadata);
                 } else {
                     // Fallback in case user data fetch fails
                     setUser({

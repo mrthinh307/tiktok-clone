@@ -44,8 +44,11 @@ export const register = async (firstName, lastName, email, password) => {
                         lastName, // This will be in raw_user_meta_data
                         fullName: `${firstName} ${lastName}`,
                         nickname: email.split('@')[0],
-                        avatar: `https://ui-avatars.com/api/?name=${firstName}+${lastName}`,
+                        avatar_url: `https://ui-avatars.com/api/?name=${firstName}+${lastName}`,
                         tick: true,
+                        followings_count: 0,
+                        followers_count: 0,
+                        likes_count: 0,
                     },
                 },
             });

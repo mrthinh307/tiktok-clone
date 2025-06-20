@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import PropTypes from 'prop-types';
 import MenuItem from './MenuItem';
-import { useState, useCallback, useImperativeHandle, forwardRef, useEffect, useMemo } from 'react';
+import { useState, useCallback, useImperativeHandle, forwardRef, useMemo } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Menu.module.scss';
 import { SIDEBAR_MENU_ITEMS, UNAUTHENTICATED_SIDEBAR_MENU_ITEMS } from '~/constants/sidebarConstants';
+import { DEFAULT_AVATAR } from '~/constants/common';
 
 const cx = classNames.bind(styles);
 
@@ -50,11 +51,29 @@ const Menu = forwardRef(function Menu({ user, collapsed, onToggleCollapse, onSet
             // eslint-disable-next-line react-hooks/exhaustive-deps
         },
         [activeItemIndex, collapsed],
-    );
-
-    const filteredMenuItems = useMemo(() => {
+    );    const filteredMenuItems = useMemo(() => {
         if (user) {
-            return SIDEBAR_MENU_ITEMS;
+            // Tạo bản sao của SIDEBAR_MENU_ITEMS và cập nhật Profile item với avatar của user
+            return SIDEBAR_MENU_ITEMS.map(item => {
+                if (item.title === 'Profile') {
+                    return {
+                        ...item,
+                        icon: (
+                            <img
+                                alt="user"
+                                src={user.avatar_url || DEFAULT_AVATAR}
+                            />
+                        ),
+                        activeIcon: (
+                            <img
+                                alt="user"
+                                src={user.avatar_url || DEFAULT_AVATAR}
+                            />
+                        ),
+                    };
+                }
+                return item;
+            });
         } else {
             return SIDEBAR_MENU_ITEMS.filter(item => UNAUTHENTICATED_SIDEBAR_MENU_ITEMS.includes(item.title));
         }
