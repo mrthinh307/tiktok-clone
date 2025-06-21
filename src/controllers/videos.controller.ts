@@ -1,73 +1,54 @@
-import supabase from "../config/supabase";
+import { StatusCodes } from "http-status-codes";
+import videosService from "~/services/videos.service";
 
 class VideosController {
-  async getVideos(req: any, res: any) {
-    // Sử dụng giá trị mặc định nếu tham số không hợp lệ
+  private parsePagination(req: any) {
     const page = isNaN(parseInt(req.query.page)) ? 1 : parseInt(req.query.page);
-    const videosPerPage = isNaN(parseInt(req.query.videosPerPage))
-      ? 10
-      : parseInt(req.query.videosPerPage);
-    const offset = (page - 1) * videosPerPage;
+    const videosPerPage = isNaN(parseInt(req.query.videosPerPage)) ? 10 : parseInt(req.query.videosPerPage);
+    return { page, videosPerPage };
+  }
+
+  private handleSuccess(res: any, data: any, pagination: any) {
+    res.status(StatusCodes.OK).json({
+      data,
+      meta: { pagination },
+    });
+  }
+
+  private handleError(res: any, error: any) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      error: error?.message || "Internal Server Error",
+    });
+  }
+
+  async getForYouVideos(req: any, res: any) {
+    const { page, videosPerPage } = this.parsePagination(req);
 
     try {
-      // Lấy tổng số bản ghi
-      const { count } = await supabase
-        .from("video")
-        .select("*", { count: "exact", head: true });
-
-      const totalPages = count ? Math.ceil(count / videosPerPage) : 0;
-      const totalVideos = count ? count : 0;
-
-      // Nếu offset vượt quá count, trả về mảng rỗng
-      if (count && offset >= count) {
-        return res.json({
-          data: [],
-          meta: {
-            pagination: {
-              page,
-              videosPerPage,
-              totalPages,
-              totalVideos,
-              hasNext: false,
-              hasPrevious: false,
-            },
-          },
-        });
-      }
-
-      // Truy vấn lấy video kèm user (JOIN ảo)
-      const { data, error } = await supabase
-        .from("video")
-        .select(
-          `
-          *,
-          user:user_id (
-            *
-          )
-        `
-        )
-        .range(offset, offset + videosPerPage - 1);
-
-      if (error) throw error;
-
-      const hasNext = count ? offset + videosPerPage < count : false;
-      const hasPrevious = offset > 0;
-
-      res.json({
-        data,
-        meta: {
-          pagination: {
-            page,
-            videosPerPage,
-            totalPages,
-            totalVideos,
-            hasNext,
-            hasPrevious,
-          },
-        },
+      const result = await videosService.getPaginatedVideos(page, videosPerPage);
+      this.handleSuccess(res, result.videos, {
+        page,
+        videosPerPage,
+        ...result.meta,
       });
-    } catch (err: any) {
-      res.status(500).json({ error: err.message });
+    } catch (err) {
+      this.handleError(res, err);
+    }
+  }
+
+  async getFollowingVideos(req: any, res: any) {
+    const { page, videosPerPage } = this.parsePagination(req);
+    const userId = req.user?.id;
+
+    try {
+      const result = await videosService.getFollowingVideos(userId, page, videosPerPage);
+      this.handleSuccess(res, result.videos, {
+        page,
+        videosPerPage,
+        ...result.meta,
+      });
+    } catch (err) {
+      this.handleError(res, err);
     }
   }
 }
