@@ -1,7 +1,6 @@
 const route = {
     home: '/',
-    following: '/following',
-    profile: '/:nickname',
+    following: '/following',  
     setting: '/setting',
     upload: '/upload',
     explore: '/explore',
@@ -9,6 +8,7 @@ const route = {
     inbox: '/inbox',
     messages: '/messages',
     live: '/live',
+    profile: '/user/:nickname',
 };
 
 export default route;

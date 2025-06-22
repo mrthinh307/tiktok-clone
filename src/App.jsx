@@ -1,6 +1,6 @@
 import './styles/tailwind.css';
 import { Fragment } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { publicRoutes } from './routes';
 import DefaultLayout from '~/layouts';
 import { AutoScrollProvider, AuthProvider, SocialInteractionProvider, VolumeProvider } from './contexts';
@@ -8,12 +8,14 @@ import { useAuth } from './contexts/AuthContext';
 import LoginForm from './components/LoginForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import config from '~/config';
 
-// AppContent component to access context inside Router
-const AppContent = () => {
-    const { isLoading } = useAuth();
-
-    // Show loading indicator while checking authentication
+// Component để bảo vệ routes
+const ProtectedRoute = ({ children, requireAuth = false }) => {
+    const { user, isLoading } = useAuth();
+    const location = useLocation();
+    
+    // Nếu đang loading, hiển thị spinner
     if (isLoading) {
         return (
             <div className="fixed inset-0 flex items-center justify-center bg-white">
@@ -28,7 +30,24 @@ const AppContent = () => {
             </div>
         );
     }
+    
+    // Nếu route yêu cầu đăng nhập nhưng user chưa đăng nhập
+    if (requireAuth && !user) {
+        console.log(`Redirecting to home because user is not authenticated. Current path: ${location.pathname}`);
+        return <Navigate to={config.routes.home} replace />;
+    }
+    
+    // Nếu user chưa đăng nhập và truy cập route khác home (không có requireAuth), vẫn redirect về home
+    // if (!user && location.pathname !== config.routes.home && location.pathname !== '/') {
+    //     console.log(`Redirecting unauthenticated user to home. Current path: ${location.pathname}`);
+    //     return <Navigate to={config.routes.home} replace />;
+    // }
+    
+    return children;
+};
 
+// AppContent component to access context inside Router
+const AppContent = () => {
     return (
         <div>
             <LoginForm />
@@ -44,18 +63,23 @@ const AppContent = () => {
                         Layout = Fragment;
                     }
 
+                    // Xác định xem route có yêu cầu đăng nhập không
+                    const requireAuth = route.requireAuth || false;
+
                     return (
                         <Route
                             key={index}
                             path={route.path}
                             element={
-                                <AutoScrollProvider>
-                                    <VolumeProvider>
-                                        <Layout>
-                                            <Page />
-                                        </Layout>
-                                    </VolumeProvider>
-                                </AutoScrollProvider>
+                                <ProtectedRoute requireAuth={requireAuth}>
+                                    <AutoScrollProvider>
+                                        <VolumeProvider>
+                                            <Layout>
+                                                <Page />
+                                            </Layout>
+                                        </VolumeProvider>
+                                    </AutoScrollProvider>
+                                </ProtectedRoute>
                             }
                         />
                     );

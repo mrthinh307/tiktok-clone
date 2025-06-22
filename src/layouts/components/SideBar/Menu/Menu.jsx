@@ -58,6 +58,7 @@ const Menu = forwardRef(function Menu({ user, collapsed, onToggleCollapse, onSet
                 if (item.title === 'Profile') {
                     return {
                         ...item,
+                        to: `/user/${user.nickname}`,
                         icon: (
                             <img
                                 alt="user"

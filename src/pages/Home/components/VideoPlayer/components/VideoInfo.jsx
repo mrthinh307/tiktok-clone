@@ -11,7 +11,7 @@ const VideoInfo = memo(({ video, expandedDescription, toggleDescription }) => {
     return (
         <div className={cx('video-info')}>
             <div className={cx('user-info')}>
-                <Link to={`/@${video.user.id}`} className={cx('username')}>
+                <Link to={`/user/${video.user.nickname}`} className={cx('username')}>
                     @{video.user.nickname}
                 </Link>
                 {video.user.tick && (
