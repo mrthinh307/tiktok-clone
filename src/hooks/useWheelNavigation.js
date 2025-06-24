@@ -10,6 +10,7 @@ import { useEffect, useRef, useCallback } from 'react';
  * @param {boolean} props.canNavigatePrev - Có thể di chuyển đến video trước không
  * @param {number} props.debounceTime - Thời gian debounce giữa các sự kiện cuộn (ms)
  * @param {number} props.deltaThreshold - Ngưỡng delta để xác định cuộn
+ * @param {React.RefObject} props.containerRef - Ref đến container cần kiểm tra scroll
  * @param {array} props.dependencyList - Danh sách phụ thuộc để useEffect chạy lại
  */
 function useWheelNavigation({
@@ -20,6 +21,7 @@ function useWheelNavigation({
     canNavigatePrev = true,
     debounceTime = 50,
     deltaThreshold = 20,
+    containerRef = null,
     dependencyList = [],
 }) {
     const scrollTimeoutRef = useRef(null);
@@ -27,6 +29,19 @@ function useWheelNavigation({
     const handleScroll = useCallback(
         (event) => {
             if (!isEnabled) return;
+
+            // Kiểm tra xem event có xảy ra trong container được chỉ định không
+            if (containerRef && containerRef.current) {
+                const target = event.target;
+                const container = containerRef.current;
+
+                // Kiểm tra xem target có nằm trong container không
+                if (!container.contains(target)) {
+                    return; // Nếu không nằm trong container, bỏ qua event
+                }
+            }
+
+            console.log('Wheel event detected:', event);
 
             // Clear any pending scroll timeouts
             if (scrollTimeoutRef.current) {
@@ -53,20 +68,35 @@ function useWheelNavigation({
             onNavigatePrev,
             debounceTime,
             deltaThreshold,
+            containerRef,
         ],
     );
-
     useEffect(() => {
-        window.addEventListener('wheel', handleScroll, { passive: false });
+        const currentContainer = containerRef?.current;
+
+        // Nếu có containerRef, attach event listener vào container đó
+        // Nếu không có, fallback về window nhưng với logic kiểm tra
+        if (currentContainer) {
+            currentContainer.addEventListener('wheel', handleScroll, {
+                passive: false,
+            });
+        } else {
+            window.addEventListener('wheel', handleScroll, { passive: false });
+        }
 
         return () => {
-            window.removeEventListener('wheel', handleScroll);
+            if (currentContainer) {
+                currentContainer.removeEventListener('wheel', handleScroll);
+            } else {
+                window.removeEventListener('wheel', handleScroll);
+            }
+
             if (scrollTimeoutRef.current) {
                 clearTimeout(scrollTimeoutRef.current);
             }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [handleScroll, ...dependencyList]);
+    }, [handleScroll, containerRef, ...dependencyList]);
 
     return {
         cleanup: () => {

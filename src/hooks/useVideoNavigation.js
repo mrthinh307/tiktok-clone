@@ -113,7 +113,7 @@ function useVideoNavigation({
         canNavigatePrev,
         dependencyList: [currentIndex, totalItems, isTransitioning],
     });
-
+    
     // Register wheel navigation
     const { cleanup: cleanupWheel } = useWheelNavigation({
         onNavigateNext: navigateToNext,
@@ -121,6 +121,7 @@ function useVideoNavigation({
         isEnabled: isEnabled && !isTransitioning,
         canNavigateNext,
         canNavigatePrev,
+        containerRef, // Truyền containerRef xuống useWheelNavigation
         dependencyList: [currentIndex, totalItems, isTransitioning],
     });
 
