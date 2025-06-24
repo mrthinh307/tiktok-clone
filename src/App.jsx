@@ -6,9 +6,8 @@ import DefaultLayout from '~/layouts';
 import { AutoScrollProvider, AuthProvider, SocialInteractionProvider, VolumeProvider } from './contexts';
 import { useAuth } from './contexts/AuthContext';
 import LoginForm from './components/LoginForm';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import config from '~/config';
+import tiktokLogoLoadingGif from './assets/images/TiktokLogoLoading.gif';
 
 // Component để bảo vệ routes
 const ProtectedRoute = ({ children, requireAuth = false }) => {
@@ -18,15 +17,8 @@ const ProtectedRoute = ({ children, requireAuth = false }) => {
     // Nếu đang loading, hiển thị spinner
     if (isLoading) {
         return (
-            <div className="fixed inset-0 flex items-center justify-center bg-white">
-                <div className="text-center">
-                    <FontAwesomeIcon
-                        icon={faSpinner}
-                        spin
-                        className="text-primary text-4xl mb-4"
-                    />
-                    <p className="text-gray-600">Loading your profile...</p>
-                </div>
+            <div className="w-[88px] h-auto bg-white absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
+                <img src={tiktokLogoLoadingGif} alt="Loading" />
             </div>
         );
     }
