@@ -2,11 +2,9 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    overflow-y: scroll;
     align-items: center;
     padding-bottom: 8px;
-    scrollbar-width: none;
-    gap: 5px;
+    gap: 6px;
 }
 
 .menu-item {

@@ -1,17 +1,33 @@
 import classNames from 'classnames/bind';
 import styles from './SideBar.module.scss';
-import { useState, memo, useCallback, useMemo, useRef, useEffect } from 'react';
+import {
+    useState,
+    memo,
+    useCallback,
+    useMemo,
+    useRef,
+    useEffect,
+    Fragment,
+} from 'react';
 
 import { Link } from 'react-router-dom';
 import config from '~/config';
 import Menu from './Menu';
 import { useDrawer } from '~/hooks';
 import DrawerContainer from './DrawContainer';
-import { DarkLogoIcon, OnlyDarkLogoIcon } from '~/assets/images/icons';
+import {
+    BackIcon,
+    DarkLogoIcon,
+    OnlyDarkLogoIcon,
+} from '~/assets/images/icons';
 import Button from '~/components/Button';
 import { useAuth } from '~/contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRightToBracket } from '@fortawesome/free-solid-svg-icons';
+import coinAdsImage from '~/assets/images/coin-ads.png';
+import supabase from '~/config/supabaseClient';
+import FollowingAccount from './FollowingAccount/FollowingAccount';
+import Frame from './FollowingAccount/Frame';
 
 const cx = classNames.bind(styles);
 
@@ -21,7 +37,6 @@ function SideBar() {
     const [currentMenuTitle, setCurrentMenuTitle] = useState({});
     const menuRef = useRef(null);
     const sidebarRef = useRef(null);
-
     const drawerOptions = useMemo(
         () => ({
             className: cx('show'),
@@ -30,9 +45,73 @@ function SideBar() {
         }),
         [],
     );
-
     const { showDrawer, drawerRef } = useDrawer(isCollapsed, drawerOptions);
     const { user, toggleLoginForm } = useAuth();
+
+    const [followingUsers, setFollowingUsers] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isFetchingMore, setIsFetchingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const excludedUserIdsRef = useRef(new Set());
+
+    // Hnandle fetching following users
+    const fetchFollowingUsers = useCallback(
+        async (isInitial = true) => {
+            if (!user || (!hasMore && !isInitial)) return;
+
+            if (isInitial) setIsLoading(true);
+            else setIsFetchingMore(true);
+
+            try {
+                const { data, error } = await supabase.rpc(
+                    'get_following_users',
+                    {
+                        current_user_id: user.sub,
+                        excluded_user_ids: Array.from(
+                            excludedUserIdsRef.current,
+                        ),
+                        limit_users: 5,
+                    },
+                );
+
+                if (error) throw error;
+
+                if (data.has_more === false) {
+                    setHasMore(false);
+                }
+
+                const users = data.users ?? [];
+                console.log(users);
+                users.forEach((user) =>
+                    excludedUserIdsRef.current.add(user.id),
+                );
+
+                if (isInitial) {
+                    setFollowingUsers(users);
+                } else {
+                    setFollowingUsers((prev) => [...prev, ...users]);
+                }
+            } catch (err) {
+                console.error('Error fetching following users:', err);
+            } finally {
+                if (isInitial) setIsLoading(false);
+                else setIsFetchingMore(false);
+            }
+        },
+        [user, hasMore],
+    );
+
+    useEffect(() => {
+        fetchFollowingUsers(true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Handle "See more" button click
+    const handleSeeMoreFollowingUsers = useCallback(() => {
+        if (hasMore && !isFetchingMore && !isLoading) {
+            fetchFollowingUsers(false);
+        }
+    }, [hasMore, isFetchingMore, isLoading, fetchFollowingUsers]);
 
     // Handle responsive behavior
     useEffect(() => {
@@ -52,6 +131,7 @@ function SideBar() {
         };
     }, []);
 
+    // Handle toggle collapse
     const handleToggleCollapse = useCallback(() => {
         setIsCollapsed((prevState) => !prevState);
     }, []);
@@ -106,6 +186,7 @@ function SideBar() {
         [handleCloseDrawer, currentMenuTitle],
     );
 
+    // Handle button click
     const handleLoginButtonClick = useCallback(() => {
         toggleLoginForm();
     }, [toggleLoginForm]);
@@ -115,7 +196,7 @@ function SideBar() {
             className={cx('wrapper', { collapsed: isCollapsed })}
             ref={sidebarRef}
         >
-            <div className={cx('container')}>
+            <div className={cx('container')} style={{overflow: 'auto', scrollbarWidth: 'none'}}>
                 <Link to={config.routes.home} className={cx('header-logo')}>
                     {!isCollapsed && !isResponsiveCollapsed ? (
                         <DarkLogoIcon className={cx('logo')} />
@@ -123,18 +204,107 @@ function SideBar() {
                         <OnlyDarkLogoIcon className={cx('logo')} />
                     )}
                 </Link>
-                <Menu {...menuProps} />
-                <Button
-                    primary
-                    className={cx('login-btn', {'hidden': !!user})}
-                    onClick={handleLoginButtonClick}
-                >
-                    {isCollapsed ? <FontAwesomeIcon icon={faArrowRightToBracket} /> : 'Log in'}
-                </Button>
+
+                {/* <div
+                    className="overflow-auto"
+                    style={{ scrollbarWidth: 'none',}}
+                > */}
+                    <Menu {...menuProps} />
+
+                    {user && (
+                        <div className={`relative w-full flex-col items-start justify-start py-[16px] my-[12px] after:content-[''] after:h-[1px] after:bg-[#1618231F] after:top-[0px] after:left-[8px] after:right-[8px] after:absolute before:content-[''] before:h-[1px] before:bg-[#1618231F] before:bottom-[0px] before:left-[8px] before:right-[8px] before:absolute ${isCollapsed ? 'hidden' : 'flex'}`}>
+                            <p className="w-[208px] px-[8px] mb-[8px] font-bold text-[#161823BF]">
+                                Following accounts
+                            </p>
+                            <div className="w-[208px] flex flex-col items-start justify-center gap-[4px]">
+                                {isLoading
+                                    ? Array.from({ length: 3 }).map(
+                                          (_, index) => <Frame key={index} />,
+                                      )
+                                    : followingUsers.map((user) => (
+                                          <FollowingAccount
+                                              key={user.id}
+                                              user={user}
+                                          />
+                                      ))}
+                                {isFetchingMore && (
+                                    <Frame />
+                                )}
+                            </div>
+                            <button
+                                className={`flex items-center justify-start w-full h-[40px] mt-[4px] text-[#161823BF] hover:bg-[#f2f2f2] transition-colors duration-200 rounded-[8px] ${
+                                    !hasMore || isLoading || isFetchingMore
+                                        ? 'hidden'
+                                        : ''
+                                }`}
+                                onClick={handleSeeMoreFollowingUsers}
+                            >
+                                <div className="w-[26px] h-[26px] mr-[8px] ml-[8px] flex relative">
+                                    <BackIcon
+                                        style={{
+                                            position: 'absolute',
+                                            rotate: '-90deg',
+                                            left: '50%',
+                                            top: '-20%',
+                                            transform: 'translate(-50%, -50%)',
+                                        }}
+                                    />
+                                </div>
+                                <span className="ml-[4px] text-[1.6rem]">
+                                    See more
+                                </span>
+                            </button>
+                        </div>
+                    )}
+
+                    <Button
+                        primary
+                        className={cx('login-btn', { hidden: !!user })}
+                        onClick={handleLoginButtonClick}
+                    >
+                        {isCollapsed ? (
+                            <FontAwesomeIcon icon={faArrowRightToBracket} />
+                        ) : (
+                            'Log in'
+                        )}
+                    </Button>
+
+                    <Fragment>
+                        <div
+                            className={cx('coin-ads-container', {
+                                hidden: isResponsiveCollapsed || isCollapsed,
+                            })}
+                        >
+                            <img
+                                src={coinAdsImage}
+                                alt="Coin Ads"
+                                className={cx('coin-ads')}
+                            />
+                            <div className={cx('ads-text-container')}>
+                                <h4>Create TikTok effects, get a reward</h4>
+                            </div>
+                        </div>
+                        <div
+                            className={`w-[208px] mt-[28px] ml-[4px] flex-col items-start justify-center text-[1.5rem] text-[#8c8c8c] font-bold leading-[22px] gap-2 ${
+                                isCollapsed || isResponsiveCollapsed
+                                    ? 'hidden'
+                                    : 'flex'
+                            }`}
+                        >
+                            <h4 className="cursor-pointer">Company</h4>
+                            <h4 className="cursor-pointer">Program</h4>
+                            <h4 className="cursor-pointer">Term & Policies</h4>
+                            <span className="text-[1.2rem] font-medium leading-[18px]">
+                                © 2025 TikTok
+                            </span>
+                        </div>
+                    </Fragment>
+                </div>
+
                 {showDrawer && (
                     <DrawerContainer ref={drawerRef} {...drawerProps} />
                 )}
-            </div>
+            {/* </div> */}
         </aside>
     );
 }

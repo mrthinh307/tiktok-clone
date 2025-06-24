@@ -260,12 +260,28 @@
     color: #fff !important;
     justify-content: center !important;
     border-radius: 6px !important;
+    margin-top: 8px;
+    margin-bottom: 24px;
+    position: relative;
 
     &:hover {
         background-color: rgba(234, 40, 78, 1) !important;
     }
 
     &.hidden {
+        display: none;
+    }
+
+    &::after {
+        content: '';
+        height: 1px;
+        background: rgba(22, 24, 35, 0.07);
+        position: absolute;
+        bottom: -24px;
+        left: 8px;
+    }
+
+    &.hidden::after {
         display: none;
     }
 }
@@ -294,8 +310,48 @@
     }
 }
 
+.coin-ads-container {
+    width: 208px;
+    height: 52px;
+    position: relative;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+
+    .coin-ads {
+        position: absolute;
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    .ads-text-container {
+        color: #000;
+        font-size: 1.2rem;
+        font-weight: 900;
+        line-height: 16px;
+        width: 70%;
+        text-align: left;
+        z-index: 2;
+        padding-left: 12px;
+    }
+
+    &.hidden {
+        display: none;
+    }   
+}
+
 @media screen and (max-width: 1024px) {
     .wrapper {
         width: 72px;
+    }
+
+    .login-btn {
+        display: none !important;
+
+        &::after {
+            display: none;
+        }
     }
 }

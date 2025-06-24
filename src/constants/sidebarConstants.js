@@ -1,4 +1,4 @@
-import { LiveIcon, LiveSolidIcon, RightArrowIcon } from '~/assets/images/icons';
+import { LiveIcon, LiveSolidIcon, ProfileIcon, RightArrowIcon } from '~/assets/images/icons';
 import { LANGUAGE_LISTS } from '~/constants/headerConstants';
 import config from '~/config';
 
@@ -96,19 +96,10 @@ export const SIDEBAR_MENU_ITEMS = [
     },
     {
         title: 'Profile',
-        to: config.routes.profile,
-        icon: (
-            <img
-                alt="user"
-                src={DEFAULT_AVATAR}
-            />
-        ),
-        activeIcon: (
-            <img
-                alt="user"
-                src={DEFAULT_AVATAR}
-            />
-        ),
+        to: window.location.href,
+        icon: <ProfileIcon />,
+        activeIcon: <ProfileIcon />,
+        iconSize: 'medium',
     },
     {
         title: 'More',
@@ -194,7 +185,9 @@ export const UNAUTHENTICATED_SIDEBAR_MENU_ITEMS = [
     'For You',
     'Explore',
     'Following',
+    'Upload',
     'LIVE',
+    'Profile',
     'More',
 ];
 
