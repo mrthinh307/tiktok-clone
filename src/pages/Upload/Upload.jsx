@@ -1,7 +1,13 @@
 import React, { useState, useRef } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Upload.module.scss';
-import { ArrowBackIcon, DarkLogoIcon, UploadIcon } from '~/assets/images/icons';
+import {
+    CameraIcon,
+    FolderIcon,
+    LightIcon,
+    ResolutionIcon,
+    UploadVideoIcon,
+} from '~/assets/images/icons';
 
 const cx = classNames.bind(styles);
 
@@ -41,29 +47,9 @@ function Upload() {
     };
     return (
         <div className={cx('upload-container')}>
-            {/* Header */}
-            <div className={cx('upload-header')}>
-                <div className={cx('header-left')}>
-                    <button className={cx('back-button')}>
-                        <ArrowBackIcon />
-                        Back to TikTok
-                    </button>
-                </div>
-                <div className={cx('header-center')}>
-                    <DarkLogoIcon />
-                    <span className={cx('studio-text')}>Studio</span>
-                </div>
-                <div className={cx('header-right')}>
-                    <button className={cx('content-script-button')}>
-                        Content Script
-                    </button>
-                </div>
-            </div>
-
             {/* Main Upload Area */}
             <div className={cx('upload-main')}>
                 <div className={cx('upload-section')}>
-                    {' '}
                     <div
                         className={cx('upload-area', {
                             'drag-over': isDragOver,
@@ -93,7 +79,7 @@ function Upload() {
                         ) : (
                             <>
                                 <div className={cx('upload-icon')}>
-                                    <UploadIcon />
+                                    <UploadVideoIcon />
                                 </div>
                                 <h2 className={cx('upload-title')}>
                                     Select video to upload
@@ -124,7 +110,7 @@ function Upload() {
                     <div className={cx('info-sections')}>
                         <div className={cx('info-item')}>
                             <div className={cx('info-icon')}>
-                                <DarkLogoIcon />
+                                <CameraIcon />
                             </div>
                             <div className={cx('info-content')}>
                                 <h3>Size and duration</h3>
@@ -137,7 +123,7 @@ function Upload() {
 
                         <div className={cx('info-item')}>
                             <div className={cx('info-icon')}>
-                                <DarkLogoIcon />
+                                <FolderIcon />
                             </div>
                             <div className={cx('info-content')}>
                                 <h3>File formats</h3>
@@ -150,7 +136,7 @@ function Upload() {
 
                         <div className={cx('info-item')}>
                             <div className={cx('info-icon')}>
-                                <DarkLogoIcon />
+                                <ResolutionIcon />
                             </div>
                             <div className={cx('info-content')}>
                                 <h3>Video resolutions</h3>
@@ -163,7 +149,7 @@ function Upload() {
 
                         <div className={cx('info-item')}>
                             <div className={cx('info-icon')}>
-                                <DarkLogoIcon />
+                                <LightIcon />
                             </div>
                             <div className={cx('info-content')}>
                                 <h3>Aspect ratios</h3>

@@ -1,310 +1,239 @@
 // Upload Container
 .upload-container {
-  min-height: 100vh;
-  background-color: white;
-}
-
-// Header
-.upload-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.header-left,
-.header-right {
-  flex: 1;
-}
-
-.header-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  flex: 1;
-}
-
-.studio-text {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #000;
-}
-
-.header-right {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.back-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #6b7280;
-  font-size: 14px;
-  font-weight: 500;
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: color 0.2s ease;
-  
-  &:hover {
-    color: #374151;
-  }
-  
-  svg {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-.content-script-button {
-  padding: 0.5rem 1rem;
-  color: #6b7280;
-  font-size: 14px;
-  font-weight: 500;
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: color 0.2s ease;
-  
-  &:hover {
-    color: #374151;
-  }
+    background-color: #f9f9f9;
 }
 
 // Main Upload Section
 .upload-main {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding-top: 40px;
+    padding-bottom: 40px;
 }
 
 .upload-section {
-  margin-bottom: 2rem;
+    padding: 24px;
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.0784313725);
 }
 
 // Upload Area
 .upload-area {
-  position: relative;
-  border: 2px dashed #d1d5db;
-  border-radius: 0.5rem;
-  padding: 4rem;
-  text-align: center;
-  background-color: #f9fafb;
-  min-height: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  
-  &:hover {
-    background-color: #f3f4f6;
-  }
-  
-  &.drag-over {
-    border-color: #60a5fa;
-    background-color: #eff6ff;
-  }
+    position: relative;
+    border: 1px dashed rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    padding: 4rem;
+    text-align: center;
+    background-color: #f8f8f8;
+    height: 460px;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
+
+    &:hover, &.drag-over {
+        background: rgba(0, 117, 220, 0.06);
+        border: 1px dashed var(--ui-shape-info, #0075dc);
+    }
 }
 
 .upload-icon {
-  margin-bottom: 1.5rem;
-  
-  svg {
-    width: 60px;
-    height: 60px;
-  }
+    svg {
+        width: 72px;
+        height: 72px;
+    }
 }
 
 .upload-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 0.5rem;
+    font-family: var(--font-family-bold);
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #111827;
+    margin-top: 12px;
 }
 
 .upload-subtitle {
-  color: #6b7280;
-  font-size: 16px;
-  margin-bottom: 2rem;
+    color: rgba(0,0,0,.48);
+    font-size: 1.6rem;
 }
 
 .select-video-button {
-  background-color: #ef4444;
-  color: white;
-  padding: 0.75rem 2rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  
-  &:hover {
-    background-color: #dc2626;
-  }
+	width: 208px;
+    background-color: #ef4444;
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1.4rem;
+	line-height: 21px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+	padding: 8px 0;
+    margin-top: 18px;
+
+    &:hover {
+        background-color: #dc2626;
+    }
 }
 
 .file-selected {
-  text-align: center;
-  
-  h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #111827;
-    margin-bottom: 0.5rem;
-  }
-  
-  p {
-    color: #6b7280;
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
-  }
+    text-align: center;
+
+    h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 0.5rem;
+    }
+
+    p {
+        color: #6b7280;
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
 }
 
 .file-input {
-  display: none;
+    display: none;
 }
 
 // Info Sections
 .info-sections {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-  margin-top: 3rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 3rem;
 }
 
 @media (min-width: 768px) {
-  .info-sections {
-    grid-template-columns: repeat(2, 1fr);
-  }
+    .info-sections {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (min-width: 1024px) {
-  .info-sections {
-    grid-template-columns: repeat(4, 1fr);
-  }
+    .info-sections {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
 .info-item {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.75rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
 }
 
 .info-icon {
-  width: 48px;
-  height: 48px;
-  background-color: #f3f4f6;
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  svg {
-    width: 24px;
-    height: 24px;
-    color: #6b7280;
-  }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        width: 24px;
+        height: 24px;
+        color: #6b7280;
+    }
 }
 
 .info-content {
-  h3 {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #111827;
-    margin-bottom: 0.25rem;
-  }
-  
-  p {
-    color: #6b7280;
-    font-size: 0.875rem;
-    line-height: 1.5;
-  }
+    h3 {
+        font-size: 1.6rem;
+		line-height: 24px;
+        font-weight: 600;
+        color: black;
+    }
+
+    p {
+        color: #6b7280;
+        font-size: 1.3rem;
+        line-height: 17px;
+		margin-top: 5px;
+    }
 }
 
 // CapCut Promotion
 .capcut-promotion {
-  background-color: #f9fafb;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border: 1px solid #e5e7eb;
-  margin-top: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #e5e7eb;
+    margin-top: 16px;
 }
 
 .capcut-content {
-  flex: 1;
-  
-  h3 {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #111827;
-    margin-bottom: 0.5rem;
-  }
-  
-  p {
-    color: #6b7280;
-    font-size: 0.875rem;
-  }
+    flex: 1;
+
+    h3 {
+        font-size: 1.4rem;
+		line-height: 18px;
+        font-weight: 600;
+        color: black;
+        margin-bottom: 0.5rem;
+    }
+
+    p {
+        color: #6b7280;
+        font-size: 1.2rem;
+		line-height: 16px;
+    }
 }
 
 .try-now-button {
-  background-color: #111827;
-  color: white;
-  padding: 0.5rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  font-size: 14px;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  margin-left: 1rem;
-  
-  &:hover {
-    background-color: #1f2937;
-  }
+	height: 36px;
+    background-color: #E5E5E5;
+    color: #111827;
+    font-weight: 900;
+    font-size: 14px;
+	padding: 1px 12px;
+	border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-left: 1rem;
+
+    &:hover {
+        background-color: rgb(201, 199, 199);
+    }
 }
 
 // Responsive Design
 @media (max-width: 768px) {
-  .upload-header {
-    padding: 0.75rem 1rem;
-  }
-  
-  .upload-main {
-    padding: 1.5rem 1rem;
-  }
-  
-  .upload-area {
-    padding: 2rem;
-    min-height: 300px;
-  }
-  
-  .upload-title {
-    font-size: 1.25rem;
-  }
-  
-  .info-sections {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .capcut-promotion {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-  
-  .try-now-button {
-    width: 100%;
-    margin-left: 0;
-  }
+    .upload-header {
+        padding: 0.75rem 1rem;
+    }
+
+    .upload-main {
+        padding: 1.5rem 1rem;
+    }
+
+    .upload-area {
+        padding: 2rem;
+        min-height: 300px;
+    }
+
+    .upload-title {
+        font-size: 1.25rem;
+    }
+
+    .info-sections {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .capcut-promotion {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .try-now-button {
+        width: 100%;
+        margin-left: 0;
+    }
 }

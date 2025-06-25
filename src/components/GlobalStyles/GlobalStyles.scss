@@ -78,9 +78,14 @@ body {
     // font-variation-settings: 'wdth' 100;
 }
 
+
 html ::-webkit-scrollbar {
     border-radius: 0px;
     width: 8px;
+}
+
+html.hide-scroll ::-webkit-scrollbar {
+    width: 0px;
 }
 
 html *::-webkit-scrollbar-thumb {
