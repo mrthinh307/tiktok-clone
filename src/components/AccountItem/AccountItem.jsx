@@ -18,8 +18,8 @@ function AccountItem({ data }) {
         <Link to={`/user/${data.nickname}`} className={cx('wrapper')}>
             <img
                 className={cx('avatar')}
-                src={data.avatar}
-                alt={data.full_name}
+                src={data.avatar_url}
+                alt={data.fullName}
                 onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = DEFAULT_AVATAR;

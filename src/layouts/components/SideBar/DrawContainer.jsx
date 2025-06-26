@@ -22,10 +22,14 @@ const DrawerContainer = forwardRef(function DrawerContainer(
             title: '',
             indexTitle: null,
         },
+        // Persistent search state props
+        searchValue = '',
+        searchResults = [],
+        onSearchValueChange = () => {},
+        onSearchResultsChange = () => {},
     },
     ref,
 ) {
-    const [searchResults, setSearchResults] = useState([]);
     const [history, setHistory] = useState([{ data: MORE_CONTENTS }]);
     const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
     const [contentVisible, setContentVisible] = useState(false);
@@ -47,11 +51,6 @@ const DrawerContainer = forwardRef(function DrawerContainer(
             setContentVisible(false);
         };
     }, []);
-
-    const handleSearchResults = useCallback((results) => {
-        setSearchResults(results);
-    }, []);
-
     const handleClose = () => {
         // Hide content before closing drawer
         setContentVisible(false);
@@ -69,7 +68,7 @@ const DrawerContainer = forwardRef(function DrawerContainer(
     };
 
     const getTitle = () => {
-        if (history.length > 1) {
+        if (history.length > 1 && titleData.title === 'More') {
             return current.title;
         } else {
             return titleData.title;
@@ -89,7 +88,11 @@ const DrawerContainer = forwardRef(function DrawerContainer(
                     iconClassName={cx('clear-icon')}
                     searchButton={false}
                     responsive={false}
-                    onSearchResults={handleSearchResults}
+                    // Pass search state as props
+                    searchValue={searchValue}
+                    searchResults={searchResults}
+                    onSearchValueChange={onSearchValueChange}
+                    onSearchResults={onSearchResultsChange}
                 />
                 {searchResults.length > 0 && (
                     <div className={cx('search-results-wrapper')}>
@@ -108,7 +111,13 @@ const DrawerContainer = forwardRef(function DrawerContainer(
                 )}
             </div>
         );
-    }, [searchResults, handleSearchResults, contentVisible]);
+    }, [
+        searchResults,
+        searchValue,
+        onSearchValueChange,
+        onSearchResultsChange,
+        contentVisible,
+    ]);
 
     const renderMoreContent = () => {
         return (
@@ -180,7 +189,7 @@ const DrawerContainer = forwardRef(function DrawerContainer(
                 })}
             >
                 <div className={cx('title-container')}>
-                    {history.length > 1 && (
+                    {titleData.title === 'More' && history.length > 1 && (
                         <BackIcon
                             className={cx('back-icon')}
                             onClick={handleBack}
@@ -188,7 +197,7 @@ const DrawerContainer = forwardRef(function DrawerContainer(
                     )}
                     <h2 className={cx('title')}>{getTitle()}</h2>
                 </div>
-                {history.length === 1 && (
+                {!(titleData.title === 'More' && history.length > 1) && (
                     <CloseIcon
                         className={cx('close-icon')}
                         onClick={handleClose}
@@ -216,6 +225,11 @@ DrawerContainer.propTypes = {
         title: PropTypes.string,
         index: PropTypes.number,
     }),
+    // Persistent search state props
+    searchValue: PropTypes.string,
+    searchResults: PropTypes.array,
+    onSearchValueChange: PropTypes.func,
+    onSearchResultsChange: PropTypes.func,
 };
 
 export default DrawerContainer;

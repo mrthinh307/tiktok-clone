@@ -1,10 +1,15 @@
-import { useState, useRef, useEffect } from 'react';
+import {
+    useState,
+    useRef,
+    useEffect,
+    forwardRef,
+    useImperativeHandle,
+} from 'react';
 import HeadlessTippy from '@tippyjs/react/headless';
 import classNames from 'classnames/bind';
 import PropTypes from 'prop-types';
 import styles from './Search.module.scss';
 
-import * as searchServies from '~/services/apiServices/searchService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import AccountItem from '~/components/AccountItem';
 import { Wrapper as PopperWrapper } from '~/components/Popper';
@@ -15,29 +20,69 @@ import {
     faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
 import { DEBOUNCE_DELAY } from '~/constants/common';
+import supabase from '~/config/supabaseClient';
 
 const cx = classNames.bind(styles);
 
-function Search({
-    className,
-    inputClassName,
-    iconClassName,
-    searchButton = true,
-    dropdownMenu = false,
-    responsive = true,  // Mặc định là responsive
-    onSearchResults = () => {},
-}) {
-    const [searchValue, setSearchValue] = useState('');
+const Search = forwardRef(function Search(
+    {
+        className,
+        inputClassName,
+        iconClassName,
+        searchButton = true,
+        dropdownMenu = false,
+        responsive = true, // Mặc định là responsive
+        onSearchResults = () => {},
+        // New props for persistent state
+        searchValue: propSearchValue,
+        onSearchValueChange,
+    },
+    ref,
+) {
+    // Use controlled state when props are provided, otherwise use internal state
+    const isControlled =
+        propSearchValue !== undefined && onSearchValueChange !== undefined;
+    const [internalSearchValue, setInternalSearchValue] = useState('');
     const [searchResult, setSearchResult] = useState([]);
     const [showResult, setShowResult] = useState(false);
     const [showLoading, setShowLoading] = useState(false);
 
+    const searchValue = isControlled ? propSearchValue : internalSearchValue;
     const debouncedValue = useDebounce(searchValue, DEBOUNCE_DELAY);
+    const inputRef = useRef(null);
 
+    // Expose focus method via ref
+    useImperativeHandle(
+        ref,
+        () => ({
+            focus: () => {
+                if (inputRef.current) {
+                    inputRef.current.focus();
+                }
+            },
+        }),
+        [],
+    );
+
+    useEffect(() => {
+        if (!dropdownMenu && inputRef.current) {
+            const timer = setTimeout(() => {
+                inputRef.current.focus();
+            }, 300);
+
+            return () => clearTimeout(timer);
+        } else {
+            console.warn('Input reference is not set');
+        }
+    }, [dropdownMenu]);
     const handleChangeInput = (e) => {
-        const searchValue = e.target.value;
-        if (!searchValue.startsWith(' ')) {
-            setSearchValue(searchValue);
+        const newSearchValue = e.target.value;
+        if (!newSearchValue.startsWith(' ')) {
+            if (isControlled) {
+                onSearchValueChange(newSearchValue);
+            } else {
+                setInternalSearchValue(newSearchValue);
+            }
         }
     };
 
@@ -49,28 +94,40 @@ function Search({
         }
 
         const fetchApi = async () => {
-            setShowLoading(true);
+            try {
+                setShowLoading(true);
+                const { data: searchResult, error } = await supabase.rpc(
+                    'search_users',
+                    {
+                        query_string: debouncedValue,
+                        limit_users: 10,
+                    },
+                );
 
-            const searchResult = await searchServies.search(
-                debouncedValue,
-                'more',
-            );
+                if (error) {
+                    throw error;
+                }
 
-            dropdownMenu
-                ? setSearchResult(searchResult)
-                : onSearchResults(searchResult);
-
-            setShowLoading(false);
+                dropdownMenu
+                    ? setSearchResult(searchResult)
+                    : onSearchResults(searchResult);
+            } catch (error) {
+                console.error('Error fetching search results:', error);
+                setSearchResult([]);
+            } finally {
+                setShowLoading(false);
+            }
         };
 
         fetchApi();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedValue]);
-
-    const inputRef = useRef();
-
     const handleClearInput = () => {
-        setSearchValue('');
+        if (isControlled) {
+            onSearchValueChange('');
+        } else {
+            setInternalSearchValue('');
+        }
         setSearchResult([]);
         setShowResult(false);
         onSearchResults([]);
@@ -78,9 +135,13 @@ function Search({
     };
 
     const classes = {
-        search: cx('search', {
-            responsive: responsive,  
-        }, className),
+        search: cx(
+            'search',
+            {
+                responsive: responsive,
+            },
+            className,
+        ),
         input: cx(inputClassName),
         icon: cx('icon', iconClassName),
     };
@@ -88,6 +149,7 @@ function Search({
     return (
         <>
             {dropdownMenu ? (
+                // Search bar in Setting page
                 <HeadlessTippy
                     interactive={true}
                     visible={!!searchResult.length && showResult}
@@ -109,7 +171,11 @@ function Search({
                                             data={result}
                                             onClick={() => {
                                                 setShowResult(false);
-                                                setSearchValue('');
+                                                if (isControlled) {
+                                                    onSearchValueChange('');
+                                                } else {
+                                                    setInternalSearchValue('');
+                                                }
                                             }}
                                         />
                                     ))}
@@ -151,6 +217,7 @@ function Search({
                     </div>
                 </HeadlessTippy>
             ) : (
+                // Search bar in Home page (Sidebar)
                 <div className={classes.search}>
                     <input
                         ref={inputRef}
@@ -181,10 +248,10 @@ function Search({
                         </button>
                     )}
                 </div>
-            )}
+            )}{' '}
         </>
     );
-}
+});
 
 Search.propTypes = {
     className: PropTypes.string,
@@ -194,6 +261,9 @@ Search.propTypes = {
     dropdownMenu: PropTypes.bool,
     responsive: PropTypes.bool,
     onSearchResults: PropTypes.func,
+    // New props for persistent state
+    searchValue: PropTypes.string,
+    onSearchValueChange: PropTypes.func,
 };
 
 export default Search;
