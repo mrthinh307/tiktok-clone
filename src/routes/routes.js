@@ -1,7 +1,7 @@
 import config from '~/config';
 
 // Layouts
-import { HeaderOnly, HeaderSideBar } from '~/layouts';
+import { HeaderOnly } from '~/layouts';
 
 // Pages
 import Home from '~/pages/Home';
@@ -15,7 +15,7 @@ const publicRoutes = [
     { path: config.routes.home, component: Home }, // Home không yêu cầu đăng nhập
     { path: config.routes.following, component: Following }, // Following yêu cầu đăng nhập
     { path: config.routes.setting, component: Settings, layout: HeaderOnly, requireAuth: true }, // Settings yêu cầu đăng nhập
-    { path: config.routes.upload, component: Upload, layout: HeaderSideBar, requireAuth: true }, // Upload yêu cầu đăng nhập
+    { path: config.routes.upload, component: Upload, layout: HeaderOnly, requireAuth: true }, // Upload yêu cầu đăng nhập
     { path: config.routes.live, component: Live },
     { path: config.routes.profile, component: Profile } // Profile yêu cầu đăng nhập
 ];
