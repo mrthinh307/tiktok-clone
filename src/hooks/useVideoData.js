@@ -1,124 +1,67 @@
-// filepath: c:\FrontendCourse\ReactJs\tiktok-ui\src\hooks\useVideoData.js
 import { useState, useCallback, useRef } from 'react';
-import * as videoService from '~/services/apiServices/videoService';
+import supabase from '~/config/supabaseClient';
+import { useAuth } from '~/contexts/AuthContext';
 
 function useVideoData(queryPage) {
+    const { user } = useAuth();
     const [videos, setVideos] = useState([]);
     const [loadedMap, setLoadedMap] = useState({});
     const [hasMore, setHasMore] = useState(true);
     const [loading, setLoading] = useState(true); // For the very first load
     const [isFetchingMore, setIsFetchingMore] = useState(false); // For subsequent "load more" actions
+    const excludedVideoIdsRef = useRef(new Set()); // To keep track of already fetched user IDs
 
-    // Sử dụng useRef để lưu trữ danh sách các page đã fetch
-    const fetchedPagesRef = useRef(new Set());
-    const totalPagesRef = useRef(0);
-    const lastFetchedPageRef = useRef(null);
-
-    // Hàm lựa chọn page ngẫu nhiên
-    const getRandomPage = useCallback(() => {
-        const totalPages = totalPagesRef.current;
-        const fetchedPages = fetchedPagesRef.current;
-
-        // Nếu đã fetch tất cả các trang, không reset lại danh 
-        // if (fetchedPages.size >= totalPages) {
-        //     console.log(
-        //         'All pages have been fetched.',
-        //     );
-        //     fetchedPages.clear();
-        //     // Có thể giữ lại trang cuối cùng để tránh trùng lặp ngay lập tức
-        //     if (lastFetchedPageRef > 0) {
-        //         fetchedPages.add(lastFetchedPageRef);
-        //     }
-        // }
-
-        // Tạo mảng các trang chưa fetch
-        const availablePages = [];
-        for (let i = 1; i <= totalPages; i++) {
-            if (!fetchedPages.has(i)) {
-                availablePages.push(i);
-            }
-        }
-
-        // Chọn ngẫu nhiên một trang từ các trang chưa fetch
-        const randomIndex = Math.floor(Math.random() * availablePages.length);
-        const selectedPage = availablePages[randomIndex] || 1;
-
-        // Thêm trang đã chọn vào danh sách đã fetch
-        fetchedPages.add(selectedPage);
-        lastFetchedPageRef.current = selectedPage;
-
-        return selectedPage;
-    }, []);
-
-    // Fetch videos from API
+    // Fetch videos from Supabase
     const loadVideos = useCallback(
         async (isInitial = true) => {
             try {
                 if (isInitial) setLoading(true);
                 else setIsFetchingMore(true);
 
-                if (totalPagesRef.current === 0) {
-                    totalPagesRef.current = await videoService.fetchTotalPages(
-                        queryPage,
-                    );
-                }
-
-                // Xác định page cần load
-                const page = getRandomPage();
-
-                const response = await videoService.fetchVideos(
-                    queryPage,
-                    page,
-                );
-
-                // Lấy videos từ response và cập nhật meta
-                const videosList = response.data || [];
-
-                if (!videosList || videosList.length === 0) {
-                    // Nếu không có videos, thử load một trang khác
-                    if (fetchedPagesRef.current.size < totalPagesRef.current) {
-                        return loadVideos(isInitial);
-                    } else {
-                        setHasMore(false);
-                        return;
+                let functionName = 'get_random_videos';
+                let params = {
+                    limit_videos: 10,
+                    excluded_video_ids: Array.from(excludedVideoIdsRef.current),
+                };
+                
+                if (queryPage === 'following') {
+                    functionName = 'get_following_videos';
+                    params = {
+                        current_user_id: user?.sub,
+                        ...params,
                     }
                 }
 
-                // const verticalVideos = videosList.filter(
-                //     (v) =>
-                //         v.meta.video.resolution_y > v.meta.video.resolution_x,
-                // );
+                const {
+                    data: { videos: videoList, has_more },
+                    error,
+                } = await supabase.rpc(functionName, params);
 
-                // if (verticalVideos.length === 0) {
-                //     // Nếu không có vertical videos, thử load một trang khác
-                //     if (fetchedPagesRef.current.size < totalPagesRef.current) {
-                //         return loadVideos(isInitial);
-                //     } else {
-                //         setHasMore(false);
-                //         return;
-                //     }
-                // }
+                if (error) {
+                    throw error;
+                }
+
+                videoList.forEach((item) =>
+                    excludedVideoIdsRef.current.add(item.id),
+                );
+
+                console.log('Fetched videos:', videoList);
+
+                if (!has_more) setHasMore(false);
 
                 // Update videos storage and loadedMap
                 if (isInitial) {
-                    setVideos(videosList);
+                    setVideos(videoList);
 
                     // Initialize loadedMap for the first 3 videos
                     const initialLoadedMap = {};
-                    videosList.slice(0, 3).forEach((video) => {
+                    videoList.slice(0, 3).forEach((video) => {
                         initialLoadedMap[video.id] = true;
                     });
                     setLoadedMap(initialLoadedMap);
                 } else {
-                    const newVideos = [...videos, ...videosList];
+                    const newVideos = [...videos, ...videoList];
                     setVideos(newVideos);
-                }
-
-                // Reset hasMore nếu chúng ta đã load hết số trang
-                if (fetchedPagesRef.current.size >= totalPagesRef.current) {
-                    console.log('All pages have been loaded at least once.');
-                    // Không set hasMore = false để người dùng vẫn có thể load lại các trang
-                    setHasMore(false);
                 }
             } catch (error) {
                 console.error('Failed to fetch videos:', error);
@@ -127,7 +70,7 @@ function useVideoData(queryPage) {
                 else setIsFetchingMore(false);
             }
         },
-        [videos, getRandomPage, queryPage],
+        [queryPage, user?.sub, videos],
     );
 
     // Check if need to load more videos
@@ -211,11 +154,6 @@ function useVideoData(queryPage) {
 
     // Hàm để reset lại trạng thái và fetch videos từ đầu
     const resetAndReload = useCallback(() => {
-        // Clear fetchedPages
-        fetchedPagesRef.current.clear();
-        lastFetchedPageRef.current = null;
-        totalPagesRef.current = 0;
-
         // Reset states
         setVideos([]);
         setLoadedMap({});

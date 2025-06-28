@@ -1,7 +1,6 @@
 import { createContext, useState, useContext, useEffect } from 'react';
-import * as followServices from '~/services/apiServices/followServices';
-import * as likeServices from '~/services/apiServices/likeServices';
 import { useAuth } from './AuthContext';
+import supabase from '~/config/supabaseClient';
 
 const SocialInteractionContext = createContext();
 
@@ -10,97 +9,71 @@ export const useSocialInteraction = () => useContext(SocialInteractionContext);
 export const SocialInteractionProvider = ({ children }) => {
     const { user } = useAuth();
     const [followingIds, setFollowingIds] = useState([]);
-    const [likedVideoIds, setLikedVideoIds] = useState([]);
 
     useEffect(() => {
         if (user) {
             fetchFollowingData();
-            fetchLikedVideosData();
         } else {
             setFollowingIds([]);
-            setLikedVideoIds([]);
         }
     }, [user]);
 
     const fetchFollowingData = async () => {
         try {
-
             // Lấy danh sách IDs
-            const allIds = await followServices.getAllFollowingIds();
-            console.log('All following IDs:', allIds);
+            const { data: allIds, error } = await supabase.rpc(
+                'get_following_ids',
+            );
+            if (error) {
+                throw error;
+            }
             setFollowingIds(allIds);
         } catch (error) {
             console.error('Error loading following data:', error);
         }
     };
 
-    const handleFollow = async (userId) => {
-        try {
-            await followServices.followUser(userId);
-            setFollowingIds((prev) => [...prev, userId]);
-        } catch (error) {
-            console.error('Error following user:', error);
+    const handleToggleFollow = async (targetUserId) => {
+        const { data, error } = await supabase.rpc('toggle_follow', {
+            _following_id: targetUserId,
+        });
+
+        if (error) {
+            console.error('Error:', error.message);
             throw error;
+        } else {
+            console.log(data.status); // "followed" or "unfollowed"
+        }
+
+        if (data.status === 'followed') {
+            setFollowingIds((prev) => [...prev, targetUserId]);
+        } else if (data.status === 'unfollowed') {
+            setFollowingIds((prev) => prev.filter((id) => id !== targetUserId));
         }
     };
 
-    const handleUnfollow = async (userId) => {
-        try {
-            await followServices.unfollowUser(userId);
-            setFollowingIds((prev) => prev.filter((id) => id !== userId));
-        } catch (error) {
-            console.error('Error unfollowing user:', error);
+    const handleToggleLikeVideo = async (targetVideoId) => {
+        const { data, error } = await supabase.rpc('toggle_like', {
+            _video_id: targetVideoId,
+        });
+
+        if (error) {
+            console.error('Error:', error.message);
             throw error;
+        } else {
+            console.log(data.status); // "liked" or "unliked"
         }
     };
 
-    const fetchLikedVideosData = async () => {
-        try {
-            // Lấy danh sách IDs
-            const allIds = await likeServices.getAllLikedVideoIds();
-            setLikedVideoIds(allIds);
-        } catch (error) {
-            console.error('Error loading liked videos data:', error);
-        }
-    };
-
-    const handleLikeVideo = async (videoId) => {
-        try {
-            await likeServices.likeVideo(videoId);
-            setLikedVideoIds((prev) => [...prev, videoId]);
-        } catch (error) {
-            console.error('Error like video:', error);
-            throw error;
-        }
-    };
-
-    const handleCancelLikeVideo = async (videoId) => {
-        try {
-            await likeServices.cancelLikeVideo(videoId);
-            setLikedVideoIds((prev) => prev.filter((id) => id !== videoId));
-        } catch (error) {
-            console.error('Error unlike video:', error);
-            throw error;
-        }
-    };
-
-    const isFollowing = (userId) => {
-        return followingIds.includes(userId);
-    };
-
-    const isLikedVideo = (videoId) => {
-        return likedVideoIds.includes(videoId);
-    };
+    const isFollowing = (targetUserId) => {
+        return followingIds.includes(targetUserId);
+    }
 
     const value = {
-        followingIds,
-        likedVideoIds,
-        handleFollow,
-        handleUnfollow,
-        handleLikeVideo,
-        handleCancelLikeVideo,
         isFollowing,
-        isLikedVideo,
+        followingIds,
+        handleToggleFollow,
+        handleToggleLikeVideo,
     };
 
     return (
