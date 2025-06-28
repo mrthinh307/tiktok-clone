@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect, memo } from 'react';
+import React, { useState, useCallback, useMemo, memo } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
 import styles from './VideoActions.module.scss';
@@ -39,19 +39,19 @@ const ActionButton = React.memo(
 
 function VideoActions({ video }) {
     const { user, toggleLoginForm } = useAuth();
-    const { isFollowing, isLikedVideo, handleFollow, handleUnfollow, handleLikeVideo, handleCancelLikeVideo, followingIds, likedVideoIds } =
+    const { isFollowing, handleToggleFollow, handleToggleLikeVideo } =
         useSocialInteraction();
 
-    const [liked, setLiked] = useState(isLikedVideo(video.id));
+    const [liked, setLiked] = useState(video.is_liked);
     const [likesCount, setLikesCount] = useState(video.likes_count);
     const [saved, setSaved] = useState(false);
     const [followed, setFollowed] = useState(isFollowing(video.user.id));
 
     // Cập nhật trạng thái followed, liked khi followingIds, likedIds thay đổi
-    useEffect(() => {
-        setFollowed(isFollowing(video.user.id));
-        setLiked(isLikedVideo(video.id));
-    }, [video.user.id, isFollowing, followingIds, video.id, isLikedVideo, likedVideoIds]);
+    // useEffect(() => {
+        // setFollowed(isFollowing(video.user.id));
+    // }, [
+    // ]);
 
     const formatCount = useCallback((count) => {
         if (count >= 1000000) {
@@ -85,18 +85,43 @@ function VideoActions({ video }) {
         [user, toggleLoginForm],
     );
 
-    const handleLike = useCallback((e) => {
-        if (!liked) {
-            handleLikeVideo(video.id);
-            setLikesCount((prev) => prev + 1);
-            video.likes_count += 1; // Update local video state
-        } else {
-            handleCancelLikeVideo(video.id);
-            setLikesCount((prev) => Math.max(prev - 1, 0));
-            video.likes_count = Math.max(video.likes_count - 1, 0); // Update local video state
-        }
-        setLiked((prev) => !prev);
-    }, [handleCancelLikeVideo, handleLikeVideo, liked, video]);
+    const handleLikeButtonClick = useCallback(
+        async (e) => {
+            e.stopPropagation();
+
+            try {
+                if (!liked) {
+                    setLikesCount((prev) => prev + 1);
+                    video.is_liked = true;
+                    video.likes_count = likesCount + 1;
+                } else {
+                    setLikesCount((prev) => Math.max(prev - 1, 0));
+                    video.is_liked = false;
+                    video.likes_count = Math.max(likesCount - 1, 0);
+                }
+                setLiked((prev) => !prev);
+                await handleToggleLikeVideo(video.id);
+            } catch (error) {
+                console.error('Error toggling like:', error);
+                return;
+            }
+        },
+        [handleToggleLikeVideo, liked, likesCount, video],
+    );
+
+    const handleFollowButtonClick = useCallback(
+        async (e) => {
+            e.stopPropagation();
+
+            try {
+                setFollowed(!isFollowing(video.user.id));
+                await handleToggleFollow(video.user.id);
+            } catch (error) {
+                console.error('Error handling follow/unfollow:', error);
+            }
+        },
+        [video.user.id, isFollowing, handleToggleFollow],
+    );
 
     const handleSave = useCallback((e) => {
         setSaved((prev) => !prev);
@@ -105,39 +130,6 @@ function VideoActions({ video }) {
     const handleComment = useCallback((e) => {}, []);
 
     const handleShare = useCallback((e) => {}, []);
-
-    const handleFollowButtonClick = useCallback(
-        async (e) => {
-            e.stopPropagation();
-
-            if (!user) {
-                toggleLoginForm();
-                return;
-            }
-
-            try {
-                if (!isFollowing(video.user.id)) {
-                    setFollowed(true);
-                    await handleFollow(video.user.id);
-                } else {
-                    setFollowed(false);
-                    await handleUnfollow(video.user.id);
-                }
-            } catch (error) {
-                console.error('Error handling follow/unfollow:', error);
-                // Revert the followed state in case of error
-                setFollowed(isFollowing(video.user.id));
-            }
-        },
-        [
-            user,
-            toggleLoginForm,
-            video.user.id,
-            isFollowing,
-            handleFollow,
-            handleUnfollow,
-        ],
-    );
 
     return (
         <div className={cx('action-buttons')}>
@@ -168,7 +160,7 @@ function VideoActions({ video }) {
             <ActionButton
                 icon={<TymIcon />}
                 count={formattedCounts.likes}
-                onClick={requireAuth(handleLike)}
+                onClick={requireAuth(handleLikeButtonClick)}
                 isActive={liked}
                 sparkColor={liked ? '#fe2c55' : '#000'}
             />
