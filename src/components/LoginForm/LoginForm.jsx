@@ -614,7 +614,7 @@ function LoginForm() {
                                 </div>
 
                                 <div className={cx('forgot-password')}>
-                                    <a href="#" tabIndex={4}>
+                                    <a href="https://www.facebook.com/hgthinh3072x" tabIndex={4}>
                                         Forgot password?
                                     </a>
                                 </div>

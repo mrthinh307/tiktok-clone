@@ -19,7 +19,6 @@ import {
     UploadIcon,
     SearchIcon,
 } from '~/assets/images/icons';
-import { DEFAULT_AVATAR } from './common';
 
 export const SIDEBAR_MENU_ITEMS = [
     {
