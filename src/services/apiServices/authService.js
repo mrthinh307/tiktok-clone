@@ -10,12 +10,6 @@ export const login = async (email, password) => {
 
         if (error) {
             console.error('Supabase login error:', error.message);
-            // Optionally, call your backend or handle error differently
-            // const legacyLoginResponse = await request.post('auth/login', { email, password });
-            // if (legacyLoginResponse.meta.token) {
-            //     localStorage.setItem('token', legacyLoginResponse.meta.token);
-            //     return true;
-            // }
             return false;
         }
 
