@@ -64,3 +64,5 @@ export { ReactComponent as CameraIcon } from './camera.svg';
 export { ReactComponent as FolderIcon } from './folder.svg';
 export { ReactComponent as ResolutionIcon } from './1080.svg';
 export { ReactComponent as LightIcon } from './light.svg';
+export { ReactComponent as TickLoaded } from './tick-loaded.svg';
+export { ReactComponent as ReplaceIcon } from './replace.svg';

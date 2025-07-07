@@ -1,6 +1,7 @@
 import './styles/tailwind.css';
 import { Fragment } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { publicRoutes } from './routes';
 import DefaultLayout from '~/layouts';
 import { AutoScrollProvider, AuthProvider, SocialInteractionProvider, VolumeProvider } from './contexts';
@@ -87,6 +88,7 @@ function App() {
             <SocialInteractionProvider>
                 <Router>
                     <AppContent />
+                    <Toaster position="top-center" richColors />
                 </Router>
             </SocialInteractionProvider>
         </AuthProvider>
