@@ -45,8 +45,6 @@ function useVideoData(queryPage) {
                     excludedVideoIdsRef.current.add(item.id),
                 );
 
-                console.log('Fetched videos:', videoList);
-
                 if (!has_more) setHasMore(false);
 
                 // Update videos storage and loadedMap

@@ -18,10 +18,13 @@ import {
 import styles from './Header.module.scss';
 import Menu from '~/components/Popper/Menu';
 import Search from '../Search';
+import { useAuth } from '~/contexts/AuthContext';
 
 const cx = classNames.bind(styles);
 
 function Header() {
+    const { user } = useAuth();
+
     const handleMenuChange = (menuItem) => {
         switch (menuItem.field) {
             default:
@@ -42,10 +45,10 @@ function Header() {
                 <Search dropdownMenu={true} />
 
                 <div className={cx('action')}>
-                    <a href={config.routes.upload} className={cx('action-upload')}>
+                    {!window.location.href.includes('/upload') && <a href={config.routes.upload} className={cx('action-upload')}>
                         <PlusIcon className={cx('plus')} />
                         <span>Upload</span>
-                    </a>
+                    </a>}
                     <Tippy content="Message" arrow={true} duration={0}>
                         <a href={config.routes.home} className={cx('action-message')}>
                             <MessageSemiBoldIcon className={cx('message')} />
@@ -64,7 +67,7 @@ function Header() {
                     >
                         <div className={cx('action-user')}>
                             <img
-                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJDRALoJakgEuuuGmBvBi-eSbPMe5B9fSdtA&s"
+                                src={user?.avatar || user?.avatar_url || 'https://www.svgrepo.com/show/508699/user.svg'}
                                 alt="user"
                             />
                         </div>

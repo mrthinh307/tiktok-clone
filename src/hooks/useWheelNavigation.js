@@ -41,8 +41,6 @@ function useWheelNavigation({
                 }
             }
 
-            console.log('Wheel event detected:', event);
-
             // Clear any pending scroll timeouts
             if (scrollTimeoutRef.current) {
                 clearTimeout(scrollTimeoutRef.current);
