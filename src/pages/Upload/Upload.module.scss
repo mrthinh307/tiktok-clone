@@ -331,27 +331,6 @@
   margin-bottom: 32px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -2px rgba(0, 0, 0, 0.05);
-
-  &::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(90deg, #fe2c55, #ff6b8a, #fe2c55);
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
 }
 
 .file-info {
@@ -500,22 +479,6 @@
   position: relative;
   overflow: hidden;
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 12px;
-    padding: 2px;
-    background: linear-gradient(45deg, #fe2c55, #ff6b8a, #fbbf24);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
   &:focus-within {
     background: linear-gradient(
       135deg,
@@ -626,8 +589,8 @@
   .post-button,
   .discard-button {
     width: 200px;
-    height: 48px;
-    border-radius: 12px;
+    height: 40px;
+    border-radius: 8px;
     font-size: 1.5rem;
     font-weight: 700;
     display: flex;
@@ -692,7 +655,7 @@
   .discard-button {
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     color: #475569;
-    border: 2px solid #e2e8f0;
+    border: 1.5px solid #e2e8f0;
 
     &:hover {
       background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
@@ -769,7 +732,7 @@
   width: 264px;
   height: 571px;
   background-color: black;
-  border: 2px solid rgba(0, 0, 0, 0.15);
+  border: 3px solid rgba(0, 0, 0, 0.15);
   border-radius: 20px;
   position: relative;
   overflow: hidden;
