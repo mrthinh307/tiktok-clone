@@ -46,7 +46,8 @@ export const SocialInteractionProvider = ({ children }) => {
         }
 
         if (data.status === 'followed') {
-            setFollowingIds((prev) => [...prev, targetUserId]);
+            const newFollowingIds = [...followingIds, targetUserId];
+            setFollowingIds(newFollowingIds);
         } else if (data.status === 'unfollowed') {
             setFollowingIds((prev) => prev.filter((id) => id !== targetUserId));
         }
@@ -66,6 +67,7 @@ export const SocialInteractionProvider = ({ children }) => {
     };
 
     const isFollowing = (targetUserId) => {
+        if (!targetUserId || !followingIds) return false;
         return followingIds.includes(targetUserId);
     }
 
