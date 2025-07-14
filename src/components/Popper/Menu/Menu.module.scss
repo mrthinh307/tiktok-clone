@@ -1,77 +1,77 @@
 .menu-wrapper {
-    display: flex;
+  display: flex;
 }
 
 .popper-wrapper {
-    width: 223px;
-    padding-bottom: 8px;
+  width: 223px;
+  padding-bottom: 8px;
 }
 
 .popper-wrapper.has-header {
-    padding-top: 50px;
+  padding-top: 50px;
 }
 
 .seperate {
-    position: relative;
+  position: relative;
 }
 
 .seperate::before {
-    content: '';
-    width: 90%;
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 1px;
-    background-color: rgba(22, 24, 35, 0.12);
+  content: '';
+  width: 90%;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 1px;
+  background-color: rgba(22, 24, 35, 0.12);
 }
 
 // HEADER
 
 .header {
-    position: relative;
-    height: 50px;
-    margin-top: -8px;
+  position: relative;
+  height: 50px;
+  margin-top: -8px;
 }
 
 .has-header .header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    margin-top: 0;
-    background-color: #fff;
-    z-index: 5;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  margin-top: 0;
+  background-color: #fff;
+  z-index: 5;
 }
 
 .back-btn {
-    width: 50px;
-    height: 100%;
-    background-color: transparent;
-    cursor: pointer;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
+  width: 50px;
+  height: 100%;
+  background-color: transparent;
+  cursor: pointer;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 .back-icon {
-    width: 20px;
-    height: 20px;
-    margin-left: 24px;
+  width: 20px;
+  height: 20px;
+  margin-left: 24px;
 }
 
 .header-title {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-weight: 600;
-    font-size: 1.6rem;
-    line-height: 21px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 600;
+  font-size: 1.6rem;
+  line-height: 21px;
 }
 
 .menu-item {
-    &.active {
-        color: var(--primary-color);
-    }
+  &.active {
+    color: var(--primary-color);
+  }
 }

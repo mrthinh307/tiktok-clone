@@ -6,9 +6,9 @@ import GlobalStyles from './components/GlobalStyles';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <GlobalStyles>
-        <App />
-    </GlobalStyles>,
+  <GlobalStyles>
+    <App />
+  </GlobalStyles>,
 );
 
 // If you want to start measuring performance in your app, pass a function

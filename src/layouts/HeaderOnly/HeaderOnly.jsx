@@ -7,24 +7,24 @@ import { useEffect } from 'react';
 const cx = classNames.bind(styles);
 
 function HeaderOnly({ children }) {
-    useEffect(() => {
-        document.documentElement.classList.add('hide-scroll');
+  useEffect(() => {
+    document.documentElement.classList.add('hide-scroll');
 
-        return () => {
-            document.documentElement.classList.remove('hide-scroll');
-        };
-    }, []);
+    return () => {
+      document.documentElement.classList.remove('hide-scroll');
+    };
+  }, []);
 
-    return (
-        <div className={cx('wrapper')}>
-            <Header />
-            <div className={cx('content')}>{children}</div>
-        </div>
-    );
+  return (
+    <div className={cx('wrapper')}>
+      <Header />
+      <div className={cx('content')}>{children}</div>
+    </div>
+  );
 }
 
 HeaderOnly.propTypes = {
-    children: PropTypes.node.isRequired,
+  children: PropTypes.node.isRequired,
 };
 
 export default HeaderOnly;

@@ -1,132 +1,130 @@
 @import 'normalize.css';
 
 @font-face {
-    font-family: 'TikTokText-Regular';
-    font-style: normal;
-    font-weight: 400;
-    src: url(../../../src/assets/fonts/TikTokText-Regular.otf);
+  font-family: 'TikTokText-Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: url(../../../src/assets/fonts/TikTokText-Regular.otf);
 }
 
 @font-face {
-    font-family: 'TikTokText-Medium';
-    font-style: normal;
-    font-weight: 500;
-    src: url(../../../src/assets/fonts/TikTokText-Medium.otf);
+  font-family: 'TikTokText-Medium';
+  font-style: normal;
+  font-weight: 500;
+  src: url(../../../src/assets/fonts/TikTokText-Medium.otf);
 }
 
 @font-face {
-    font-family: 'TikTokText-Bold';
-    font-style: normal;
-    font-weight: 700;
-    src: url(../../../src/assets/fonts/TikTokText-Bold.otf);
+  font-family: 'TikTokText-Bold';
+  font-style: normal;
+  font-weight: 700;
+  src: url(../../../src/assets/fonts/TikTokText-Bold.otf);
 }
 
 @font-face {
-    font-family: 'TikTokDisplay-Regular';
-    font-style: normal;
-    font-weight: 400;
-    src: url(../../../src/assets/fonts/TikTokDisplay-Regular.otf);
+  font-family: 'TikTokDisplay-Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: url(../../../src/assets/fonts/TikTokDisplay-Regular.otf);
 }
 
 @font-face {
-    font-family: 'TikTokDisplay-Medium';
-    font-style: normal;
-    font-weight: 500;
-    src: url(../../../src/assets/fonts/TikTokDisplay-Medium.otf);
+  font-family: 'TikTokDisplay-Medium';
+  font-style: normal;
+  font-weight: 500;
+  src: url(../../../src/assets/fonts/TikTokDisplay-Medium.otf);
 }
 
 @font-face {
-    font-family: 'TikTokDisplay-Bold';
-    font-style: normal;
-    font-weight: 700;
-    src: url(../../../src/assets/fonts/TikTokDisplay-Bold.otf);
+  font-family: 'TikTokDisplay-Bold';
+  font-style: normal;
+  font-weight: 700;
+  src: url(../../../src/assets/fonts/TikTokDisplay-Bold.otf);
 }
 
 :root {
-    --primary-color: #fe2c55;
-    --text-color: rgb(22, 24, 35);
-    --search-hover-bg: rgba(22, 24, 35, 0.06);
-    --ui-page-flat-bg-1: rgba(255, 255, 255, 1);
-    --ui-text-placeholder: rgba(0, 0, 0, 0.34);
+  --primary-color: #fe2c55;
+  --text-color: rgb(22, 24, 35);
+  --search-hover-bg: rgba(22, 24, 35, 0.06);
+  --ui-page-flat-bg-1: rgba(255, 255, 255, 1);
+  --ui-text-placeholder: rgba(0, 0, 0, 0.34);
 
-    --feed-nav-button-width: 48px;
+  --feed-nav-button-width: 48px;
 
-    --font-family-regular: 'TikTokText-Regular', 'TikTokDisplay-Regular',
-        sans-serif;
-    --font-family-medium: 'TikTokText-Medium', 'TikTokDisplay-Medium',
-        sans-serif;
-    --font-family-bold: 'TikTokText-Bold', 'TikTokDisplay-Bold', sans-serif;
+  --font-family-regular:
+    'TikTokText-Regular', 'TikTokDisplay-Regular', sans-serif;
+  --font-family-medium: 'TikTokText-Medium', 'TikTokDisplay-Medium', sans-serif;
+  --font-family-bold: 'TikTokText-Bold', 'TikTokDisplay-Bold', sans-serif;
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html {
-    font-size: 62.5%;
+  font-size: 62.5%;
 }
 
 body {
-    font-family: var(--font-family-regular);
-    font-size: 1.6rem;
-    line-height: 1.5;
-    text-rendering: optimizeSpeed;
-    // font-optical-sizing: auto;
-    // font-style: normal;
-    // font-variation-settings: 'wdth' 100;
+  font-family: var(--font-family-regular);
+  font-size: 1.6rem;
+  line-height: 1.5;
+  text-rendering: optimizeSpeed;
+  // font-optical-sizing: auto;
+  // font-style: normal;
+  // font-variation-settings: 'wdth' 100;
 }
 
-
 html ::-webkit-scrollbar {
-    border-radius: 0px;
-    width: 8px;
+  border-radius: 0px;
+  width: 8px;
 }
 
 html.hide-scroll ::-webkit-scrollbar {
-    width: 0px;
+  width: 0px;
 }
 
 html *::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-    background-color: rgba(22, 24, 35, 0.06);
+  border-radius: 4px;
+  background-color: rgba(22, 24, 35, 0.06);
 }
 
 html *::-webkit-scrollbar-track {
-    border-radius: 0;
-    background-color: rgba(0, 0, 0, 0);
+  border-radius: 0;
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .tippy-box {
-    background-color: rgba(84, 84, 84, 0.92) !important;
-    color: rgb(255, 255, 255) !important;
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    font-size: 1.6rem !important;
-    line-height: 21px;
-    padding: 1.5px 1px !important;
+  background-color: rgba(84, 84, 84, 0.92) !important;
+  color: rgb(255, 255, 255) !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 1.6rem !important;
+  line-height: 21px;
+  padding: 1.5px 1px !important;
 
-    .tippy-arrow {
-        color: rgba(84, 84, 84, 0.92) !important;
-    }
+  .tippy-arrow {
+    color: rgba(84, 84, 84, 0.92) !important;
+  }
 
-    &[data-placement^='bottom'] > .tippy-arrow:before {
-        top: -8px !important;
-    }
+  &[data-placement^='bottom'] > .tippy-arrow:before {
+    top: -8px !important;
+  }
 }
 
 button,
 input,
 [tabindex] {
-    outline: none;
-    border: none;
-    color: var(--text-color);
+  outline: none;
+  border: none;
+  color: var(--text-color);
 }
 
 a {
-    text-decoration: none;
-    color: var(--text-color);
+  text-decoration: none;
+  color: var(--text-color);
 }
 
 // Config based on Tailwind CSS

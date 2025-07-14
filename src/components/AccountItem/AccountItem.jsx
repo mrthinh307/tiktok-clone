@@ -6,54 +6,54 @@ import { BlueTickIcon, EllipsisIcon } from '~/assets/images/icons';
 import Menu from '../Popper/Menu';
 import {} from '~/assets/images/icons';
 import {
-    SEARCH_ACCOUNT_BUTTON_PROPS,
-    SEARCH_ACCOUNT_OPTIONS,
+  SEARCH_ACCOUNT_BUTTON_PROPS,
+  SEARCH_ACCOUNT_OPTIONS,
 } from '~/constants/headerConstants';
 import { DEFAULT_AVATAR } from '~/constants/common';
 
 const cx = classNames.bind(styles);
 
 function AccountItem({ data }) {
-    return (
-        <Link to={`/user/${data.nickname}`} className={cx('wrapper')}>
-            <img
-                className={cx('avatar')}
-                src={data.avatar_url}
-                alt={data.fullName}
-                onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = DEFAULT_AVATAR;
-                }}
-            />
-            <div className={cx('info')}>
-                <p className={cx('nickname')}>
-                    <strong>{data.nickname}</strong>
-                    {data.tick && <BlueTickIcon className={cx('blue-tick')} />}
-                </p>
-                <p className={cx('name')}>{data.full_name}</p>
-            </div>
-            <Menu
-                items={SEARCH_ACCOUNT_OPTIONS}
-                className={cx('account-item-menu')}
-                {...SEARCH_ACCOUNT_BUTTON_PROPS}
-                onClick={(e) => {
-                    e.stopPropagation();
-                }}
-            >
-                <EllipsisIcon
-                    className={cx('ellipsis')}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                    }}
-                />
-            </Menu>
-        </Link>
-    );
+  return (
+    <Link to={`/user/${data.nickname}`} className={cx('wrapper')}>
+      <img
+        className={cx('avatar')}
+        src={data.avatar_url}
+        alt={data.fullName}
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.src = DEFAULT_AVATAR;
+        }}
+      />
+      <div className={cx('info')}>
+        <p className={cx('nickname')}>
+          <strong>{data.nickname}</strong>
+          {data.tick && <BlueTickIcon className={cx('blue-tick')} />}
+        </p>
+        <p className={cx('name')}>{data.full_name}</p>
+      </div>
+      <Menu
+        items={SEARCH_ACCOUNT_OPTIONS}
+        className={cx('account-item-menu')}
+        {...SEARCH_ACCOUNT_BUTTON_PROPS}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
+        <EllipsisIcon
+          className={cx('ellipsis')}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+        />
+      </Menu>
+    </Link>
+  );
 }
 
 AccountItem.propTypes = {
-    data: PropTypes.object.isRequired,
+  data: PropTypes.object.isRequired,
 };
 
 export default AccountItem;

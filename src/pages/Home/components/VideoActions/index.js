@@ -1,1 +1,1 @@
-export { default } from './VideoActions'
+export { default } from './VideoActions';

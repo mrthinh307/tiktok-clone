@@ -1,4 +1,9 @@
-import React, { useState, forwardRef, useRef, useImperativeHandle } from 'react';
+import React, {
+  useState,
+  forwardRef,
+  useRef,
+  useImperativeHandle,
+} from 'react';
 import classNames from 'classnames/bind';
 import styles from '../Upload.module.scss';
 import {

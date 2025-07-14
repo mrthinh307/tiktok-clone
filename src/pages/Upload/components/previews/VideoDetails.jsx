@@ -14,7 +14,7 @@ const VideoDetails = React.memo(
     onDiscard,
     isUploading,
     coverImage,
-    isPortable
+    isPortable,
   }) => {
     const inputRef = React.useRef(null);
     return (

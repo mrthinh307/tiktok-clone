@@ -28,10 +28,7 @@ function Upload() {
       {!selectedFile ? (
         <PreUpload ref={fileInputRef} onFileSelected={handleFileSelected} />
       ) : (
-        <VideoPreview
-          selectedFile={selectedFile}
-          onBack={handleBack}
-        />
+        <VideoPreview selectedFile={selectedFile} onBack={handleBack} />
       )}
     </div>
   );

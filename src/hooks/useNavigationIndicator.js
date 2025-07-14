@@ -5,41 +5,40 @@ import { useState, useRef, useCallback } from 'react';
  * @param {number} duration - Thời gian hiển thị indicator (ms)
  */
 function useNavigationIndicator(duration = 500) {
-    const [showNavigationIndicator, setShowNavigationIndicator] =
-        useState(false);
-    const [transitionDirection, setTransitionDirection] = useState(null);
+  const [showNavigationIndicator, setShowNavigationIndicator] = useState(false);
+  const [transitionDirection, setTransitionDirection] = useState(null);
 
-    const navigationTimeoutRef = useRef(null);
+  const navigationTimeoutRef = useRef(null);
 
-    const showNavigationCue = useCallback(
-        (direction) => {
-            if (navigationTimeoutRef.current) {
-                clearTimeout(navigationTimeoutRef.current);
-            }
+  const showNavigationCue = useCallback(
+    (direction) => {
+      if (navigationTimeoutRef.current) {
+        clearTimeout(navigationTimeoutRef.current);
+      }
 
-            setTransitionDirection(direction);
-            setShowNavigationIndicator(true);
+      setTransitionDirection(direction);
+      setShowNavigationIndicator(true);
 
-            navigationTimeoutRef.current = setTimeout(() => {
-                setShowNavigationIndicator(false);
-            }, duration);
-        },
-        [duration],
-    );
+      navigationTimeoutRef.current = setTimeout(() => {
+        setShowNavigationIndicator(false);
+      }, duration);
+    },
+    [duration],
+  );
 
-    // Cleanup function
-    const cleanup = useCallback(() => {
-        if (navigationTimeoutRef.current) {
-            clearTimeout(navigationTimeoutRef.current);
-        }
-    }, []);
+  // Cleanup function
+  const cleanup = useCallback(() => {
+    if (navigationTimeoutRef.current) {
+      clearTimeout(navigationTimeoutRef.current);
+    }
+  }, []);
 
-    return {
-        showNavigationIndicator,
-        transitionDirection,
-        showNavigationCue,
-        cleanup,
-    };
+  return {
+    showNavigationIndicator,
+    transitionDirection,
+    showNavigationCue,
+    cleanup,
+  };
 }
 
 export default useNavigationIndicator;

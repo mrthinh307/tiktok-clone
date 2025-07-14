@@ -1,18 +1,18 @@
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback } from 'react';
 
 const ClickSpark = ({
-  sparkColor = "#fe2c55",
+  sparkColor = '#fe2c55',
   sparkSize = 10,
   sparkRadius = 15,
   sparkCount = 8,
   duration = 400,
-  easing = "ease-out",
+  easing = 'ease-out',
   extraScale = 1.0,
-  children
+  children,
 }) => {
   const canvasRef = useRef(null);
-  const sparksRef = useRef([]);     
-  const startTimeRef = useRef(null); 
+  const sparksRef = useRef([]);
+  const startTimeRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -50,29 +50,29 @@ const ClickSpark = ({
   const easeFunc = useCallback(
     (t) => {
       switch (easing) {
-        case "linear":
+        case 'linear':
           return t;
-        case "ease-in":
+        case 'ease-in':
           return t * t;
-        case "ease-in-out":
+        case 'ease-in-out':
           return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
         default:
           return t * (2 - t);
       }
     },
-    [easing]
+    [easing],
   );
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
 
     let animationId;
 
     const draw = (timestamp) => {
       if (!startTimeRef.current) {
-        startTimeRef.current = timestamp; 
+        startTimeRef.current = timestamp;
       }
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -140,25 +140,25 @@ const ClickSpark = ({
   };
 
   return (
-    <div 
+    <div
       style={{
         position: 'relative',
         width: '100%',
-        height: '100%'
+        height: '100%',
       }}
       onClick={handleClick}
     >
       <canvas
         ref={canvasRef}
         style={{
-          width: "100%",
-          height: "100%",
-          display: "block",
-          userSelect: "none",
-          position: "absolute",
+          width: '100%',
+          height: '100%',
+          display: 'block',
+          userSelect: 'none',
+          position: 'absolute',
           top: 0,
           left: 0,
-          pointerEvents: "none"
+          pointerEvents: 'none',
         }}
       />
       {children}

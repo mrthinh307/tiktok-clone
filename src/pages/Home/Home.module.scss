@@ -1,159 +1,160 @@
 .wrapper {
-    width: 100%;
-    gap: 16px;
-    height: 100vh;
-    position: relative;
-    background-color: var(--ui-page-flat-1);
-    scroll-snap-type: y mandatory;
-    overflow: hidden;
-    scrollbar-width: none;
-    scroll-behavior: smooth;
-    padding-inline-end: calc(var(--feed-nav-button-width) + 16px);
+  width: 100%;
+  gap: 16px;
+  height: 100vh;
+  position: relative;
+  background-color: var(--ui-page-flat-1);
+  scroll-snap-type: y mandatory;
+  overflow: hidden;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+  padding-inline-end: calc(var(--feed-nav-button-width) + 16px);
 
-    &.transitioning {
-        pointer-events: none; /* Prevent interaction during transition */
-    }
+  &.transitioning {
+    pointer-events: none; /* Prevent interaction during transition */
+  }
 }
 
 .video-wrapper {
-    width: 100%;
-    height: 100%;
-    max-height: 100%;
-    position: relative;
-    transition: transform 0.2s cubic-bezier(0.33, 1, 0.68, 1),
-        opacity 0.2s cubic-bezier(0.33, 1, 0.68, 1);
-    will-change: transform, opacity;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  position: relative;
+  transition:
+    transform 0.2s cubic-bezier(0.33, 1, 0.68, 1),
+    opacity 0.2s cubic-bezier(0.33, 1, 0.68, 1);
+  will-change: transform, opacity;
 
-    &.transition {
-        animation: slide-transition 0.2s cubic-bezier(0.33, 1, 0.68, 1);
-    }
+  &.transition {
+    animation: slide-transition 0.2s cubic-bezier(0.33, 1, 0.68, 1);
+  }
 }
 
 // Add these transition classes for up/down movement
 .transitioning-next .video-wrapper {
-    transform: translateY(-10%);
-    opacity: 0;
+  transform: translateY(-10%);
+  opacity: 0;
 }
 
 .transitioning-prev .video-wrapper {
-    transform: translateY(10%);
-    opacity: 0;
+  transform: translateY(10%);
+  opacity: 0;
 }
 
 .loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 100;
-    color: var(--primary-color);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  color: var(--primary-color);
 }
 
 /* Navigation indicators */
 .navigation-indicators {
-    position: fixed;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    z-index: 100;
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 100;
 }
 
 .nav-button {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
-    border: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    color: #fff;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(4px);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  color: #fff;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
 
-    &:hover {
-        background: rgba(255, 255, 255, 0.25);
-        transform: scale(1.1);
-    }
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.1);
+  }
 
-    &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 
-    &.prev {
-        animation: fade-in-up 0.5s;
-    }
+  &.prev {
+    animation: fade-in-up 0.5s;
+  }
 
-    &.next {
-        animation: fade-in-down 0.5s;
-    }
+  &.next {
+    animation: fade-in-down 0.5s;
+  }
 }
 
 /* Animation keyframes */
 @keyframes slide-transition {
-    0% {
-        transform: translateY(15%);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
+  0% {
+    transform: translateY(15%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes slide-prev {
-    0% {
-        transform: translateY(-15%);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
+  0% {
+    transform: translateY(-15%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes slide-next {
-    0% {
-        transform: translateY(15%);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
+  0% {
+    transform: translateY(15%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes fade-in-up {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fade-in-down {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Support for keyboard navigation indicator */
 @media screen and (max-width: 768px) {
-    .wrapper {
-        padding: 0;
-    }
+  .wrapper {
+    padding: 0;
+  }
 }

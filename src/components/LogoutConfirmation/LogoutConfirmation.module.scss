@@ -1,99 +1,100 @@
 .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.65);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    backdrop-filter: blur(4px);
-    transition: opacity 0.3s ease;
-    opacity: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+  transition: opacity 0.3s ease;
+  opacity: 0;
 
-    &.active {
-        opacity: 1;
-    }
+  &.active {
+    opacity: 1;
+  }
 }
 
 .dialog {
-    background-color: #fff;
-    border-radius: 12px;
-    width: 380px;
-    max-width: 90vw;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.8);
-    opacity: 0;
-    transition: transform 0.3s cubic-bezier(0.17, 0.67, 0.21, 1.02),
-        opacity 0.3s ease;
+  background-color: #fff;
+  border-radius: 12px;
+  width: 380px;
+  max-width: 90vw;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  opacity: 0;
+  transition:
+    transform 0.3s cubic-bezier(0.17, 0.67, 0.21, 1.02),
+    opacity 0.3s ease;
 
-    &.active {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-    }
+  &.active {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
 }
 
 .header {
-    padding: 24px 24px 0;
-    text-align: center;
+  padding: 24px 24px 0;
+  text-align: center;
 
-    h3 {
-        font-size: 2.4rem;
-        font-weight: 700;
-        color: var(--text-color);
-        margin: 0;
-    }
+  h3 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0;
+  }
 }
 
 .body {
-    padding: 16px 24px 24px;
-    text-align: center;
+  padding: 16px 24px 24px;
+  text-align: center;
 
-    p {
-        font-size: 1.6rem;
-        line-height: 1.5;
-        color: #4f4f4f;
-        margin: 0;
-    }
+  p {
+    font-size: 1.6rem;
+    line-height: 1.5;
+    color: #4f4f4f;
+    margin: 0;
+  }
 }
 
 .buttons {
-    display: flex;
-    border-top: 1px solid rgba(22, 24, 35, 0.12);
+  display: flex;
+  border-top: 1px solid rgba(22, 24, 35, 0.12);
 
-    button {
-        flex: 1;
-        padding: 14px;
-        font-size: 1.6rem;
-        font-weight: 600;
-        cursor: pointer;
-        border: none;
-        background: none;
-        transition: all 0.2s ease;
-    }
+  button {
+    flex: 1;
+    padding: 14px;
+    font-size: 1.6rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background: none;
+    transition: all 0.2s ease;
+  }
 }
 
 .cancel-btn {
-    color: #4f4f4f;
-    border-right: 1px solid rgba(22, 24, 35, 0.12);
+  color: #4f4f4f;
+  border-right: 1px solid rgba(22, 24, 35, 0.12);
 
-    &:hover {
-        background-color: rgba(22, 24, 35, 0.03);
-    }
+  &:hover {
+    background-color: rgba(22, 24, 35, 0.03);
+  }
 }
 
 .confirm-btn {
-    color: var(--primary-color);
+  color: var(--primary-color);
 
-    &:hover {
-        background-color: rgba(254, 44, 85, 0.06);
-    }
+  &:hover {
+    background-color: rgba(254, 44, 85, 0.06);
+  }
 }

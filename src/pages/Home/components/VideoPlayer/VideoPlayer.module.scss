@@ -1,528 +1,528 @@
 .wrapper {
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: transparent;
-    position: relative;
-    gap: 16px;
-    padding: 16px;
-    padding-inline-start: calc(var(--feed-nav-button-width) + 16px);
-    padding-inline-end: calc(240px - (var(--feed-nav-button-width) + 16px));
-    padding-block: calc(8px);
-    margin: 0px auto;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  position: relative;
+  gap: 16px;
+  padding: 16px;
+  padding-inline-start: calc(var(--feed-nav-button-width) + 16px);
+  padding-inline-end: calc(240px - (var(--feed-nav-button-width) + 16px));
+  padding-block: calc(8px);
+  margin: 0px auto;
 }
 
 .container {
-    height: 100%;
-    width: 100%;
-    max-width: 100vw;
-    max-height: 100vh;
-    display: flex;
-    flex-grow: 1;
-    justify-content: center;
-    align-items: end;
-    overflow: hidden;
-    background: transparent;
-    position: relative;
-    gap: 1rem;
-    transition: transform 0.2s ease-out, width 0.3s ease;
+  height: 100%;
+  width: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+  align-items: end;
+  overflow: hidden;
+  background: transparent;
+  position: relative;
+  gap: 1rem;
+  transition:
+    transform 0.2s ease-out,
+    width 0.3s ease;
 }
 
 .video-player {
-    height: 100%;
-    position: relative;
-    display: flex;
-    border-radius: 16px;
-    cursor: pointer;
-    overflow: hidden;
-    background: var(--ui-page-flat-1);
+  height: 100%;
+  position: relative;
+  display: flex;
+  border-radius: 16px;
+  cursor: pointer;
+  overflow: hidden;
+  background: var(--ui-page-flat-1);
 
-    &:hover {
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-    }
+  &:hover {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  }
 }
 
 .video {
-    border-radius: 16px;
-    transition: opacity 0.3s ease;
-    display: block;
+  border-radius: 16px;
+  transition: opacity 0.3s ease;
+  display: block;
 
-    /* Các lớp CSS khác nhau cho video dọc và ngang */
-    &.video-vertical {
-        object-fit: contain; /* Hiển thị toàn bộ video theo tỷ lệ 9:16 */
-        max-height: 100%;
-    }
+  /* Các lớp CSS khác nhau cho video dọc và ngang */
+  &.video-vertical {
+    object-fit: contain; /* Hiển thị toàn bộ video theo tỷ lệ 9:16 */
+    max-height: 100%;
+  }
 
-    &.video-horizontal {
-        object-fit: cover; /* Lấp đầy toàn bộ không gian, có thể cắt một phần */
-        object-position: center; /* Luôn căn giữa video */
-    }
+  &.video-horizontal {
+    object-fit: cover; /* Lấp đầy toàn bộ không gian, có thể cắt một phần */
+    object-position: center; /* Luôn căn giữa video */
+  }
 
-    &.hidden {
-        opacity: 0;
-    }
+  &.hidden {
+    opacity: 0;
+  }
 
-    &.loaded {
-        opacity: 1;
-        z-index: 6;
-    }
+  &.loaded {
+    opacity: 1;
+    z-index: 6;
+  }
 }
 
 @keyframes shimmer {
-    0% {
-        background-position: -200% 0;
-    }
-    100% {
-        background-position: 200% 0;
-    }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 // Improved play/pause overlay with smoother animations
 .play-pause-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-    background: transparent;
-    z-index: 10;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  background: transparent;
+  z-index: 10;
 
-    &.visible {
-        opacity: 1;
-    }
+  &.visible {
+    opacity: 1;
+  }
 }
 
 .play-pause-btn {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    cursor: pointer;
-    transform: scale(0.8);
-    transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transform: scale(0.8);
+  transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
 
-    svg {
-        width: 28px;
-        height: 28px;
-        color: #fff;
-    }
+  svg {
+    width: 28px;
+    height: 28px;
+    color: #fff;
+  }
 }
 
 .visible .play-pause-btn {
-    transform: scale(1.3);
+  transform: scale(1.3);
 }
 
 // Thêm vào VideoPlayer.module.scss
 .buffering-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    z-index: 15;
-    pointer-events: none; // Cho phép click xuyên qua overlay
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  z-index: 15;
+  pointer-events: none; // Cho phép click xuyên qua overlay
 }
 
 .buffering-spinner {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: pulse 1s infinite alternate ease-in-out;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 1s infinite alternate ease-in-out;
 
-    svg {
-        width: 24px;
-        height: 24px;
-        color: #fff;
-        animation: spin 1.2s infinite linear;
-    }
+  svg {
+    width: 24px;
+    height: 24px;
+    color: #fff;
+    animation: spin 1.2s infinite linear;
+  }
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes pulse {
-    0% {
-        transform: scale(1);
-        opacity: 0.8;
-    }
-    100% {
-        transform: scale(1.1);
-        opacity: 1;
-    }
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
 }
 
 .progress-container {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: calc(100% - 2px);
-    height: 4px;
-    background-color: rgba(255, 255, 255, 0.5);
-    border-bottom-left-radius: 16px;
-    border-bottom-right-radius: 16px;
-    overflow: hidden;
-    z-index: 10;
-    margin: 0 1px 0 1px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: calc(100% - 2px);
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  overflow: hidden;
+  z-index: 10;
+  margin: 0 1px 0 1px;
 }
 
 .progress-bar {
-    height: 100%;
-    width: 100%;
-    position: relative;
-    overflow: hidden;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
 .progress-filled {
-    height: 100%;
-    background-color: var(--primary-color);
-    position: absolute;
-    top: 0;
-    left: 0;
-    transition: width 0.1s linear;
-    border-bottom-left-radius: 16px;
+  height: 100%;
+  background-color: var(--primary-color);
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: width 0.1s linear;
+  border-bottom-left-radius: 16px;
 }
 
 // Nút âm thanh
 
 .header-btns {
-    padding: 4px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 48px;
-    border-top-left-radius: 16px;
-    border-top-right-radius: 16px;
-    display: flex;
-    justify-content: space-between;
+  padding: 4px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 48px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .btn-wrapper {
-    background-color: transparent;
-    cursor: pointer;
-    z-index: 11;
-    padding: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  background-color: transparent;
+  cursor: pointer;
+  z-index: 11;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    .icon-btn {
-        width: 24px;
-        height: 24px;
-        fill: #fff;
+  .icon-btn {
+    width: 24px;
+    height: 24px;
+    fill: #fff;
+  }
+
+  + .ellipsis-btn {
+    border-radius: 50%;
+    padding: 0;
+    width: 48px;
+    height: 48px;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.19);
     }
-
-    + .ellipsis-btn {
-        border-radius: 50%;
-        padding: 0;
-        width: 48px;
-        height: 48px;
-
-        &:hover {
-            background-color: rgba(255, 255, 255, 0.19);
-        }
-    }
+  }
 }
 
 .ellipsis-popper {
-    padding: 4px !important;
-    width: 234px !important;
+  padding: 4px !important;
+  width: 234px !important;
 }
 
 // Thông tin video và người dùng
 .video-info {
-    width: 100%;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    padding: 4px 12px 16px;
-    display: flex;
-    flex-direction: column;
-    color: white;
-    z-index: 10;
-    gap: 6px;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 4px 12px 16px;
+  display: flex;
+  flex-direction: column;
+  color: white;
+  z-index: 10;
+  gap: 6px;
 }
 
 .user-info {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: rgba(255, 255, 255, 0.9);
-    gap: 4px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.9);
+  gap: 4px;
 
-    & .username:hover {
-        text-decoration: underline;
-        top: -1px;
-    }
+  & .username:hover {
+    text-decoration: underline;
+    top: -1px;
+  }
 }
 
 .username {
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: #fff;
-    line-height: 18.5px;
-    position: relative;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 18.5px;
+  position: relative;
 }
 
 .verified-icon {
-    svg {
-        width: 14px;
-        height: 14px;
-    }
+  svg {
+    width: 14px;
+    height: 14px;
+  }
 }
 
 .description {
-    width: 100%;
-    font-size: 1.4rem;
-    line-height: 15.5px;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
+  width: 100%;
+  font-size: 1.4rem;
+  line-height: 15.5px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+
+  p {
+    max-width: 368px;
+    color: #f6f6f6;
+    white-space: nowrap;
     overflow: hidden;
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    position: relative;
+    text-overflow: ellipsis;
+    line-clamp: 1;
+    margin-right: 4px;
+    margin-bottom: 0;
+    transition: all 0.2s ease;
+  }
 
-    p {
-        max-width: 368px;
-        color: #f6f6f6;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        line-clamp: 1;
-        margin-right: 4px;
-        margin-bottom: 0;
-        transition: all 0.2s ease;
-    }
+  &.expanded p {
+    white-space: normal;
+    line-clamp: unset;
+    max-height: 300px;
+    line-height: 17px;
+  }
 
-    &.expanded p {
-        white-space: normal;
-        line-clamp: unset;
-        max-height: 300px;
-        line-height: 17px;
-    }
-
-    .more-btn {
-        font-size: 1.4rem;
-        font-weight: 600;
-        margin-right: 4px;
-        cursor: pointer;
-        position: absolute;
-        bottom: 0;
-        right: 0;
-    }
+  .more-btn {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-right: 4px;
+    cursor: pointer;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
 }
 
 .hashtag {
-    cursor: pointer;
+  cursor: pointer;
 
-    &:hover {
-        text-decoration: underline;
-    }
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 @media screen and (max-width: 1280px) {
-    .wrapper {
-        padding-inline-start: 16px;
-        padding-inline-end: calc(
-            200px - (var(--feed-nav-button-width) * 2) - 16px
-        );
-    }
+  .wrapper {
+    padding-inline-start: 16px;
+    padding-inline-end: calc(200px - (var(--feed-nav-button-width) * 2) - 16px);
+  }
 
-    .video-info {
-        padding: 4px 10px 14px;
-    }
+  .video-info {
+    padding: 4px 10px 14px;
+  }
 
-    .play-pause-btn {
-        width: 70px;
-        height: 70px;
-    }
+  .play-pause-btn {
+    width: 70px;
+    height: 70px;
+  }
 
-    .buffering-spinner {
-        width: 50px;
-        height: 50px;
-    }
+  .buffering-spinner {
+    width: 50px;
+    height: 50px;
+  }
 }
 
 @media screen and (max-width: 1024px) {
-    .wrapper {
-        padding-inline-start: var(--feed-nav-button-width);
-        padding-inline-end: 16px;
-    }
+  .wrapper {
+    padding-inline-start: var(--feed-nav-button-width);
+    padding-inline-end: 16px;
+  }
 
-    .video-player {
-        border-radius: 12px;
-    }
+  .video-player {
+    border-radius: 12px;
+  }
 
-    .progress-container {
-        height: 3px;
-    }
+  .progress-container {
+    height: 3px;
+  }
 
-    .description p {
-        max-width: 320px;
-    }
+  .description p {
+    max-width: 320px;
+  }
 
-    .video-info {
-        padding: 4px 8px 12px;
-    }
+  .video-info {
+    padding: 4px 8px 12px;
+  }
 
-    .username {
-        font-size: 1.3rem;
-    }
+  .username {
+    font-size: 1.3rem;
+  }
 
-    .description {
-        font-size: 1.3rem;
-    }
+  .description {
+    font-size: 1.3rem;
+  }
 
-    .play-pause-btn {
-        width: 60px;
-        height: 60px;
-    }
+  .play-pause-btn {
+    width: 60px;
+    height: 60px;
+  }
 
-    .play-pause-btn svg {
-        width: 24px;
-        height: 24px;
-    }
+  .play-pause-btn svg {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 @media screen and (max-width: 768px) {
-    .wrapper {
-        padding-inline: 16px;
-    }
+  .wrapper {
+    padding-inline: 16px;
+  }
 
-    .container {
-        flex-shrink: 1;
-        height: calc(35vh + 70vw);
-    }
+  .container {
+    flex-shrink: 1;
+    height: calc(35vh + 70vw);
+  }
 
-    .video-player {
-        border-radius: 10px;
-    }
+  .video-player {
+    border-radius: 10px;
+  }
 
-    .video {
-        border-radius: 10px;
-    }
+  .video {
+    border-radius: 10px;
+  }
 
-    .progress-container {
-        height: 2px;
-    }
+  .progress-container {
+    height: 2px;
+  }
 
-    .description p {
-        max-width: 280px;
-        font-size: 1.2rem;
-    }
+  .description p {
+    max-width: 280px;
+    font-size: 1.2rem;
+  }
 
-    .video-info {
-        padding: 4px 6px 8px;
-    }
+  .video-info {
+    padding: 4px 6px 8px;
+  }
 
-    .username {
-        font-size: 1.2rem;
-    }
+  .username {
+    font-size: 1.2rem;
+  }
 
-    .description {
-        font-size: 1.2rem;
-    }
+  .description {
+    font-size: 1.2rem;
+  }
 
-    .play-pause-btn {
-        width: 50px;
-        height: 50px;
-    }
+  .play-pause-btn {
+    width: 50px;
+    height: 50px;
+  }
 
-    .play-pause-btn svg {
-        width: 20px;
-        height: 20px;
-    }
+  .play-pause-btn svg {
+    width: 20px;
+    height: 20px;
+  }
 
-    .visible .play-pause-btn {
-        transform: scale(1.2);
-    }
+  .visible .play-pause-btn {
+    transform: scale(1.2);
+  }
 }
 
 @media screen and (max-width: 480px) {
-    .wrapper {
-        padding-inline: 8px;
-        padding-block: 2px;
-    }
+  .wrapper {
+    padding-inline: 8px;
+    padding-block: 2px;
+  }
 
-    .video-player {
-        border-radius: 8px;
-    }
+  .video-player {
+    border-radius: 8px;
+  }
 
-    .video {
-        border-radius: 8px;
-    }
+  .video {
+    border-radius: 8px;
+  }
 
-    .description p {
-        max-width: 240px;
-        font-size: 1.1rem;
-    }
+  .description p {
+    max-width: 240px;
+    font-size: 1.1rem;
+  }
 
-    .video-info {
-        padding: 2px 4px 6px;
-    }
+  .video-info {
+    padding: 2px 4px 6px;
+  }
 
-    .username {
-        font-size: 1.1rem;
-        line-height: 16px;
-    }
+  .username {
+    font-size: 1.1rem;
+    line-height: 16px;
+  }
 
-    .description {
-        font-size: 1.1rem;
-        line-height: 14px;
-    }
+  .description {
+    font-size: 1.1rem;
+    line-height: 14px;
+  }
 
-    .verified-icon svg {
-        width: 12px;
-        height: 12px;
-    }
+  .verified-icon svg {
+    width: 12px;
+    height: 12px;
+  }
 
-    .play-pause-btn {
-        width: 40px;
-        height: 40px;
-    }
+  .play-pause-btn {
+    width: 40px;
+    height: 40px;
+  }
 
-    .play-pause-btn svg {
-        width: 16px;
-        height: 16px;
-    }
+  .play-pause-btn svg {
+    width: 16px;
+    height: 16px;
+  }
 
-    .visible .play-pause-btn {
-        transform: scale(1.1);
-    }
+  .visible .play-pause-btn {
+    transform: scale(1.1);
+  }
 
-    .buffering-spinner {
-        width: 40px;
-        height: 40px;
-    }
+  .buffering-spinner {
+    width: 40px;
+    height: 40px;
+  }
 
-    .buffering-spinner svg {
-        width: 18px;
-        height: 18px;
-    }
+  .buffering-spinner svg {
+    width: 18px;
+    height: 18px;
+  }
 }

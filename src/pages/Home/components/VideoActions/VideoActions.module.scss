@@ -1,206 +1,205 @@
 .action-buttons {
-    // position: absolute;
-    // right: 20px;
-    // bottom: 100px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 3px;
-    gap: 14px;
+  // position: absolute;
+  // right: 20px;
+  // bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 3px;
+  gap: 14px;
 }
 
 .avatar-container,
 .sound-container {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    margin-bottom: 3px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    background: transparent;
-    cursor: pointer;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  margin-bottom: 3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: transparent;
+  cursor: pointer;
 }
 
 .avatar-container {
-    margin-bottom: 14px;
+  margin-bottom: 14px;
 }
 
 .avatar {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .sound {
-    width: 92%;
-    height: 92%;
-    object-fit: cover;
-    border-radius: 50%;
-    animation: spin 5s linear infinite;
+  width: 92%;
+  height: 92%;
+  object-fit: cover;
+  border-radius: 50%;
+  animation: spin 5s linear infinite;
 }
 
 @keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .follow-btn {
-    position: absolute;
-    top: 37px;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: var(--primary-color);
-    border: 1px solid transparent;
-    cursor: pointer;
+  position: absolute;
+  top: 37px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--primary-color);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  opacity: 1;
+  transform: scale(1);
+  visibility: visible;
+  pointer-events: auto;
+
+  &.followed {
+    background-color: #fff;
+    border-color: rgba(22, 24, 35, 0.2);
+  }
+
+  &.hidden {
+    opacity: 0;
+    transform: scale(0);
+    visibility: hidden;
+    pointer-events: none;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    opacity: 1;
-    transform: scale(1);
-    visibility: visible;
-    pointer-events: auto;
+  }
 
-    &.followed {
-        background-color: #fff;
-        border-color: rgba(22, 24, 35, 0.2);
-    }
+  &:not(.hidden) {
+    animation: appearAnimation 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
 
-    &.hidden {
-        opacity: 0;
-        transform: scale(0);
-        visibility: hidden;
-        pointer-events: none;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
+  .plus-icon {
+    width: 10px;
+    height: 10px;
+    color: #fff;
+  }
 
-    &:not(.hidden) {
-        animation: appearAnimation 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
+  .follow-icon {
+    color: var(--primary-color);
+  }
 
-    .plus-icon {
-        width: 10px;
-        height: 10px;
-        color: #fff;
-    }
+  &:hover {
+    background: rgba(234, 40, 78, 1);
+    transform: scale(1.05);
+  }
 
-    .follow-icon {
-        color: var(--primary-color);
-    }
-
-    &:hover {
-        background: rgba(234, 40, 78, 1);
-        transform: scale(1.05);
-    }
-
-    &.followed:hover {
-        background-color: rgba(245, 245, 245, 1);
-    }
+  &.followed:hover {
+    background-color: rgba(245, 245, 245, 1);
+  }
 }
 
 @keyframes appearAnimation {
-    from {
-        opacity: 0;
-        transform: scale(0.5);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .action-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    gap: 4px;
-    color: black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  gap: 4px;
+  color: black;
 
-    &.active {
-        color: var(--primary-color);
+  &.active {
+    color: var(--primary-color);
 
-        .icon-wrapper svg {
-            animation: like-animation 0.3s
-                cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+    .icon-wrapper svg {
+      animation: like-animation 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
+  }
 
-    &.active .bookmark {
-        color: rgb(243, 205, 0);
-    }
+  &.active .bookmark {
+    color: rgb(243, 205, 0);
+  }
 }
 
 .icon-wrapper {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--search-hover-bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    transition: all 0.25s ease;
-    position: relative;
-    overflow: hidden;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--search-hover-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
 
-    &:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-    }
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  }
 }
 
 .count {
-    font-family: var(--font-family-bold);
-    font-size: 1.2rem;
-    font-weight: 100;
-    line-height: 16px;
-    color: rgba(22, 24, 35, 0.75);
-    text-align: center;
-    transition: all 0.3s ease;
+  font-family: var(--font-family-bold);
+  font-size: 1.2rem;
+  font-weight: 100;
+  line-height: 16px;
+  color: rgba(22, 24, 35, 0.75);
+  text-align: center;
+  transition: all 0.3s ease;
 
-    .action-btn.active & {
-        animation: bounce 0.4s ease;
-    }
+  .action-btn.active & {
+    animation: bounce 0.4s ease;
+  }
 }
 
 @keyframes bounce {
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-    40% {
-        transform: translateY(-5px);
-    }
-    60% {
-        transform: translateY(2px);
-    }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-5px);
+  }
+  60% {
+    transform: translateY(2px);
+  }
 }
 
 @keyframes like-animation {
-    0% {
-        transform: scale(1);
-    }
-    30% {
-        transform: scale(1.3) rotate(-10deg);
-    }
-    50% {
-        transform: scale(0.95) rotate(3deg);
-    }
-    70% {
-        transform: scale(1.05);
-    }
-    100% {
-        transform: scale(1);
-    }
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.3) rotate(-10deg);
+  }
+  50% {
+    transform: scale(0.95) rotate(3deg);
+  }
+  70% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
