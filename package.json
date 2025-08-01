@@ -19,6 +19,7 @@
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",
     "css-loader": "^7.1.2",
+    "framer-motion": "^12.23.5",
     "normalize.css": "^8.0.1",
     "postcss-cli": "^11.0.1",
     "postcss-loader": "^8.1.1",
