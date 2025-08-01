@@ -105,19 +105,6 @@ export const checkAuth = async () => {
     }
 
     return user;
-
-    // Call API to validate token and get user info
-    // const response = await request.get('auth/me', {
-    // });
-
-    // if (response && response.data) {
-    //     console.log('Token valid, user authenticated');
-    //     return response.data;
-    // } else {
-    //     console.log('Invalid response from auth/me');
-    //     localStorage.removeItem('token');
-    //     return null;
-    // }
   } catch (error) {
     console.error(
       'Failed to authenticate token:',

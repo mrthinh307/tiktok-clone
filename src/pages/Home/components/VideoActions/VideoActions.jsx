@@ -75,6 +75,7 @@ function VideoActions({ video }) {
   // Wrapper to check if user is logged in before executing action
   const requireAuth = useCallback(
     (action) => (e) => {
+      e.stopPropagation();
       if (!user) {
         toggleLoginForm();
         return;
@@ -146,7 +147,7 @@ function VideoActions({ video }) {
             followed: followed,
             hidden: video.user.id === user?.sub,
           })}
-          onClick={handleFollowButtonClick}
+          onClick={requireAuth((e) => handleFollowButtonClick(e))}
         >
           {!followed ? (
             <PlusIcon className={cx('plus-icon')} />
@@ -159,7 +160,7 @@ function VideoActions({ video }) {
       <ActionButton
         icon={<TymIcon />}
         count={formattedCounts.likes}
-        onClick={requireAuth(handleLikeButtonClick)}
+        onClick={requireAuth((e) => handleLikeButtonClick(e))}
         isActive={liked}
         sparkColor={liked ? '#fe2c55' : '#000'}
       />
@@ -167,7 +168,7 @@ function VideoActions({ video }) {
       <ActionButton
         icon={<FontAwesomeIcon icon={faCommentDots} />}
         count={formattedCounts.comments}
-        onClick={requireAuth(handleComment)}
+        onClick={handleComment}
         isActive={false}
         sparkColor="transparent"
       />
@@ -183,7 +184,7 @@ function VideoActions({ video }) {
       <ActionButton
         icon={<FontAwesomeIcon icon={faShare} />}
         count={formattedCounts.shares}
-        onClick={requireAuth(handleShare)}
+        onClick={handleShare}
         isActive={false}
         sparkColor="transparent"
       />
