@@ -66,3 +66,6 @@ export { ReactComponent as ResolutionIcon } from './1080.svg';
 export { ReactComponent as LightIcon } from './light.svg';
 export { ReactComponent as TickLoaded } from './tick-loaded.svg';
 export { ReactComponent as ReplaceIcon } from './replace.svg';
+export { ReactComponent as MessageLogo } from './message.svg';
+export { ReactComponent as SmileIcon } from './smile.svg';
+export { ReactComponent as UploadImageIcon } from './upload-image.svg';
