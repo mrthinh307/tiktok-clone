@@ -44,8 +44,11 @@ export const SocialInteractionProvider = ({ children }) => {
     }
 
     if (data.status === 'followed') {
-      const newFollowingIds = [...followingIds, targetUserId];
-      setFollowingIds(newFollowingIds);
+      if (followingIds) {
+        setFollowingIds((prev) => [...prev, targetUserId]);
+      } else {
+        setFollowingIds([targetUserId]);
+      }
     } else if (data.status === 'unfollowed') {
       setFollowingIds((prev) => prev.filter((id) => id !== targetUserId));
     }
