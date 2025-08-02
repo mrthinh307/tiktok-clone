@@ -116,10 +116,22 @@ export const checkAuth = async () => {
   }
 };
 
-export const logout = () => {
-  const projectId = process.env.REACT_APP_SUPABASE_PROJECT_ID;
-  localStorage.removeItem(`sb-${projectId}-auth-token`);
-  return true;
+export const logout = async () => {
+  try {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error('Error during sign out:', error.message);
+      return false;
+    }
+
+    window.location.pathname = '/';
+
+    return true;
+  } catch (err) {
+    console.error('Unexpected error during sign out:', err);
+    return false;
+  }
 };
 
 export const checkEmailExists = async (email) => {
