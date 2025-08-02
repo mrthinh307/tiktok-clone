@@ -9,7 +9,7 @@ import {
   useEffect,
   Fragment,
 } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import config from '~/config';
 import Menu from './Menu';
@@ -58,6 +58,7 @@ function SideBar() {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const excludedUserIdsRef = useRef(new Set());
+  const location = useLocation();
 
   // Handle fetching following users
   const fetchFollowingUsers = useCallback(
@@ -98,21 +99,24 @@ function SideBar() {
     [user, hasMore],
   );
 
-  useEffect(() => {
-    fetchFollowingUsers(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const handleSeeMoreFollowingUsers = useCallback(() => {
     if (hasMore && !isFetchingMore && !isLoading) {
       fetchFollowingUsers(false);
     }
   }, [hasMore, isFetchingMore, isLoading, fetchFollowingUsers]);
 
+  useEffect(() => {
+    fetchFollowingUsers(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Handle responsive behavior
   useEffect(() => {
     const handleResize = () => {
-      setIsResponsiveCollapsed(window.innerWidth < 1024);
+      setIsResponsiveCollapsed(
+        window.innerWidth < 1024 ||
+          location.pathname === config.routes.messages,
+      );
     };
 
     // Set initial state
@@ -125,7 +129,7 @@ function SideBar() {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [location.pathname]);
 
   // Handle toggle collapse
   const handleToggleCollapse = useCallback(() => {
@@ -210,7 +214,13 @@ function SideBar() {
 
   return (
     <aside
-      className={cx('wrapper', { collapsed: isCollapsed })}
+      className={cx(
+        'wrapper',
+        { collapsed: isCollapsed },
+        {
+          'responsive-collapsed': isResponsiveCollapsed,
+        },
+      )}
       ref={sidebarRef}
     >
       <div
@@ -227,44 +237,47 @@ function SideBar() {
 
         <Menu {...menuProps} />
 
-        {user && followingUsers.length > 0 && !isCollapsed && (
-          <div
-            className={`hidden lg:flex relative w-full flex-col items-start justify-start py-[16px] my-[12px] after:content-[''] after:h-[1px] after:bg-[#1618231F] after:top-[0px] after:left-[8px] after:right-[8px] after:absolute before:content-[''] before:h-[1px] before:bg-[#1618231F] before:bottom-[0px] before:left-[8px] before:right-[8px] before:absolute`}
-          >
-            <p className="w-[208px] px-[8px] mb-[8px] font-bold text-[#161823BF]">
-              Following accounts
-            </p>
-            <div className="w-[208px] flex flex-col items-start justify-center gap-[4px]">
-              {isLoading
-                ? Array.from({ length: 3 }).map((_, index) => (
-                    <Frame key={index} />
-                  ))
-                : followingUsers.map((user) => (
-                    <FollowingAccount key={user.id} user={user} />
-                  ))}
-              {isFetchingMore && <Frame />}
-            </div>
-            <button
-              className={`flex items-center justify-start w-full h-[40px] mt-[4px] text-[#161823BF] hover:bg-[#f2f2f2] transition-colors duration-200 rounded-[8px] ${
-                !hasMore || isLoading || isFetchingMore ? 'hidden' : ''
-              }`}
-              onClick={handleSeeMoreFollowingUsers}
+        {user &&
+          followingUsers.length > 0 &&
+          !isCollapsed &&
+          !isResponsiveCollapsed && (
+            <div
+              className={`hidden lg:flex relative w-full flex-col items-start justify-start py-[16px] my-[12px] after:content-[''] after:h-[1px] after:bg-[#1618231F] after:top-[0px] after:left-[8px] after:right-[8px] after:absolute before:content-[''] before:h-[1px] before:bg-[#1618231F] before:bottom-[0px] before:left-[8px] before:right-[8px] before:absolute`}
             >
-              <div className="w-[26px] h-[26px] mr-[8px] ml-[8px] flex relative">
-                <BackIcon
-                  style={{
-                    position: 'absolute',
-                    rotate: '-90deg',
-                    left: '50%',
-                    top: '-20%',
-                    transform: 'translate(-50%, -50%)',
-                  }}
-                />
+              <p className="w-[208px] px-[8px] mb-[8px] font-bold text-[#161823BF]">
+                Following accounts
+              </p>
+              <div className="w-[208px] flex flex-col items-start justify-center gap-[4px]">
+                {isLoading
+                  ? Array.from({ length: 3 }).map((_, index) => (
+                      <Frame key={index} />
+                    ))
+                  : followingUsers.map((user) => (
+                      <FollowingAccount key={user.id} user={user} />
+                    ))}
+                {isFetchingMore && <Frame />}
               </div>
-              <span className="ml-[4px] text-[1.6rem]">See more</span>
-            </button>
-          </div>
-        )}
+              <button
+                className={`flex items-center justify-start w-full h-[40px] mt-[4px] text-[#161823BF] hover:bg-[#f2f2f2] transition-colors duration-200 rounded-[8px] ${
+                  !hasMore || isLoading || isFetchingMore ? 'hidden' : ''
+                }`}
+                onClick={handleSeeMoreFollowingUsers}
+              >
+                <div className="w-[26px] h-[26px] mr-[8px] ml-[8px] flex relative">
+                  <BackIcon
+                    style={{
+                      position: 'absolute',
+                      rotate: '-90deg',
+                      left: '50%',
+                      top: '-20%',
+                      transform: 'translate(-50%, -50%)',
+                    }}
+                  />
+                </div>
+                <span className="ml-[4px] text-[1.6rem]">See more</span>
+              </button>
+            </div>
+          )}
 
         <Button
           primary

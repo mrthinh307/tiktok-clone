@@ -9,6 +9,14 @@
 
 .wrapper.collapsed {
   width: 72px;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.wrapper.responsive-collapsed {
+  width: 72px;
+  overflow: hidden;
+  transition: width 0.4s ease, opacity 0.2s ease;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 .container {
@@ -21,7 +29,6 @@
   flex-direction: column;
   background-color: var(--ui-page-flat-1);
   padding: 0 16px;
-  border-right: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 .header-logo {
@@ -47,7 +54,6 @@
   transform: translateX(-50px);
   opacity: 0;
   border-right: 1px solid rgba(0, 0, 0, 0.12);
-  border-left: 1px solid rgba(0, 0, 0, 0.12);
   pointer-events: none;
 
   &.show {
@@ -55,10 +61,7 @@
     transform: translateX(0);
     opacity: 1;
     z-index: 10;
-    transition:
-      width 0.4s ease,
-      transform 0.2s ease,
-      opacity 0.4s ease,
+    transition: width 0.4s ease, transform 0.2s ease, opacity 0.4s ease,
       z-index 0s;
     pointer-events: auto;
   }
@@ -70,9 +73,7 @@
 .more-contents {
   opacity: 0;
   visibility: hidden;
-  transition:
-    opacity 0.2s ease,
-    visibility 0.2s ease;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
   will-change: opacity, visibility;
 
   &.content-visible {
@@ -95,9 +96,7 @@
 .more-content-item {
   opacity: 0;
   transform: translateY(8px);
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 
   .content-visible & {
     opacity: 1;
@@ -271,6 +270,7 @@
   margin-top: 8px;
   margin-bottom: 24px;
   position: relative;
+  flex-shrink: 0;
 
   &:hover {
     background-color: rgba(234, 40, 78, 1) !important;
@@ -351,10 +351,6 @@
 }
 
 @media screen and (max-width: 1024px) {
-  .wrapper {
-    width: 72px;
-  }
-
   .login-btn {
     display: none !important;
 

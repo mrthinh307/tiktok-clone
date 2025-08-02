@@ -77,7 +77,7 @@ function Following() {
   return user ? (
     <Home queryPage="following" />
   ) : (
-    <div className="w-full pt-[20px] flex flex-col items-center px-4">
+    <div className="w-[calc(100%-72px)] ml-[72px] lg:w-[calc(100%-240px)] lg:ml-[240px] pt-[20px] flex flex-col items-center px-4">
       <div className="max-w-[736px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-items-start relative">
         {isLoading ? (
           // Initial loading state
