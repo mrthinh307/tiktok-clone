@@ -15,8 +15,10 @@ import {
   AuthProvider,
   SocialInteractionProvider,
   VolumeProvider,
+  PresenceProvider,
 } from './contexts';
 import { useAuth } from './contexts/AuthContext';
+import usePresenceCleanup from './hooks/usePresenceCleanup';
 import LoginForm from './components/LoginForm';
 import config from '~/config';
 import tiktokLogoLoadingGif from './assets/images/TiktokLogoLoading.gif';
@@ -52,10 +54,17 @@ const ProtectedRoute = ({ children, requireAuth = false }) => {
   return children;
 };
 
+// Component để chạy presence cleanup sau khi PresenceProvider đã mount
+const PresenceCleanupManager = () => {
+  usePresenceCleanup();
+  return null; // Không render gì cả
+};
+
 // AppContent component to access context inside Router
 const AppContent = () => {
   return (
     <div>
+      <PresenceCleanupManager />
       <LoginForm />
       <Routes>
         {publicRoutes.map((route, index) => {
@@ -98,12 +107,14 @@ const AppContent = () => {
 function App() {
   return (
     <AuthProvider>
-      <SocialInteractionProvider>
-        <Router>
-          <AppContent />
-          <Toaster position="top-center" richColors />
-        </Router>
-      </SocialInteractionProvider>
+      <PresenceProvider>
+        <SocialInteractionProvider>
+          <Router>
+            <AppContent />
+            <Toaster position="top-center" richColors />
+          </Router>
+        </SocialInteractionProvider>
+      </PresenceProvider>
     </AuthProvider>
   );
 }
