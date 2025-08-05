@@ -15,7 +15,7 @@ import {
   ELLIPSIS_OPTIONS,
   ELLIPSIS_POPPER_PROPS,
 } from '~/constants/videoConstant';
-import LoadingSpinner from '~/layouts/components/LoadingSpinner';
+import { TiktokLoading } from '~/components/Animations';
 
 const cx = classNames.bind(styles);
 
@@ -51,7 +51,11 @@ const VideoControls = memo(
         )}
 
         {/* Buffering overlay - hiển thị khi đang buffer */}
-        {isBuffering && <LoadingSpinner />}
+        {isBuffering && (
+          <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center z-10'>
+            <TiktokLoading />
+          </div>
+        )}
 
         {/* Progress video */}
         <div className={cx('progress-container')}>

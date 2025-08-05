@@ -5,7 +5,7 @@ import styles from './Home.module.scss';
 import { useVideoData, useVideoNavigation } from '~/hooks';
 import VideoList from './components/VideoList';
 import VideoNavButton from '~/layouts/components/VideoNavButton';
-import { TiktokLoading } from '~/components/Animations';
+import VideoPlayerSkeleton from './components/VideoPlayer/components/VideoPlayerSkeleton';
 
 const cx = classNames.bind(styles);
 
@@ -78,7 +78,7 @@ function Home({ queryPage = 'for-you' }) {
     <div className={cx('wrapper')} ref={containerRef}>
       {loading ? (
         <div className="flex items-center justify-center h-full">
-          <TiktokLoading />
+          <VideoPlayerSkeleton />
         </div>
       ) : (
         <>

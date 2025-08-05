@@ -9,7 +9,6 @@
   padding: 16px;
   padding-inline-start: calc(var(--feed-nav-button-width) + 16px);
   padding-inline-end: calc(240px - (var(--feed-nav-button-width) + 16px));
-  padding-block: calc(8px);
   margin: 0px auto;
 }
 
@@ -26,15 +25,14 @@
   background: transparent;
   position: relative;
   gap: 1rem;
-  transition:
-    transform 0.2s ease-out,
-    width 0.3s ease;
+  transition: transform 0.2s ease-out, width 0.3s ease;
 }
 
 .video-player {
   height: 100%;
   position: relative;
   display: flex;
+  position: relative;
   border-radius: 16px;
   cursor: pointer;
   overflow: hidden;
@@ -46,9 +44,20 @@
 }
 
 .video {
+  min-width: 450px;
   border-radius: 16px;
   transition: opacity 0.3s ease;
   display: block;
+  background: rgba(229, 231, 235, 0.6); // fallback màu xám nhạt
+  background: linear-gradient(
+    90deg,
+    rgba(229, 231, 235, 0.6) 0%,
+    rgba(209, 213, 219, 0.35) 50%,
+    rgba(229, 231, 235, 0.6) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2.2s linear infinite;
+  opacity: 0.85;
 
   /* Các lớp CSS khác nhau cho video dọc và ngang */
   &.video-vertical {
@@ -73,10 +82,10 @@
 
 @keyframes shimmer {
   0% {
-    background-position: -200% 0;
+    background-position: -120% 0;
   }
   100% {
-    background-position: 200% 0;
+    background-position: 120% 0;
   }
 }
 
@@ -420,14 +429,6 @@
     height: calc(35vh + 70vw);
   }
 
-  .video-player {
-    border-radius: 10px;
-  }
-
-  .video {
-    border-radius: 10px;
-  }
-
   .progress-container {
     height: 2px;
   }
@@ -524,5 +525,63 @@
   .buffering-spinner svg {
     width: 18px;
     height: 18px;
+  }
+}
+
+// Skeleton loading styles
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(229, 231, 235, 0.6) 0%,
+    rgba(209, 213, 219, 0.35) 50%,
+    rgba(229, 231, 235, 0.6) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2.2s linear infinite;
+  opacity: 0.85;
+}
+
+.skeleton-avatar {
+  @extend .skeleton-shimmer;
+  border-radius: 50%;
+}
+
+.skeleton-button {
+  @extend .skeleton-shimmer;
+  border-radius: 50%;
+}
+
+.skeleton-text {
+  @extend .skeleton-shimmer;
+  border-radius: 4px;
+}
+
+.skeleton-progress {
+  @extend .skeleton-shimmer;
+  border-radius: 2px;
+}
+
+// Responsive skeleton adjustments
+@media screen and (max-width: 1024px) {
+  .skeleton-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .skeleton-button {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .skeleton-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .skeleton-button {
+    width: 36px;
+    height: 36px;
   }
 }

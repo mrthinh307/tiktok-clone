@@ -5,7 +5,6 @@ import styles from './VideoPlayer.module.scss';
 import useVideoControl from '~/hooks/useVideoControl';
 import VideoActions from '../VideoActions';
 import { VideoControls, VideoInfo } from './components';
-import LoadingSpinner from '~/layouts/components/LoadingSpinner';
 
 const cx = classNames.bind(styles);
 function VideoPlayer({
@@ -83,8 +82,6 @@ function VideoPlayer({
           onClick={togglePlay}
           ref={videoContainerRef}
         >
-          {!videoLoaded && <LoadingSpinner video={video} />}
-
           <video
             ref={videoRef}
             src={videoSrc}
@@ -93,7 +90,6 @@ function VideoPlayer({
             playsInline
             preload={isLoaded ? 'auto' : 'none'}
             className={cx('video', {
-              hiden: !videoLoaded || !isLoaded,
               loaded: videoLoaded && isLoaded,
               'video-horizontal': videoOrientation === 'horizontal',
               'video-vertical': videoOrientation === 'vertical',

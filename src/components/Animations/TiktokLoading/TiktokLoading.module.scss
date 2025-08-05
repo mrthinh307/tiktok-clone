@@ -6,7 +6,8 @@
 
 .loader {
   position: relative;
-  left: calc(var(--circle-diameter) * -1);
+  inset: 0;
+  // left: calc(var(--circle-diameter) * -1);
   width: calc(var(--circle-diameter) * 2);
   height: var(--circle-diameter);
 }
