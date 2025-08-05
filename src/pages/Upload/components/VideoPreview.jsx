@@ -50,8 +50,8 @@ function VideoPreview({ selectedFile, onBack }) {
       const ctx = canvas.getContext('2d');
 
       // Set canvas size to match video aspect ratio
-      canvas.width = 132 * 5;
-      canvas.height = 176 * 5;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
 
       try {
         const time = 1; // Generate cover at 1 second
