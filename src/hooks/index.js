@@ -14,3 +14,4 @@ export { default as usePresence } from './usePresence';
 export { default as useConversations } from './useConversations';
 export { default as useConversationMessages } from './useConversationMessages';
 export { default as useMessagesRealtime } from './useMessagesRealtime';
+export { default as useSlidingTabs } from './useSlidingTabs';
