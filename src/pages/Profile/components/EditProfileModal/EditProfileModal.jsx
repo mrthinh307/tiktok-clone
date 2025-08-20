@@ -1,29 +1,36 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import cx from 'clsx';
 import Button from '~/components/Button';
 import { CloseIcon, UploadIcon2 } from '~/assets/images/icons';
-import { useAuth } from '~/contexts/AuthContext';
 import styles from './EditProfileModal.module.scss';
+import supabase from '~/config/supabaseClient';
 
 function EditProfileModal({ isOpen, onClose, userProfile }) {
-  const { user } = useAuth();
   const fileInputRef = useRef(null);
 
   // Original data for comparison
   const originalData = useMemo(
     () => ({
-      username: userProfile?.username || user?.username || '',
-      name: userProfile?.name || user?.name || user?.display_name || '',
-      bio: userProfile?.bio || user?.bio || '',
-      avatar: userProfile?.avatar || user?.avatar_url || user?.avatar || '',
+      username: userProfile?.nickname || '',
+      name: userProfile?.fullName || '',
+      bio: userProfile?.bio || '',
+      avatar: userProfile?.avatar_url || '',
     }),
-    [userProfile, user],
+    [userProfile],
   );
 
   // Form state
-  const [formData, setFormData] = useState(originalData);
-  const [previewAvatar, setPreviewAvatar] = useState(originalData.avatar);
-  const [charCount, setCharCount] = useState(originalData.bio.length);
+  const [formData, setFormData] = useState(() => originalData);
+  const [previewAvatar, setPreviewAvatar] = useState(() => originalData.avatar);
+  const [charCount, setCharCount] = useState(() => originalData.bio.length);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Update form data when originalData changes
+  useEffect(() => {
+    setFormData(originalData);
+    setPreviewAvatar(originalData.avatar);
+    setCharCount(originalData.bio.length);
+  }, [originalData, isOpen]);
 
   // Check if data has changed
   const hasChanges = useMemo(() => {
@@ -68,17 +75,66 @@ function EditProfileModal({ isOpen, onClose, userProfile }) {
   };
 
   // Handle form submission
-  const handleSave = () => {
-    console.log('Saving profile data:', formData);
-    // Here you would typically make an API call to save the data
-    onClose();
+  const handleSave = async () => {
+    if (!hasChanges || !userProfile?.id) return;
+
+    setIsSaving(true);
+
+    try {
+      // Prepare update data
+      const updateData = {};
+
+      if (formData.username !== originalData.username) {
+        updateData.nickname = formData.username;
+      }
+      
+      if (formData.name !== originalData.name) {
+        updateData.fullName = formData.name;
+        updateData.firstName = formData.name.split(' ')[0];
+        updateData.lastName = formData.name.split(' ')[1] || '';
+      }
+      
+      if (formData.bio !== originalData.bio) {
+        updateData.bio = formData.bio;
+      }
+
+      // Handle avatar upload if changed
+      if (formData.avatar !== originalData.avatar && formData.avatar.startsWith('data:')) {
+        // If avatar is a base64 string (new upload), we would need to upload to storage
+        // For now, we'll just save the avatar_url
+        updateData.avatar_url = formData.avatar;
+      }
+
+      // Update user in Supabase
+      const { error } = await supabase
+        .from('user')
+        .update(updateData)
+        .eq('id', userProfile.id);
+
+      if (error) {
+        console.error('Error updating profile:', error);
+        alert('Error updating profile. Please try again.');
+        return;
+      }
+
+      onClose();
+      
+      // Reload the page to fetch updated data
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Error updating profile. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancel = () => {
     // Reset form data to original values
     setFormData(originalData);
     setPreviewAvatar(originalData.avatar);
-    setCharCount(originalData.bio.length);
+    setCharCount(originalData.bio?.length || 0);
     onClose();
   };
 
@@ -104,11 +160,8 @@ function EditProfileModal({ isOpen, onClose, userProfile }) {
                 onClick={handleAvatarClick}
               >
                 <img
-                  src={
-                    previewAvatar ||
-                    'https://www.svgrepo.com/show/508699/user.svg'
-                  }
-                  alt="Profile"
+                  src={previewAvatar}
+                  alt="avatar"
                   className={cx(styles.avatar)}
                 />
                 <div className={cx(styles.avatarOverlay)}>
@@ -184,16 +237,16 @@ function EditProfileModal({ isOpen, onClose, userProfile }) {
 
           {/* Footer Buttons - Move inside content */}
           <div className={cx(styles.footer)}>
-            <Button className={cx(styles.cancelButton)} onClick={handleCancel}>
+            <Button className={cx(styles.cancelButton)} onClick={handleCancel} disabled={isSaving}>
               Cancel
             </Button>
             <Button
               className={cx(styles.saveButton)}
               primary
               onClick={handleSave}
-              disabled={!hasChanges}
+              disabled={!hasChanges || isSaving}
             >
-              Save
+              {isSaving ? 'Saving...' : 'Save'}
             </Button>
           </div>
         </div>

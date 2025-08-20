@@ -1,46 +1,29 @@
 import cx from 'clsx';
-import { useState } from 'react';
-import Button from '~/components/Button';
-import { EllipsisIcon, SettingIcon, ShareIcon } from '~/assets/images/icons';
-import { useAuth } from '~/contexts/AuthContext';
-import EditProfileModal from '../EditProfileModal';
 import styles from './ProfileHeader.module.scss';
+import Button from '~/components/Button';
+import { useState } from 'react';
+import { EllipsisIcon, SettingIcon, ShareIcon } from '~/assets/images/icons';
+import EditProfileModal from '../EditProfileModal';
+import { useAuth } from '~/contexts/AuthContext';
 
-function ProfileHeader({
-  nickname,
-  displayName = 'duy thinh',
-  avatar = 'https://p16-sign-sg.tiktokcdn.com/tos-alisg-avt-0068/51b002de377bbab3d82174c2f4c6c8d5~tplv-tiktokx-cropcenter:1080:1080.jpeg?dr=14579&refresh_token=041f7cad&x-expires=1755748800&x-signature=FMvFtfmiq8eS5Q%2FO3EyBwHULiEU%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=81f88b70&idc=my2',
-  bio = 'No bio yet.',
-  stats = {
-    following: 822,
-    followers: 35,
-    likes: 57,
-  },
-}) {
-  const { user } = useAuth();
+function ProfileHeader({ profile }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { user } = useAuth();
 
   // Check if this profile belongs to the current user
-  const isOwnProfile =
-    user &&
-    (user.nickname === nickname ||
-      user.username === nickname ||
-      user.id === nickname);
+  const isOwnProfile = profile?.nickname === user?.nickname || profile?.id === user?.sub;
 
-  // Current user profile data for modal
-  const userProfile = {
-    username: nickname,
-    name: displayName,
-    bio: bio,
-    avatar: avatar,
-  };
+  // Safety check - if profile is null/undefined, don't render
+  if (!profile) {
+    return null;
+  }
 
   // Handle button clicks
   const handlePrimaryButtonClick = () => {
     if (isOwnProfile) {
       setIsEditModalOpen(true);
     } else {
-      console.log('Follow clicked - Following user:', nickname);
+      console.log('Follow clicked - Following user:', profile.nickname);
     }
   };
 
@@ -48,28 +31,39 @@ function ProfileHeader({
     if (isOwnProfile) {
       console.log('Promote Post clicked - Opening promotion options');
     } else {
-      console.log('Message clicked - Opening chat with user:', nickname);
+      console.log(
+        'Message clicked - Opening chat with user:',
+        profile.nickname,
+      );
     }
   };
 
   const handleShareClick = () => {
-    console.log('Share clicked - Sharing profile:', nickname);
+    console.log('Share clicked - Sharing profile:', profile.nickname);
   };
 
   const handleMoreOptionsClick = () => {
-    console.log('More options clicked for profile:', nickname);
+    console.log('More options clicked for profile:', profile.nickname);
   };
 
   return (
     <>
       <div className={cx(styles['profile-header'])}>
         <div className={cx(styles['avatar-container'])}>
-          <img alt="avatar" src={avatar} className={cx(styles.avatar)} />
+          <img
+            alt="avatar"
+            src={profile.avatar_url}
+            className={cx(styles.avatar)}
+          />
         </div>
         <div className={cx(styles['user-info'])}>
           <div className={cx(styles['user-details'])}>
-            <span className={cx(styles.username)}>{nickname}</span>
-            <p className={cx(styles['display-name'])}>{displayName}</p>
+            <span className={cx(styles.username)}>
+              {profile.nickname || ''}
+            </span>
+            <p className={cx(styles['display-name'])}>
+              {profile.fullName || ''}
+            </p>
           </div>
 
           <div className={cx(styles['action-buttons'])}>
@@ -104,23 +98,25 @@ function ProfileHeader({
           <div className={cx(styles['stats-container'])}>
             <div className={cx(styles['stat-item'])}>
               <span className={cx(styles['stat-number'])}>
-                {stats.following}
+                {profile.followings_count || 0}
               </span>
               <span className={cx(styles['stat-label'])}>Following</span>
             </div>
             <div className={cx(styles['stat-item'])}>
               <span className={cx(styles['stat-number'])}>
-                {stats.followers}
+                {profile.followers_count || 0}
               </span>
               <span className={cx(styles['stat-label'])}>Followers</span>
             </div>
             <div className={cx(styles['stat-item'])}>
-              <span className={cx(styles['stat-number'])}>{stats.likes}</span>
+              <span className={cx(styles['stat-number'])}>
+                {profile.likes_count || 0}
+              </span>
               <span className={cx(styles['stat-label'])}>Likes</span>
             </div>
           </div>
 
-          <p className={cx(styles.bio)}>{bio}</p>
+          <p className={cx(styles.bio)}>{profile.bio || 'No bio yet.'}</p>
         </div>
       </div>
 
@@ -128,7 +124,7 @@ function ProfileHeader({
       <EditProfileModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        userProfile={userProfile}
+        userProfile={profile}
       />
     </>
   );

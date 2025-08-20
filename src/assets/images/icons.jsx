@@ -75,3 +75,4 @@ export { ReactComponent as VideoListIcon } from './video-list.svg';
 export { ReactComponent as RepostIcon } from './repost.svg';
 export { ReactComponent as LikedIcon } from './liked.svg';
 export { ReactComponent as PlayOutlineIcon } from './play-outline.svg';
+export { ReactComponent as FavouriteIcon } from './favourite.svg';

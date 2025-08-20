@@ -1,24 +1,65 @@
 import { useParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import cx from 'clsx';
 import styles from './Profile.module.scss';
 import useSlidingTabs from '~/hooks/useSlidingTabs';
-import { RepostsEmpty, LikedEmpty, ProfileHeader } from './components';
 import {
+  RepostsEmpty,
+  LikedEmpty,
+  ProfileHeader,
+  ProfileHeaderSkeleton,
+  VideosEmpty,
+  FavouritesEmpty,
+} from './components';
+import {
+  FavouriteIcon,
   LikedIcon,
   PlayOutlineIcon,
   RepostIcon,
   VideoListIcon,
 } from '~/assets/images/icons';
-import VideosEmpty from './components/EmptyState/VideosEmpty';
+import supabase from '~/config/supabaseClient';
 
 function Profile() {
   const { nickname } = useParams();
   const [activeTab, setActiveTab] = useState('videos');
+  const [profile, setProfile] = useState(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
 
   // Custom hook for sliding tabs animation
   const { navTabsRef, handleTabHover, handleNavLeave } =
     useSlidingTabs(activeTab);
+
+  useEffect(() => {
+    if (!nickname) return;
+
+    const ac = new AbortController();
+
+    (async () => {
+      setLoadingProfile(true);
+
+      const { data, error } = await supabase
+        .from('user')
+        .select('*')
+        .eq('nickname', nickname)
+        .maybeSingle();
+
+      if (ac.signal.aborted) return;
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        setProfile(null);
+      } else {
+        setProfile(data ?? null);
+      }
+
+      setLoadingProfile(false);
+
+      return () => {
+        ac.abort();
+      };
+    })();
+  }, [nickname]);
 
   // Mock video data
   const videos = [
@@ -81,6 +122,11 @@ function Profile() {
       icon: <RepostIcon />,
     },
     {
+      id: 'favourites',
+      label: 'Favourites',
+      icon: <FavouriteIcon />,
+    },
+    {
       id: 'liked',
       label: 'Liked',
       icon: <LikedIcon />,
@@ -91,7 +137,12 @@ function Profile() {
     <div className={cx(styles['profile-container'])}>
       <div className={cx(styles['profile-wrapper'])}>
         <div className={cx(styles['profile-content'])}>
-          <ProfileHeader nickname={nickname} />
+          {/* Profile Header with Loading State */}
+          {loadingProfile || !profile ? (
+            <ProfileHeaderSkeleton />
+          ) : (
+            <ProfileHeader profile={profile} />
+          )}
 
           {/* Navigation Tabs */}
           <div
@@ -146,6 +197,8 @@ function Profile() {
 
           {/* Empty state for other tabs */}
           {activeTab === 'reposts' && <RepostsEmpty />}
+
+          {activeTab === 'favourites' && <FavouritesEmpty />}
 
           {activeTab === 'liked' && <LikedEmpty />}
         </div>
