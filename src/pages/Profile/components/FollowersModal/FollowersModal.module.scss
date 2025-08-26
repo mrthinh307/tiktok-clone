@@ -1,0 +1,447 @@
+// Variables
+:root {
+  --tiktok-red: #fe2c55;
+  --text-primary: #161823;
+  --text-secondary: rgba(22, 24, 35, 0.75);
+  --text-tertiary: rgba(22, 24, 35, 0.5);
+  --border-light: rgba(22, 24, 35, 0.06);
+  --hover-bg: rgba(22, 24, 35, 0.03);
+  --shadow-modal: 0 16px 48px rgba(0, 0, 0, 0.16), 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+// Modal Overlay
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal {
+  background: #ffffff;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 640px;
+  max-height: 85vh;
+  min-height: 500px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+// Header
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 32px;
+  background: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.title {
+  font-family: var(--font-family-bold);
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text-color);
+  margin: 0;
+  text-align: center;
+  flex: 1;
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-color);
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background: rgba(22, 24, 35, 0.06);
+  }
+  
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// Tabs Container
+.tabsContainer {
+  position: relative;
+  background: #ffffff;
+  padding: 0 24px;
+  position: sticky;
+  top: 89px;
+  z-index: 15;
+  border-bottom: 1px solid rgba(22, 24, 35, 0.12);
+}
+
+.tabs {
+  display: flex;
+  position: relative;
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s ease;
+  
+  &:hover {
+    color: rgba(22, 24, 35, 0.75);
+  }
+  
+  &.active {
+    .tabLabel {
+      color: var(--text-color);
+      font-weight: 700;
+    }
+    
+    .tabCount {
+      color: var(--text-color);
+      font-weight: bold;
+    }
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #161823;
+    }
+  }
+}
+
+.tabLabel {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(22, 24, 35, 0.5);
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.tabCount {
+  font-size: 16px;
+  font-weight: 400;
+  color: rgba(22, 24, 35, 0.5);
+  transition: color 0.2s ease;
+  margin-left: 4px;
+}
+
+// Content Area
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+  background: #ffffff;
+  max-height: 500px;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(22, 24, 35, 0.2);
+    border-radius: 3px;
+    
+    &:hover {
+      background: rgba(22, 24, 35, 0.3);
+    }
+  }
+}
+
+// User Item
+.userItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background: rgba(22, 24, 35, 0.03);
+  }
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+  
+  &:hover {
+    .nickname {
+      color: rgba(22, 24, 35, 1);
+    }
+  }
+}
+
+.avatarContainer {
+  flex-shrink: 0;
+  position: relative;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: rgba(22, 24, 35, 0.06);
+}
+
+.userDetails {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nicknameRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nickname {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-color);
+  transition: color 0.2s ease;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 300px;
+}
+
+.blueTick {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: #20d5ec;
+}
+
+.fullName {
+  font-size: 15px;
+  font-weight: 400;
+  color: rgba(22, 24, 35, 0.5);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 320px;
+}
+
+// Follow Button
+.followBtn {
+  min-width: 100px;
+  height: 36px;
+  padding: 0 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  background: #fe2c55;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  min-width: 108px;
+  
+  &:hover {
+    background-color: #e91e4d;
+  }
+  
+  &.following {
+    background: rgba(22, 24, 35, 0.06);
+    color: var(--text-primary);
+    
+    &:hover {
+      background: rgba(22, 24, 35, 0.1);
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .overlay {
+    padding: 16px;
+  }
+  
+  .modal {
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 8px;
+  }
+  
+  .header {
+    padding: 20px 24px;
+  }
+  
+  .title {
+    font-size: 20px;
+  }
+  
+  .tabsContainer {
+    padding: 0 24px;
+    top: 81px;
+  }
+  
+  .tab {
+    padding: 16px 12px;
+    
+    .tabLabel {
+      font-size: 16px;
+    }
+    
+    .tabCount {
+      font-size: 14px;
+    }
+  }
+  
+  .userItem {
+    padding: 14px 24px;
+  }
+  
+  .userInfo {
+    gap: 14px;
+  }
+  
+  .avatar {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .nickname {
+    font-size: 16px;
+    max-width: 200px;
+  }
+  
+  .fullName {
+    font-size: 14px;
+    max-width: 220px;
+  }
+  
+  .followBtn {
+    min-width: 90px;
+    height: 34px;
+    font-size: 14px;
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal {
+    border-radius: 6px;
+  }
+  
+  .header {
+    padding: 16px 20px;
+  }
+  
+  .title {
+    font-size: 18px;
+  }
+  
+  .tabsContainer {
+    padding: 0 20px;
+  }
+  
+  .tab {
+    padding: 14px 8px;
+    
+    .tabLabel {
+      font-size: 14px;
+    }
+    
+    .tabCount {
+      font-size: 12px;
+    }
+  }
+  
+  .userItem {
+    padding: 12px 20px;
+  }
+  
+  .userInfo {
+    gap: 12px;
+  }
+  
+  .avatar {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .nickname {
+    font-size: 15px;
+    max-width: 150px;
+  }
+  
+  .fullName {
+    font-size: 13px;
+    max-width: 170px;
+  }
+  
+  .followBtn {
+    min-width: 80px;
+    height: 32px;
+    font-size: 13px;
+    padding: 0 14px;
+  }
+}
+
+// Empty State
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--text-tertiary);
+  font-size: 16px;
+  text-align: center;
+  min-height: 200px;
+  
+  p {
+    margin: 0;
+  }
+}
+
+.loadingState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  min-height: 200px;
+}

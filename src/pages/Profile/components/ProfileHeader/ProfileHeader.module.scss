@@ -46,6 +46,11 @@
   margin: 0;
 }
 
+.blue-tick {
+  width: 20px;
+  height: 20px;
+}
+
 .display-name {
   color: var(--text-color);
   font-size: 18px;
@@ -72,9 +77,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 4px;
 
   &:hover {
     background-color: #e91e4d;
+  }
+
+  &.following {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--text-color);
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
   }
 }
 
@@ -133,6 +148,7 @@
   display: flex;
   align-items: baseline;
   gap: 6px;
+  user-select: none;
 }
 
 .stat-number {

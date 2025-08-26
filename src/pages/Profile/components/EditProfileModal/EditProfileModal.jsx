@@ -4,9 +4,13 @@ import Button from '~/components/Button';
 import { CloseIcon, UploadIcon2 } from '~/assets/images/icons';
 import styles from './EditProfileModal.module.scss';
 import supabase from '~/config/supabaseClient';
+import { usePreventBodyScroll } from '~/hooks';
 
 function EditProfileModal({ isOpen, onClose, userProfile }) {
   const fileInputRef = useRef(null);
+
+  // Prevent body scroll when modal is open
+  usePreventBodyScroll(isOpen);
 
   // Original data for comparison
   const originalData = useMemo(
@@ -14,21 +18,21 @@ function EditProfileModal({ isOpen, onClose, userProfile }) {
       username: userProfile?.nickname || '',
       name: userProfile?.fullName || '',
       bio: userProfile?.bio || '',
-      avatar: userProfile?.avatar_url || '',
+      avatar_url: userProfile?.avatar_url || '',
     }),
     [userProfile],
   );
 
   // Form state
   const [formData, setFormData] = useState(() => originalData);
-  const [previewAvatar, setPreviewAvatar] = useState(() => originalData.avatar);
+  const [previewAvatar, setPreviewAvatar] = useState(() => originalData.avatar_url);
   const [charCount, setCharCount] = useState(() => originalData.bio.length);
   const [isSaving, setIsSaving] = useState(false);
 
   // Update form data when originalData changes
   useEffect(() => {
     setFormData(originalData);
-    setPreviewAvatar(originalData.avatar);
+    setPreviewAvatar(originalData.avatar_url);
     setCharCount(originalData.bio.length);
   }, [originalData, isOpen]);
 
@@ -38,7 +42,7 @@ function EditProfileModal({ isOpen, onClose, userProfile }) {
       formData.username !== originalData.username ||
       formData.name !== originalData.name ||
       formData.bio !== originalData.bio ||
-      formData.avatar !== originalData.avatar
+      formData.avatar_url !== originalData.avatar_url
     );
   }, [formData, originalData]);
 
@@ -67,7 +71,7 @@ function EditProfileModal({ isOpen, onClose, userProfile }) {
         setPreviewAvatar(e.target.result);
         setFormData((prev) => ({
           ...prev,
-          avatar: e.target.result,
+          avatar_url: e.target.result,
         }));
       };
       reader.readAsDataURL(file);
@@ -99,14 +103,14 @@ function EditProfileModal({ isOpen, onClose, userProfile }) {
       }
 
       // Handle avatar upload if changed
-      if (formData.avatar !== originalData.avatar && formData.avatar.startsWith('data:')) {
+      if (formData.avatar_url !== originalData.avatar_url && formData.avatar_url.startsWith('data:')) {
         // If avatar is a base64 string (new upload), we would need to upload to storage
         // For now, we'll just save the avatar_url
-        updateData.avatar_url = formData.avatar;
+        updateData.avatar_url = formData.avatar_url;
       }
 
       // Update user in Supabase
-      const { error } = await supabase
+      const { error } = await supabase  
         .from('user')
         .update(updateData)
         .eq('id', userProfile.id);
@@ -120,7 +124,7 @@ function EditProfileModal({ isOpen, onClose, userProfile }) {
       onClose();
       
       // Reload the page to fetch updated data
-      window.location.reload();
+      // window.location.reload();
       
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -133,7 +137,7 @@ function EditProfileModal({ isOpen, onClose, userProfile }) {
   const handleCancel = () => {
     // Reset form data to original values
     setFormData(originalData);
-    setPreviewAvatar(originalData.avatar);
+    setPreviewAvatar(originalData.avatar_url);
     setCharCount(originalData.bio?.length || 0);
     onClose();
   };
@@ -191,7 +195,7 @@ function EditProfileModal({ isOpen, onClose, userProfile }) {
               />
               <div className={cx(styles.inputHelper)}>
                 <span className={cx(styles.urlPrefix)}>
-                  www.tiktok.com/@{formData.username}
+                  www.dthinh.com/user/{formData.username}
                 </span>
                 <p className={cx(styles.helperText)}>
                   Usernames can only contain letters, numbers, underscores, and
@@ -214,7 +218,7 @@ function EditProfileModal({ isOpen, onClose, userProfile }) {
                 placeholder="Name"
               />
               <p className={cx(styles.helperText)}>
-                Your nickname can only be changed once every 7 days.
+                Your nickname can only be changed everytime you want.
               </p>
             </div>
           </div>
