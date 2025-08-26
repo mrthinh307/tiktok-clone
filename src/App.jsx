@@ -20,6 +20,7 @@ import {
 import { useAuth } from './contexts/AuthContext';
 import usePresenceCleanup from './hooks/usePresenceCleanup';
 import LoginForm from './components/LoginForm';
+import AuthErrorHandler from './components/AuthErrorHandler';
 import config from '~/config';
 import tiktokLogoLoadingGif from './assets/images/TiktokLogoLoading.gif';
 
@@ -63,44 +64,46 @@ const PresenceCleanupManager = () => {
 // AppContent component to access context inside Router
 const AppContent = () => {
   return (
-    <div>
-      <PresenceCleanupManager />
-      <LoginForm />
-      <Routes>
-        {publicRoutes.map((route, index) => {
-          const Page = route.component;
-          let Layout = DefaultLayout;
+    <AuthErrorHandler>
+      <div>
+        <PresenceCleanupManager />
+        <LoginForm />
+        <Routes>
+          {publicRoutes.map((route, index) => {
+            const Page = route.component;
+            let Layout = DefaultLayout;
 
-          // Check if the route has a layout
-          if (route.layout) {
-            Layout = route.layout;
-          } else if (route.layout === null) {
-            Layout = Fragment;
-          }
+            // Check if the route has a layout
+            if (route.layout) {
+              Layout = route.layout;
+            } else if (route.layout === null) {
+              Layout = Fragment;
+            }
 
-          // Xác định xem route có yêu cầu đăng nhập không
-          const requireAuth = route.requireAuth || false;
+            // Xác định xem route có yêu cầu đăng nhập không
+            const requireAuth = route.requireAuth || false;
 
-          return (
-            <Route
-              key={index}
-              path={route.path}
-              element={
-                <ProtectedRoute requireAuth={requireAuth}>
-                  <AutoScrollProvider>
-                    <VolumeProvider>
-                      <Layout>
-                        <Page />
-                      </Layout>
-                    </VolumeProvider>
-                  </AutoScrollProvider>
-                </ProtectedRoute>
-              }
-            />
-          );
-        })}
-      </Routes>
-    </div>
+            return (
+              <Route
+                key={index}
+                path={route.path}
+                element={
+                  <ProtectedRoute requireAuth={requireAuth}>
+                    <AutoScrollProvider>
+                      <VolumeProvider>
+                        <Layout>
+                          <Page />
+                        </Layout>
+                      </VolumeProvider>
+                    </AutoScrollProvider>
+                  </ProtectedRoute>
+                }
+              />
+            );
+          })}
+        </Routes>
+      </div>
+    </AuthErrorHandler>
   );
 };
 
