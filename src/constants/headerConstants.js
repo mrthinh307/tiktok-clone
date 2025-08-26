@@ -10,6 +10,7 @@ import {
   ReportIcon,
   MarkIrrelevantIcon,
 } from '~/assets/images/icons';
+import config from '~/config';
 
 export const USER_MENU_BUTTON_PROPS = {
   buttonPadding: 'medium',
@@ -318,18 +319,22 @@ export const USER_OPTIONS = [
   {
     icon: <ProfileIcon />,
     title: 'View profile',
+    to: config.routes.profile,
   },
   {
     icon: <CoinIcon />,
     title: 'Get coins',
+    to: config.routes.coins,
   },
   {
     icon: <CreatorIcon />,
     title: 'Creator tools',
+    to: config.routes.creator,
   },
   {
     icon: <SettingIcon />,
     title: 'Settings',
+    to: config.routes.setting,
   },
   {
     icon: <LanguageIcon />,
@@ -342,10 +347,12 @@ export const USER_OPTIONS = [
   {
     icon: <FeedbackIcon />,
     title: 'Feedback and help',
+    to: config.routes.feedback,
   },
   {
     icon: <DarkModeIcon />,
     title: 'Dark mode',
+    // Không cần route vì đây là toggle function
   },
   {
     icon: <LogoutIcon />,

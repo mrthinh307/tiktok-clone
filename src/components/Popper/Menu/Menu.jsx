@@ -6,6 +6,8 @@ import classNames from 'classnames/bind';
 import styles from './Menu.module.scss';
 import MenuItem from './MenuItem';
 import Header from './Header';
+import { generatePath, useNavigate } from 'react-router-dom';
+import { useAuth } from '~/contexts/AuthContext';
 
 const cx = classNames.bind(styles);
 const defaultFn = () => {};
@@ -19,6 +21,8 @@ function Menu({
   ...props
 }) {
   const [history, setHistory] = useState([{ data: items }]);
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   const renderItems = (props) => {
     return history[history.length - 1].data.map((item, index) => {
@@ -42,6 +46,28 @@ function Menu({
             if (isParent) {
               setHistory((prev) => [...prev, item.children]);
             } else {
+              // Handle navigation
+              if (item.to) {
+                navigate(generatePath(item.to, { nickname: user.nickname }));
+              }
+              // Handle special actions
+              else if (item.title === 'Dark mode') {
+                // Toggle dark mode functionality
+                console.log('Dark mode toggle clicked');
+                // You can add dark mode toggle logic here
+              }
+              else if (item.title === 'Log out') {
+                // Handle logout
+                console.log('Logout clicked');
+                // Add logout logic here
+                
+              }
+              else {
+                // For other items without specific routes, log action
+                console.log(`${item.title} clicked - functionality not implemented yet`);
+              }
+              
+              // Call onChange callback if provided
               onChange(item);
             }
           }}

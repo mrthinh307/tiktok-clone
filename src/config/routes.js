@@ -9,6 +9,10 @@ const route = {
   messages: '/messages',
   live: '/live',
   profile: '/user/:nickname',
+  resetPassword: '/reset-password',
+  coins: '/coins',
+  creator: '/creator',
+  feedback: '/feedback',
 };
 
 export default route;

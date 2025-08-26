@@ -11,6 +11,7 @@ import Settings from '~/pages/Settings';
 import Upload from '~/pages/Upload';
 import Live from '~/pages/Live';
 import Messages from '~/pages/Messages';
+import ResetPassword from '~/pages/ResetPassword';
 
 const publicRoutes = [
   { path: config.routes.home, component: Home },
@@ -30,6 +31,11 @@ const publicRoutes = [
   { path: config.routes.messages, component: Messages, requireAuth: true },
   { path: config.routes.live, component: Live },
   { path: config.routes.profile, component: Profile },
+  { 
+    path: config.routes.resetPassword, 
+    component: ResetPassword, 
+    layout: HeaderOnly 
+  },
 ];
 
 const privateRoutes = [];
