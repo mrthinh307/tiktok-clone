@@ -10,30 +10,14 @@ import {
   faCheck,
   faExclamationCircle,
 } from '@fortawesome/free-solid-svg-icons';
-import { createPortal } from 'react-dom';
 import styles from './LoginForm.module.scss';
 import { useAuth } from '~/contexts/AuthContext';
 import { useDebounce } from '~/hooks';
 import { DEBOUNCE_DELAY } from '~/constants/common';
 import * as authService from '~/services/apiServices/authService';
+import PasswordReset from '~/components/PasswordReset';
 
 const cx = classNames.bind(styles);
-
-// Global notification component using React Portal
-const GlobalNotification = ({ message, type, onClose }) => {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onClose();
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [onClose]);
-
-  return createPortal(
-    <div className={cx('notification', `notification-${type}`)}>{message}</div>,
-    document.body,
-  );
-};
 
 function LoginForm() {
   const {
@@ -59,6 +43,9 @@ function LoginForm() {
   const [registerPassword, setRegisterPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  // Password Reset state
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
+
   // Debounced values for validation
   const debouncedLoginEmail = useDebounce(email, DEBOUNCE_DELAY);
   const debouncedLoginPassword = useDebounce(password, DEBOUNCE_DELAY);
@@ -82,7 +69,7 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [globalNotification, setGlobalNotification] = useState(null);
+  // const [globalNotification, setGlobalNotification] = useState(null);
 
   const formRef = useRef(null);
   const modalRef = useRef(null);
@@ -286,17 +273,6 @@ function LoginForm() {
     if (confirmPassword) validateRegisterForm('confirmPassword');
   }, [debouncedConfirmPassword]);
 
-  // Show notification function
-  const showNotification = (message, type) => {
-    if (type === 'success') {
-      // For success notifications, show them globally
-      setGlobalNotification({ message, type });
-    } else {
-      // For error notifications, show them in the modal
-      setGlobalNotification({ message, type });
-    }
-  };
-
   const handleSubmitLogin = async (e) => {
     e.preventDefault();
 
@@ -308,26 +284,18 @@ function LoginForm() {
 
     try {
       // Call login function from context
-      const success = await login(email, password);
+      const result = await login(email, password);
 
-      if (success) {
-        // Show notification and close form
-        showNotification('Login successful! You are now logged in.', 'success');
-        // Close form with a small delay
+      if (result.success) {
+        // Just close form, AuthErrorHandler will show success toast
         setTimeout(() => {
           toggleLoginForm();
         }, 300);
-      } else {
-        showNotification(
-          'Login failed. Please check your information.',
-          'error',
-        );
       }
+      // Don't show error here - AuthErrorHandler will handle it
     } catch (error) {
-      showNotification(
-        'An unexpected error occurred. Please try again.',
-        'error',
-      );
+      console.error('Login form error:', error);
+      // AuthErrorHandler will show the error toast
     } finally {
       setIsLoading(false);
     }
@@ -351,10 +319,6 @@ function LoginForm() {
             'Please wait for email validation or fix the invalid email.',
         }));
       }
-      showNotification(
-        'Please enter valid information and ensure email is available.',
-        'error',
-      );
       return;
     }
 
@@ -370,32 +334,23 @@ function LoginForm() {
       );
 
       if (result.success) {
-        // Show notification before closing the form
-        showNotification(
-          'Registration successful! You are now logged in.',
-          'success',
-        );
-
-        // Small delay before closing form to ensure notification is seen
+        // Just close form, AuthErrorHandler will show success toast
         setTimeout(() => {
           toggleLoginForm();
         }, 300);
       } else {
-        // Show specific error message
+        // Handle specific field errors locally
         if (result.message === 'Email already exists') {
           setFieldErrors({
             ...fieldErrors,
             registerEmail: 'This email is already registered',
           });
-        } else {
-          showNotification('Registration failed. Please try again.', 'error');
         }
+        // General errors will be handled by AuthErrorHandler
       }
     } catch (error) {
-      showNotification(
-        'An unexpected error occurred. Please try again.',
-        'error',
-      );
+      console.error('Register form error:', error);
+      // AuthErrorHandler will show the error toast
     } finally {
       setIsLoading(false);
     }
@@ -499,14 +454,6 @@ function LoginForm() {
 
   return (
     <>
-      {globalNotification && (
-        <GlobalNotification
-          message={globalNotification.message}
-          type={globalNotification.type}
-          onClose={() => setGlobalNotification(null)}
-        />
-      )}
-
       {showLoginForm && (
         <div ref={modalRef} className={cx('overlay', { show: showLoginForm })}>
           <div
@@ -602,9 +549,14 @@ function LoginForm() {
                 </div>
 
                 <div className={cx('forgot-password')}>
-                  <a href="https://www.facebook.com/hgthinh3072x" tabIndex={4}>
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswordReset(true)}
+                    tabIndex={4}
+                    disabled={isLoading}
+                  >
                     Forgot password?
-                  </a>
+                  </button>
                 </div>
 
                 <button
@@ -851,6 +803,12 @@ function LoginForm() {
           </div>
         </div>
       )}
+
+      {/* Password Reset Modal */}
+      <PasswordReset
+        isOpen={showPasswordReset}
+        onClose={() => setShowPasswordReset(false)}
+      />
     </>
   );
 }

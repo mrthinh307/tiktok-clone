@@ -242,6 +242,27 @@
 .forgot-password {
   text-align: right;
 
+  button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #161823;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    cursor: pointer;
+    padding: 0;
+
+    &:hover:not(:disabled) {
+      color: var(--primary-color);
+      text-decoration: underline;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
   a {
     font-size: 1.5rem;
     color: #161823;
