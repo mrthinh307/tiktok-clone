@@ -45,7 +45,7 @@ const PhonePreview = React.memo(
               />
               <div className={cx('sidebar-overlay')}>
                 <div className={cx('avatar-container')}>
-                  <img src={user.avatar || user.avatar_url} alt="avatar" />
+                  <img src={user.avatar_url} alt="avatar" />
                 </div>
                 <img
                   src="/images/sidebar-tiktok-phone.png"

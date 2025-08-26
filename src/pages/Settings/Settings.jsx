@@ -5,11 +5,13 @@ import { useState, useRef, useCallback, useMemo } from 'react';
 import { ArrowBackIcon } from '~/assets/images/icons';
 import { SETTING_CONTENT_ITEMS } from './constants';
 import Sidebar from './Sidebar';
+import { useNavigate } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
 function Settings() {
   const [activeSidebar, setActiveSidebar] = useState(0);
+  const navigate = useNavigate();
 
   const contentRefs = useRef([]);
 
@@ -42,7 +44,7 @@ function Settings() {
   return (
     <div className={cx('setting-wrapper')}>
       <div className={cx('setting-container')}>
-        <ArrowBackIcon className={cx('back-button')} />
+        <ArrowBackIcon className={cx('back-button')} onClick={() => navigate(-1)} />
         <div className={cx('setting-main')}>
           <Sidebar
             activeSidebar={activeSidebar}

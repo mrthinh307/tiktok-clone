@@ -46,20 +46,20 @@ function Header() {
 
         <div className={cx('action')}>
           {!window.location.href.includes('/upload') && (
-            <a href={config.routes.upload} className={cx('action-upload')}>
+            <Link to={config.routes.upload} className={cx('action-upload')}>
               <PlusIcon className={cx('plus')} />
               <span>Upload</span>
-            </a>
+            </Link>
           )}
           <Tippy content="Message" arrow={true} duration={0}>
-            <a href={config.routes.home} className={cx('action-message')}>
+            <Link to={config.routes.messages} className={cx('action-message')}>
               <MessageSemiBoldIcon className={cx('message')} />
-            </a>
+            </Link>
           </Tippy>
           <Tippy content="Inbox" arrow={true} duration={0}>
-            <a href={config.routes.home} className={cx('action-inbox')}>
+            <Link to={config.routes.inbox} className={cx('action-inbox')}>
               <InboxSemiBoldIcon className={cx('inbox')} />
-            </a>
+            </Link>
           </Tippy>
 
           <Menu
@@ -70,7 +70,6 @@ function Header() {
             <div className={cx('action-user')}>
               <img
                 src={
-                  user?.avatar ||
                   user?.avatar_url ||
                   'https://www.svgrepo.com/show/508699/user.svg'
                 }

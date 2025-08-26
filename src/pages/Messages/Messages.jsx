@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { MessageLogo } from '~/assets/images/icons';
 import {
   useConversations,
@@ -11,6 +12,7 @@ import ChatForm from './ChatForm';
 
 function Messages() {
   const [selectedUserInfo, setSelectedUserInfo] = useState(null);
+  const location = useLocation();
 
   const { isUserOnline } = usePresence();
 
@@ -41,6 +43,18 @@ function Messages() {
     incrementUnreadCount,
     ensureConversationMessages,
   });
+
+  // Handle pre-selected conversation from navigation state
+  useEffect(() => {
+    if (location.state?.selectedUserInfo && !selectedUserInfo) {
+      const preSelectedUser = location.state.selectedUserInfo;
+      setSelectedUserInfo(preSelectedUser);
+      
+      // Reset unread count and load messages for pre-selected conversation
+      resetUnreadCount(preSelectedUser.partner_id);
+      loadMessagesForConversation(preSelectedUser.partner_id);
+    }
+  }, [location.state, selectedUserInfo, resetUnreadCount, loadMessagesForConversation]);
 
   // Function để handle chọn conversation
   const handleSelectConversation = useCallback(

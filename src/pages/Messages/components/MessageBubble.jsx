@@ -149,7 +149,7 @@ const MessageBubble = memo(
 
           {isMe && (
             <img
-              src={user.avatar_url || user.avatar}
+              src={user.avatar_url}
               alt="avatar"
               className="w-[3.2rem] h-[3.2rem] rounded-full flex-shrink-0"
             />

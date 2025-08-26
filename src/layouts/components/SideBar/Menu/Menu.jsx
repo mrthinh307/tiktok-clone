@@ -15,7 +15,6 @@ import {
   SIDEBAR_MENU_ITEMS,
   UNAUTHENTICATED_SIDEBAR_MENU_ITEMS,
 } from '~/constants/sidebarConstants';
-import { DEFAULT_AVATAR } from '~/constants/common';
 
 const cx = classNames.bind(styles);
 
@@ -79,9 +78,9 @@ const Menu = forwardRef(function Menu(
           return {
             ...item,
             to: `/user/${user.nickname}`,
-            icon: <img alt="user" src={user.avatar_url || DEFAULT_AVATAR} />,
+            icon: <img alt="user" src={user.avatar_url} />,
             activeIcon: (
-              <img alt="user" src={user.avatar_url || DEFAULT_AVATAR} />
+              <img alt="user" src={user.avatar_url} />
             ),
           };
         }

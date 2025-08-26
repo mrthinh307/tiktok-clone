@@ -14,6 +14,7 @@ import {
 } from '~/assets/images/icons';
 import { useAuth } from '~/contexts/AuthContext';
 import { useSocialInteraction } from '~/contexts/SocialInteractionContext';
+import { Link } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
@@ -76,6 +77,7 @@ function VideoActions({ video }) {
   const requireAuth = useCallback(
     (action) => (e) => {
       e.stopPropagation();
+      e.preventDefault();
       if (!user) {
         toggleLoginForm();
         return;
@@ -133,9 +135,9 @@ function VideoActions({ video }) {
 
   return (
     <div className={cx('action-buttons')}>
-      <button
+      <Link
         className={cx('avatar-container')}
-        onClick={requireAuth(() => {})}
+        to={`/user/${video.user.nickname}`}
       >
         <img
           src={video.user.avatar_url}
@@ -155,7 +157,7 @@ function VideoActions({ video }) {
             <TickFollowIcon className={cx('follow-icon')} />
           )}
         </div>
-      </button>
+      </Link>
 
       <ActionButton
         icon={<TymIcon />}
