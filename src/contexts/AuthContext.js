@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react';
-import { DEFAULT_AVATAR } from '~/constants/common';
+import { toast } from 'sonner';
 import * as authService from '~/services/apiServices/authService';
 
 const AuthContext = createContext();
@@ -11,30 +11,76 @@ export const AuthProvider = ({ children }) => {
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [authError, setAuthError] = useState(null);
 
-  // Check authentication status when the app loads
+  // Auth State Change Listener
   useEffect(() => {
-    const checkAuthentication = async () => {
-      try {
-        setIsLoading(true);
-        const userData = await authService.checkAuth();
-
-        if (userData) {
-          setUser(userData.user_metadata);
-          console.log('User authenticated on startup');
-        } else {
+    console.log('🔧 Setting up auth state listener...');
+    
+    const {
+      data: { subscription },
+    } = authService.onAuthStateChange((event, session) => {
+      console.log('🔔 Auth state changed:', event, session?.user?.id);
+      
+      setAuthError(null); // Clear any previous errors
+      
+      switch (event) {
+        case 'SIGNED_IN':
+          if (session?.user) {
+            setUser(session.user.user_metadata || session.user);
+            console.log('✅ User signed in:', session.user.id);
+          }
+          break;
+          
+        case 'SIGNED_OUT':
           setUser(null);
-          console.log('No valid authentication found');
+          console.log('👋 User signed out');
+          break;
+          
+        case 'TOKEN_REFRESHED':
+          console.log('🔄 Token refreshed automatically');
+          // User state remains the same, just token was refreshed
+          break;
+          
+        case 'USER_UPDATED':
+          if (session?.user) {
+            setUser(session.user.user_metadata || session.user);
+            console.log('📝 User data updated');
+          }
+          break;
+          
+        default:
+          console.log('📢 Auth event:', event);
+      }
+      
+      setIsLoading(false);
+    });
+
+    // Initial session check
+    const checkInitialSession = async () => {
+      try {
+        const session = await authService.getSession();
+        if (session?.user) {
+          setUser(session.user.user_metadata || session.user);
+          console.log('🎯 Initial session found:', session.user.id);
+        } else {
+          console.log('❌ No initial session found');
         }
       } catch (error) {
-        console.error('Authentication check failed:', error);
-        setUser(null);
+        console.error('❌ Initial session check failed:', error);
+        setAuthError('Failed to check authentication status');
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkAuthentication();
+    checkInitialSession();
+
+    // Cleanup subscription
+    return () => {
+      console.log('🧹 Cleaning up auth state listener');
+      subscription.unsubscribe();
+    };
   }, []);
 
   const toggleLoginForm = () => {
@@ -48,74 +94,136 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const success = await authService.login(email, password);
+      setIsLoading(true);
+      setAuthError(null);
+      
+      const result = await authService.login(email, password);
 
-      if (success) {
-        // After successful login, fetch the user data
-        const userData = await authService.checkAuth();
-        if (userData) {
-          window.location.href = '/';
-          setUser(userData.user_metadata);
-        } else {
-          // Fallback in case user data fetch fails
-          setUser({
-            email,
-            avatar: DEFAULT_AVATAR,
-          });
-        }
-        return true;
+      if (result.success) {
+        // Show manual toast for login success
+        toast.success('Login successful!');
+        return { success: true };
       }
-      return false;
+      
+      setAuthError(result.message);
+      return { success: false, message: result.message };
     } catch (error) {
       console.error('Login error:', error);
-      return false;
+      const errorMessage = 'An unexpected error occurred during login';
+      setAuthError(errorMessage);
+      return { success: false, message: errorMessage };
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const register = async (firstName, lastName, email, password) => {
     try {
-      const res = await authService.register(
+      setIsLoading(true);
+      setAuthError(null);
+      
+      const result = await authService.register(
         firstName,
         lastName,
         email,
         password,
       );
 
-      if (res.success) {
-        console.log(res.user);
-        // After successful registration, fetch the user data
-        const userData = res.user.user_metadata;
-        if (userData) {
-          // window.location.href = '/';
-          setUser(userData);
-        } else {
-          // Fallback in case user data fetch fails
-          setUser({
-            firstName,
-            lastName,
-            email,
-            avatar: DEFAULT_AVATAR,
-          });
-        }
+      if (result.success) {
+        // Show manual toast for registration success
+        toast.success('Registration successful!');
         setIsRegistering(false);
         return { success: true };
       }
-      return {
-        success: false,
-        message: 'Registration failed. Please try again.',
-      };
+      
+      const errorMessage = result.message || 'Registration failed. Please try again.';
+      setAuthError(errorMessage);
+      return { success: false, message: errorMessage };
     } catch (error) {
       console.error('Registration error:', error);
-      return {
-        success: false,
-        message: 'An error occurred during registration',
-      };
+      const errorMessage = 'An error occurred during registration';
+      setAuthError(errorMessage);
+      return { success: false, message: errorMessage };
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const logout = () => {
-    authService.logout();
-    setUser(null);
+  const logout = async () => {
+    try {
+      setIsLoading(true);
+      const result = await authService.logout();
+      
+      if (result.success) {
+        // Show manual toast for logout
+        toast.info('Logout successful!');
+        window.location.href = '/'; // Redirect to home
+      } else {
+        console.error('Logout failed:', result.message);
+        setAuthError('Failed to logout properly');
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      setAuthError('An error occurred during logout');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Password Reset Functions
+  const sendPasswordReset = async (email) => {
+    try {
+      setAuthError(null);
+      const result = await authService.sendPasswordResetEmail(email);
+      
+      if (!result.success) {
+        setAuthError(result.message);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Password reset error:', error);
+      const errorMessage = 'Failed to send password reset email';
+      setAuthError(errorMessage);
+      return { success: false, message: errorMessage };
+    }
+  };
+
+  const updatePassword = async (newPassword) => {
+    try {
+      setAuthError(null);
+      const result = await authService.updatePassword(newPassword);
+      
+      if (!result.success) {
+        setAuthError(result.message);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Password update error:', error);
+      const errorMessage = 'Failed to update password';
+      setAuthError(errorMessage);
+      return { success: false, message: errorMessage };
+    }
+  };
+
+  // Email Verification
+  const resendEmailVerification = async () => {
+    try {
+      setAuthError(null);
+      const result = await authService.resendEmailVerification();
+      
+      if (!result.success) {
+        setAuthError(result.message);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Email verification error:', error);
+      const errorMessage = 'Failed to resend verification email';
+      setAuthError(errorMessage);
+      return { success: false, message: errorMessage };
+    }
   };
 
   const value = {
@@ -123,11 +231,15 @@ export const AuthProvider = ({ children }) => {
     showLoginForm,
     isRegistering,
     isLoading,
+    authError,
     toggleLoginForm,
     toggleRegisterMode,
     login,
     register,
     logout,
+    sendPasswordReset,
+    updatePassword,
+    resendEmailVerification,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
