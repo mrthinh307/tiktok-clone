@@ -2,7 +2,6 @@ import supabase from '../../config/supabaseClient'; // Import Supabase client
 
 export const login = async (email, password) => {
   try {
-    // Consider using Supabase client for login as well for consistency
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -10,15 +9,14 @@ export const login = async (email, password) => {
 
     if (error) {
       console.error('Supabase login error:', error.message);
-      return false;
+      return { success: false, message: error.message };
     }
 
-    // Supabase client handles session/token storage automatically
     console.log('Supabase login successful, session:', data.session);
-    return true;
+    return { success: true, session: data.session, user: data.user };
   } catch (error) {
-    console.error('Failed to login:', error.response?.data || error.message);
-    return false;
+    console.error('Failed to login:', error.message);
+    return { success: false, message: 'An unexpected error occurred' };
   }
 };
 
@@ -31,15 +29,10 @@ export const register = async (firstName, lastName, email, password) => {
         password,
         options: {
           data: {
-            firstName, // This will be in raw_user_meta_data
-            lastName, // This will be in raw_user_meta_data
             fullName: `${firstName} ${lastName}`,
             nickname: email.split('@')[0],
             avatar_url: `https://ui-avatars.com/api/?name=${firstName}+${lastName}`,
             tick: true,
-            followings_count: 0,
-            followers_count: 0,
-            likes_count: 0,
           },
         },
       },
@@ -87,11 +80,13 @@ export const register = async (firstName, lastName, email, password) => {
 
 export const checkAuth = async () => {
   try {
-    const projectId = process.env.REACT_APP_SUPABASE_PROJECT_ID;
-    const tokens = localStorage.getItem(`sb-${projectId}-auth-token`);
+    // Use Supabase session instead of manual token parsing
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-    if (!tokens) {
-      console.log('No token found');
+    if (!session) {
+      console.log('No valid session found');
       return null;
     }
 
@@ -106,12 +101,9 @@ export const checkAuth = async () => {
 
     return user;
   } catch (error) {
-    console.error(
-      'Failed to authenticate token:',
-      error.response?.data || error.message,
-    );
-    // Clear invalid token
-    localStorage.removeItem('token');
+    console.error('Failed to authenticate token:', error.message);
+    // Clear invalid session
+    await supabase.auth.signOut();
     return null;
   }
 };
@@ -122,15 +114,14 @@ export const logout = async () => {
 
     if (error) {
       console.error('Error during sign out:', error.message);
-      return false;
+      return { success: false, message: error.message };
     }
 
-    window.location.pathname = '/';
-
-    return true;
+    console.log('User successfully signed out');
+    return { success: true };
   } catch (err) {
     console.error('Unexpected error during sign out:', err);
-    return false;
+    return { success: false, message: 'An unexpected error occurred' };
   }
 };
 
@@ -153,4 +144,96 @@ export const checkEmailExists = async (email) => {
     console.error('Failed to check email existence:', error.message);
     return false; // Or throw error to be handled by caller
   }
+};
+
+// Password Reset Functions
+export const sendPasswordResetEmail = async (email) => {
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    if (error) {
+      console.error('Password reset email error:', error.message);
+      return { success: false, message: error.message };
+    }
+
+    return { success: true, message: 'Password reset email sent successfully' };
+  } catch (error) {
+    console.error('Failed to send password reset email:', error.message);
+    return { success: false, message: 'An unexpected error occurred' };
+  }
+};
+
+export const updatePassword = async (newPassword) => {
+  try {
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (error) {
+      console.error('Password update error:', error.message);
+      return { success: false, message: error.message };
+    }
+
+    return { success: true, message: 'Password updated successfully' };
+  } catch (error) {
+    console.error('Failed to update password:', error.message);
+    return { success: false, message: 'An unexpected error occurred' };
+  }
+};
+
+// Session Management
+export const getSession = async () => {
+  try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    return session;
+  } catch (error) {
+    console.error('Failed to get session:', error.message);
+    return null;
+  }
+};
+
+export const refreshSession = async () => {
+  try {
+    const { data, error } = await supabase.auth.refreshSession();
+
+    if (error) {
+      console.error('Session refresh error:', error.message);
+      return { success: false, message: error.message };
+    }
+
+    return { success: true, session: data.session };
+  } catch (error) {
+    console.error('Failed to refresh session:', error.message);
+    return { success: false, message: 'An unexpected error occurred' };
+  }
+};
+
+// Email Verification
+export const resendEmailVerification = async () => {
+  try {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: '', // Will use the current user's email
+    });
+
+    if (error) {
+      console.error('Email verification resend error:', error.message);
+      return { success: false, message: error.message };
+    }
+
+    return { success: true, message: 'Verification email sent successfully' };
+  } catch (error) {
+    console.error('Failed to resend verification email:', error.message);
+    return { success: false, message: 'An unexpected error occurred' };
+  }
+};
+
+// Auth State Change Handler
+export const onAuthStateChange = (callback) => {
+  return supabase.auth.onAuthStateChange(callback);
 };
