@@ -32,7 +32,7 @@
 
 🎯 **A modern TikTok clone built with React & Supabase -** A comprehensive social media platform that replicates TikTok's core features including video streaming, user authentication, social interactions, real-time messaging, and content discovery.
 
-## 🏆 Goals & Key Features
+## 🏆 Key Features
 
 <table>
   <tr>
@@ -55,21 +55,11 @@
   </tr>
   <tr>
     <td align="center" width="100%">
-      <h3>🖥️ Desktop-Focused Design</h3>
-      <p>Optimized desktop experience with clean, modern UI</p>
+      <h3>📤 Advanced Video Upload</h3>
+      <p>Seamless video upload with preview, custom thumbnails, and metadata editing</p>
     </td>
   </tr>
 </table>
-
-### 🚀 Key Capabilities
-
-- **🎥 Video Upload & Streaming**: Upload videos with custom thumbnails and descriptions
-- **👥 Social Features**: Follow/unfollow users, like videos, save content
-- **💬 Real-time Messaging**: Chat with media sharing, typing indicators, and presence status
-- **🔍 Content Discovery**: For You page algorithm and Following feed
-- **🖥️ Desktop Experience**: Clean desktop interface with sidebar navigation
-- **🔐 Secure Authentication**: Supabase Auth with email/password and social login
-- **⚙️ User Settings**: Profile management, privacy controls, and preferences
 
 ## 🌳 Project Structure
 
